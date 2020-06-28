@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo
+    environment:
+      TZ: Europe/Moscow
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    volumes:
+      - mongo_data:/data/db
+      - mongo_configdb:/data/configdb
+    tmpfs:
+      - /tmp
+    ports:
+      - 27017:27017
+volumes:
+  mongo_data:
+    driver: local
+  mongo_configdb:
+    driver: local

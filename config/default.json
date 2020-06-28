@@ -1,0 +1,11 @@
+{
+  "app": {
+    "port": 3000
+  },
+  "dbConfig": {
+    "uri": "mongodb://localhost:27017",
+    "dbName": "ermi",
+    "user": "root",
+    "pass": "123456"
+  }
+}
