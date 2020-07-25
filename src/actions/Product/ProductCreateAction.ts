@@ -1,10 +1,11 @@
 import {Action} from '../Action'
 import {NextFunction, Request, Response} from 'express';
-import {IProduct, Product} from "@core/models/Product";
+import {IProduct, ProductModel} from "@models/Product";
 
-class ProductCreateActionBase implements Action {
+
+class ProductCreateAction implements Action {
     async handle(req: Request<{}, {}, {}, IProduct>, res: Response) {
-        const resp = await Product.create(req.query);
+        const resp = await ProductModel.create(req.query);
         res.send(resp);
     }
 
@@ -21,4 +22,4 @@ class ProductCreateActionBase implements Action {
     }
 }
 
-export default new ProductCreateActionBase();
+export default new ProductCreateAction();

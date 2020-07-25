@@ -12,5 +12,5 @@ const ProductSchema: Schema = new Schema({
     cost: {type: String, required: true}
 });
 
-const Product = mongoose.model<IProduct>('product', ProductSchema);
-export {Product};
+const ProductModel = mongoose.model<IProduct>('product', ProductSchema);
+export {ProductModel};

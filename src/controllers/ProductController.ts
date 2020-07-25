@@ -1,9 +1,14 @@
-import {ProductControllerBase} from "@core/controllers/ProductControllerBase";
 import {Router} from "express";
+import ProductCreateAction from "@actions/Product/ProductCreateAction";
+import ProductReadAction from "@actions/Product/ProductReadAction";
+
 
 export class ProductController{
   static get routes(): Router {
-    // Add external routes here
-    return ProductControllerBase.routes;
+    const router = Router();
+
+    router.get('/create', ...ProductCreateAction.action);
+    router.get('/', ...ProductReadAction.action);
+    return router;
   }
 }

@@ -28,6 +28,8 @@
     "ts-node": "^8.10.2"
   },
   "_moduleAliases": {
-    "@core": "dist/core"
+    "@actions": "dist/actions",
+    "@controllers": "dist/controllers",
+    "@models": "dist/models"
   }
 }
