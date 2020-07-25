@@ -11,3 +11,6 @@
 
 ## start
 `npm run start`
+
+## migrate
+`npm run migrate`

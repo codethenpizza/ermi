@@ -1,20 +1,21 @@
 version: '3.7'
 services:
-  mongo:
-    image: mongo
+  mysql:
+    image: mysql/mysql-server:8.0
     environment:
       TZ: Europe/Moscow
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 903a987afbca0f6c3d07aa1666b5435e
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_USER: ermi
+      MYSQL_PASSWORD: ermi123456
+      MYSQL_DATABASE: ermi
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1 --innodb-buffer-pool-size=1G
     volumes:
-      - mongo_data:/data/db
-      - mongo_configdb:/data/configdb
+      - mysql_data:/var/lib/mysql
     tmpfs:
       - /tmp
     ports:
-      - 27017:27017
+      - 3306:3306
 volumes:
-  mongo_data:
-    driver: local
-  mongo_configdb:
+  mysql_data:
     driver: local

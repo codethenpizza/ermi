@@ -8,28 +8,37 @@
   "scripts": {
     "start": "node dist/server/index.js",
     "build": "tsc",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "migrate": "ts-node -r tsconfig-paths/register migrations/index.ts"
   },
   "dependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/validator": "^13.1.0",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "config": "^3.3.1",
     "express": "^4.17.1",
+    "migrate": "^1.7.0",
     "module-alias": "^2.2.2",
-    "mongoose": "^5.9.20",
+    "mysql2": "^2.1.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.1.0",
+    "sequelize-typescript": "^1.1.0",
     "typescript": "^3.9.5"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/express": "^4.17.6",
-    "@types/mongoose": "^5.7.28",
-    "@types/node": "^14.0.13",
+    "@types/node": "^14.0.26",
     "nodemon": "^2.0.4",
-    "ts-node": "^8.10.2"
+    "ts-node": "^8.10.2",
+    "tsconfig-paths": "^3.9.0"
   },
   "_moduleAliases": {
     "@actions": "dist/actions",
     "@controllers": "dist/controllers",
-    "@models": "dist/models"
+    "@models": "dist/models",
+    "@types": "dist/types",
+    "@db": "dist/database.js"
   }
 }

@@ -1,8 +1,11 @@
 import {Router} from "express";
-import {ProductController} from "./ProductController";
+
+import {UserController} from "@controllers/UserController";
+import {ProductController} from "@controllers/ProductController";
 
 const Controller = Router();
 
-Controller.use('/product', ProductController.routes);
+Controller.use('/product', ProductController);
+Controller.use('/user', UserController);
 
 export {Controller};

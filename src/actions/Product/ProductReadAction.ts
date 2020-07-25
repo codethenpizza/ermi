@@ -1,12 +1,12 @@
-import {Action} from '../Action'
 import {NextFunction, Request, Response} from 'express';
-import {ProductModel} from "@models/Product";
+// @ts-ignore
+import {Action} from "@types/types";
 
 
 class ProductReadAction implements Action {
     async handle(req: Request, res: Response) {
-        const resp = await ProductModel.find();
-        res.send(resp);
+        // const resp = await ProductModel.find();
+        // res.send(resp);
     }
 
     assert(req: Request, res: Response, next: NextFunction): void {
