@@ -1,5 +1,5 @@
 import {NextFunction, Request} from "express";
-import User from "@models/User.model";
+import User, {UserI} from "@models/User.model";
 // @ts-ignore
 import {Action} from "@types/types";
 
@@ -12,7 +12,8 @@ class UserCreateAction extends Action {
     }
 
     async handle(req: Request<any, any, any, any>, res) {
-        const user = new User({email: 'dsa', password: 'wqe', name: 'trefsda', isAdmin: false});
+        const userData: UserI = {email: 'dsa', password: 'wqe', name: 'trefsda', isAdmin: false};
+        const user = new User(userData);
         await user.save();
         res.send(user);
     }

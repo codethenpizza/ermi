@@ -18,3 +18,10 @@ export default class User extends Model<User> {
     @Column({field: 'is_admin'})
     isAdmin: boolean;
 }
+
+export type UserI = {
+    email: string;
+    password: string;
+    name: string;
+    isAdmin: boolean;
+};

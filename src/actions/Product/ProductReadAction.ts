@@ -6,7 +6,7 @@ import {Action} from "@types/types";
 class ProductReadAction implements Action {
     async handle(req: Request, res: Response) {
         // const resp = await ProductModel.find();
-        // res.send(resp);
+        res.send('resp');
     }
 
     assert(req: Request, res: Response, next: NextFunction): void {

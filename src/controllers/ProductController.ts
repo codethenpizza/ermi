@@ -3,10 +3,9 @@ import ProductCreateAction from "@actions/Product/ProductCreateAction";
 import ProductReadAction from "@actions/Product/ProductReadAction";
 
 
-export const ProductController = (): Router => {
-    const router = Router();
+const ProductController = Router();
 
-    router.get('/create', ...ProductCreateAction.action);
-    router.get('/', ...ProductReadAction.action);
-    return router;
-};
+ProductController.get('/create', ...ProductCreateAction.action);
+ProductController.get('/', ...ProductReadAction.action);
+
+export {ProductController};
