@@ -19,7 +19,7 @@
       "@models/*": [
         "models/*"
       ],
-      "@types/*": [
+      "@projTypes/*": [
         "types/*"
       ],
       "@db": [

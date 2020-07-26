@@ -38,7 +38,7 @@
     "@actions": "dist/actions",
     "@controllers": "dist/controllers",
     "@models": "dist/models",
-    "@types": "dist/types",
+    "@projTypes": "dist/types",
     "@db": "dist/database.js"
   }
 }

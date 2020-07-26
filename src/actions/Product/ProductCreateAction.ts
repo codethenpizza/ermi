@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
-// @ts-ignore
-import {Action} from "@types/types";
+import {Action} from "@projTypes/action";
+
 
 
 class ProductCreateAction implements Action {
