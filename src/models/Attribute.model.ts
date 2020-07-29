@@ -14,7 +14,9 @@ export default class Attribute extends Model<Attribute> {
     name: string;
 
     @ForeignKey(() => AttrType)
-    @Column
+    @Column({
+        allowNull: false
+    })
     type_id: number;
 
     @BelongsTo(() => AttrType)

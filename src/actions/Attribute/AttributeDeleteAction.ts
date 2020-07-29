@@ -6,7 +6,7 @@ type reqParams = {
     id: string;
 };
 
-class AttributeDeleteAction extends Action {
+class AttributeDeleteAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }

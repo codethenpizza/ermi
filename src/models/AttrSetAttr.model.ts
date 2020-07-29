@@ -15,4 +15,10 @@ export default class AttrSetAttr extends Model<AttrSetAttr> {
     @ForeignKey(() => Attribute)
     @Column
     attr_id: number;
+
+}
+
+export interface IAttrSetAttr {
+    attr_set_id: number;
+    attr_id: number;
 }

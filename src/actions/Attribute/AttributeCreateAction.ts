@@ -4,7 +4,7 @@ import Attribute, {AttributeI} from "@models/Attribute.model";
 import {Action} from "@projTypes/action";
 import {catchError} from "@actions/Attribute/helper";
 
-class AttributeCreateAction extends Action {
+class AttributeCreateAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }

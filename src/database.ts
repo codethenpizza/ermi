@@ -7,4 +7,5 @@ export const sequelize = new Sequelize({
     username: dbConfig.user,
     password: dbConfig.pass,
     models: [__dirname + '/models/**/*.model.*'],
+    logging: true
 });

@@ -8,7 +8,7 @@ type reqParams = {
     id: string;
 };
 
-class AttributeUpdateAction extends Action {
+class AttributeUpdateAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }

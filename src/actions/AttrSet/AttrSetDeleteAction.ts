@@ -1,21 +1,19 @@
-import {NextFunction, Response, Request} from "express";
-
 import {Action} from "@projTypes/action";
-import Attribute from "@models/Attribute.model";
-import AttrType from "@models/AttrType.model";
+import {NextFunction, Request, Response} from "express";
+import AttrSet from "@models/AttrSet.model";
 
 type reqParams = {
     id: string;
 };
 
-class AttributeGetAction implements Action {
+class AttrSetDeleteAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }
 
     assert(req: Request<reqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
-            res.status(400).send({error: 'id is required number query param'});
+            res.status(400).send({error: 'id is required number param'});
         } else {
             next();
         }
@@ -24,11 +22,11 @@ class AttributeGetAction implements Action {
     async handle(req: Request<reqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            const attr = await Attribute.findOne({where: {id}, include: [AttrType]});
-            if (attr instanceof Attribute) {
-                res.send(attr);
+            const attr = await AttrSet.destroyWR({where: {id}});
+            if (attr) {
+                res.status(204).send();
             } else {
-                res.status(400).send({error: `attribute with id=${id} not found`});
+                res.status(400).send({error: `attribute set with id=${id} not found`});
             }
         } catch (error) {
             res.status(400).send({error});
@@ -37,4 +35,4 @@ class AttributeGetAction implements Action {
 
 }
 
-export default new AttributeGetAction();
+export default new AttrSetDeleteAction();
