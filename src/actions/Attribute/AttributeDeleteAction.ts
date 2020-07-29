@@ -6,14 +6,14 @@ type reqParams = {
     id: string;
 };
 
-class AttributeDeleteAction extends Action {
+class AttributeDeleteAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }
 
     assert(req: Request<reqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
-            res.status(400).send({error: 'id is required number query param'});
+            res.status(400).send({error: 'id is required number param'});
         } else {
             next();
         }

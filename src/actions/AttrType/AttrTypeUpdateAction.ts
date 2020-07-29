@@ -1,14 +1,13 @@
 import {NextFunction, Response, Request} from "express";
 
 import {Action} from "@projTypes/action";
-import Attribute from "@models/Attribute.model";
-import AttrType from "@models/AttrType.model";
+import Attribute, {AttributeI} from "@models/Attribute.model";
 
 type reqParams = {
     id: string;
 };
 
-class AttributeGetAction implements Action {
+class AttrTypeUpdateAction extends Action {
     get action() {
         return [this.assert, this.handle];
     }
@@ -21,15 +20,18 @@ class AttributeGetAction implements Action {
         }
     }
 
-    async handle(req: Request<reqParams, any, any, any>, res: Response) {
+    async handle(req: Request<reqParams, any, AttributeI, any>, res: Response) {
         try {
+            const attrData = req.body;
             const id = parseInt(req.params.id);
-            const attr = await Attribute.findOne({where: {id}, include: [AttrType]});
-            if (attr instanceof Attribute) {
-                res.send(attr);
+            const attr = await Attribute.update(attrData, {where: {id}});
+            const isUpdated = !!attr[0];
+            if (isUpdated) {
+                res.status(202).send();
             } else {
                 res.status(400).send({error: `attribute with id=${id} not found`});
             }
+
         } catch (error) {
             res.status(400).send({error});
         }
@@ -37,4 +39,4 @@ class AttributeGetAction implements Action {
 
 }
 
-export default new AttributeGetAction();
+export default new AttrTypeUpdateAction();

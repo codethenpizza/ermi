@@ -2,13 +2,13 @@ import {NextFunction, Response, Request} from "express";
 
 import {Action} from "@projTypes/action";
 import Attribute from "@models/Attribute.model";
-import AttrType from "@models/AttrType.model";
+import AttrSet from "@models/AttrSet.model";
 
 type reqParams = {
     id: string;
 };
 
-class AttributeGetAction implements Action {
+class AttrSetGetAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }
@@ -24,11 +24,11 @@ class AttributeGetAction implements Action {
     async handle(req: Request<reqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            const attr = await Attribute.findOne({where: {id}, include: [AttrType]});
-            if (attr instanceof Attribute) {
+            const attr = await AttrSet.findOne({where: {id}, include: [Attribute]});
+            if (attr instanceof AttrSet) {
                 res.send(attr);
             } else {
-                res.status(400).send({error: `attribute with id=${id} not found`});
+                res.status(400).send({error: `attribute set with id=${id} not found`});
             }
         } catch (error) {
             res.status(400).send({error});
@@ -37,4 +37,4 @@ class AttributeGetAction implements Action {
 
 }
 
-export default new AttributeGetAction();
+export default new AttrSetGetAction();
