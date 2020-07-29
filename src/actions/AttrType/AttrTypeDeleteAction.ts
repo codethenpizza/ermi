@@ -1,12 +1,12 @@
 import {Action} from "@projTypes/action";
-import {NextFunction, Request, Response} from "express";
-import Attribute from "@models/Attribute.model";
+import {NextFunction, Response, Request} from "express";
+import AttrType from "@models/AttrType.model";
 
 type reqParams = {
     id: string;
 };
 
-class AttributeDeleteAction extends Action {
+class AttrTypeDeleteAction extends Action {
     get action() {
         return [this.assert, this.handle];
     }
@@ -22,17 +22,18 @@ class AttributeDeleteAction extends Action {
     async handle(req: Request<reqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            const attr = await Attribute.destroy({where: {id}});
+            const attr = await AttrType.destroy({where: {id}});
             if (!!attr) {
                 res.status(204).send();
             } else {
-                res.status(400).send({error: `attribute with id=${id} not found`});
+                res.status(400).send({error: `attribute type with id=${id} not found`});
             }
         } catch (error) {
             res.status(400).send({error});
         }
+
     }
 
 }
 
-export default new AttributeDeleteAction();
+export default new AttrTypeDeleteAction();
