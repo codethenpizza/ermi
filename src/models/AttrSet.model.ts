@@ -11,7 +11,9 @@ import {CreateOptions, DestroyOptions, Op} from "sequelize";
 export default class AttrSet extends Model<AttrSet> {
 
     @Unique
-    @Column
+    @Column({
+        allowNull: false
+    })
     name: string;
 
     @Column({

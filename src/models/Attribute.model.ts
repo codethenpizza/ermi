@@ -10,7 +10,9 @@ import AttrSetAttr from "@models/AttrSetAttr.model";
 })
 export default class Attribute extends Model<Attribute> {
     @Unique
-    @Column
+    @Column({
+        allowNull: false
+    })
     name: string;
 
     @ForeignKey(() => AttrType)

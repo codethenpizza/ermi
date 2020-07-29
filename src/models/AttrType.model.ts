@@ -7,7 +7,9 @@ import Attribute from "@models/Attribute.model";
     createdAt: 'created_at'
 })
 export default class AttrType extends Model<AttrType> {
-    @Column
+    @Column({
+        allowNull: false
+    })
     type: string;
 
     @HasMany(() => Attribute)
