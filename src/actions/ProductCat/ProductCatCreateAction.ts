@@ -1,6 +1,6 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
-import ProductCategory, {IProductCategory} from "@models/Category.model";
+import ProductCategory, {IProductCategory} from "@models/ProductCategory.model";
 
 class ProductCatCreateAction implements Action {
     get action() {

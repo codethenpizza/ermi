@@ -1,9 +1,9 @@
-import {NextFunction, Response, Request} from "express";
+import {NextFunction, Request, Response} from "express";
 
 import {Action} from "@projTypes/action";
 import AttrType from "@models/AttrType.model";
 
-type reqParams = {
+type ReqParams = {
     id: string;
 };
 
@@ -12,7 +12,7 @@ class AttrTypeGetAction extends Action {
         return [this.assert, this.handle];
     }
 
-    assert(req: Request<reqParams, any, any, any>, res: Response, next: NextFunction) {
+    assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
             res.status(400).send({error: 'id is required number query param'});
         } else {
@@ -20,7 +20,7 @@ class AttrTypeGetAction extends Action {
         }
     }
 
-    async handle(req: Request<reqParams, any, any, any>, res: Response) {
+    async handle(req: Request<ReqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
             const attr = await AttrType.findOne({where: {id}});

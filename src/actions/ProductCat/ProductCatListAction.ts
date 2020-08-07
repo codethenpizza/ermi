@@ -1,7 +1,7 @@
-import {NextFunction, Response, Request} from "express";
+import {NextFunction, Request, Response} from "express";
 
 import {Action} from "@projTypes/action";
-import ProductCategory from "@models/Category.model";
+import ProductCategory from "@models/ProductCategory.model";
 
 class ProductCatListAction extends Action {
     get action() {

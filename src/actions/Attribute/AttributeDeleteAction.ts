@@ -2,7 +2,7 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import Attribute from "@models/Attribute.model";
 
-type reqParams = {
+type ReqParams = {
     id: string;
 };
 
@@ -11,7 +11,7 @@ class AttributeDeleteAction implements Action {
         return [this.assert, this.handle];
     }
 
-    assert(req: Request<reqParams, any, any, any>, res: Response, next: NextFunction) {
+    assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
             res.status(400).send({error: 'id is required number param'});
         } else {
@@ -19,7 +19,7 @@ class AttributeDeleteAction implements Action {
         }
     }
 
-    async handle(req: Request<reqParams, any, any, any>, res: Response) {
+    async handle(req: Request<ReqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
             const attr = await Attribute.destroy({where: {id}});
