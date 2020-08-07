@@ -14,7 +14,7 @@ const catchError = (e, res: Response) => {
     }
 };
 
-type reqParams = {
+type ReqParams = {
     id: string;
 };
 
@@ -29,7 +29,7 @@ class AttrSetCreateAction implements Action {
         return [this.assert, this.handle];
     }
 
-    assert(req: Request<reqParams, any, reqType, any>, res: Response, next: NextFunction) {
+    assert(req: Request<ReqParams, any, reqType, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
             res.status(400).send({error: 'id is required number query param'});
         } else {
@@ -37,7 +37,7 @@ class AttrSetCreateAction implements Action {
         }
     }
 
-    async handle(req: Request<reqParams, any, reqType, any>, res: Response) {
+    async handle(req: Request<ReqParams, any, reqType, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
             const set = await AttrSet.updateWR({id, ...req.body});

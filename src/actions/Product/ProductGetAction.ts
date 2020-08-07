@@ -1,13 +1,14 @@
 import {NextFunction, Request, Response} from "express";
-
+import Product from "@models/Product.model";
 import {Action} from "@projTypes/action";
-import ProductCategory from "@models/ProductCategory.model";
+import ProductVariant from "@models/ProductVariant.model";
+import AttrValue from "@models/AttrValue.model";
 
 type ReqParams = {
     id: string;
 };
 
-class ProductCatGetAction extends Action {
+class ProductGetAction implements Action {
     get action() {
         return [this.assert, this.handle];
     }
@@ -23,17 +24,20 @@ class ProductCatGetAction extends Action {
     async handle(req: Request<ReqParams, any, any, any>, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            const model = await ProductCategory.findOne({where: {id}});
-            if (model instanceof ProductCategory) {
+            const model = await Product.findOne({
+                where: {id}, include: [
+                    {model: ProductVariant, include: [AttrValue]}
+                ]
+            });
+            if (model instanceof Product) {
                 res.send(model);
             } else {
-                res.status(400).send({error: `category with id=${id} not found`});
+                res.status(400).send({error: `product with id=${id} not found`});
             }
         } catch (error) {
-            res.status(400).send({error});
+            res.status(500).send({error});
         }
     }
-
 }
 
-export default new ProductCatGetAction();
+export default new ProductGetAction();

@@ -1,5 +1,4 @@
 import {NextFunction, Request, Response} from "express";
-
 import Attribute, {AttributeI} from "@models/Attribute.model";
 import {Action} from "@projTypes/action";
 import {catchError} from "@actions/Attribute/helper";

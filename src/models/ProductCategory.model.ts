@@ -1,4 +1,6 @@
-import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import Product from "@models/Product.model";
+import ProductCatsProduct from "@models/ProductCatsProduct.model";
 
 @Table({
     tableName: 'product_cat',
@@ -25,6 +27,9 @@ export default class ProductCategory extends Model<ProductCategory> {
         defaultValue: 0
     })
     position: number;
+
+    @BelongsToMany(() => Product, () => ProductCatsProduct)
+    products: Product[];
 
 }
 

@@ -1,10 +1,9 @@
-import {NextFunction, Response, Request} from "express";
-
+import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import Attribute, {AttributeI} from "@models/Attribute.model";
 import {catchError} from "@actions/Attribute/helper";
 
-type reqParams = {
+type ReqParams = {
     id: string;
 };
 
@@ -13,7 +12,7 @@ class AttributeUpdateAction implements Action {
         return [this.assert, this.handle];
     }
 
-    assert(req: Request<reqParams, any, any, any>, res: Response, next: NextFunction) {
+    assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
             res.status(400).send({error: 'id is required number query param'});
         } else {
@@ -21,7 +20,7 @@ class AttributeUpdateAction implements Action {
         }
     }
 
-    async handle(req: Request<reqParams, any, AttributeI, any>, res: Response) {
+    async handle(req: Request<ReqParams, any, AttributeI, any>, res: Response) {
         try {
             const attrData = req.body;
             const id = parseInt(req.params.id);
