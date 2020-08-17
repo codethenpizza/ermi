@@ -3,6 +3,7 @@ import Product from "@models/Product.model";
 import {Action} from "@projTypes/action";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
+import Attribute from "@models/Attribute.model";
 
 
 class ProductGetListAction implements Action {
@@ -18,7 +19,7 @@ class ProductGetListAction implements Action {
         try {
             const model = await Product.findAll({
                 include: [
-                    {model: ProductVariant, include: [AttrValue]}
+                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}]}
                 ]
             });
             res.send(model);
