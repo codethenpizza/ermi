@@ -3,6 +3,7 @@ import Product from "@models/Product.model";
 import {Action} from "@projTypes/action";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
+import Attribute from "@models/Attribute.model";
 
 type ReqParams = {
     id: string;
@@ -26,7 +27,7 @@ class ProductGetAction implements Action {
             const id = parseInt(req.params.id);
             const model = await Product.findOne({
                 where: {id}, include: [
-                    {model: ProductVariant, include: [AttrValue]}
+                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}]}
                 ]
             });
             if (model instanceof Product) {

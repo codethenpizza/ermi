@@ -1,4 +1,4 @@
-import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript"
+import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript"
 import Attribute from "@models/Attribute.model";
 import ProductVariant from "@models/ProductVariant.model";
 
@@ -23,9 +23,12 @@ export default class AttrValue extends Model<AttrValue> {
     @Column
     product_variant_id: number;
 
+    @BelongsTo(() => Attribute, 'attr_id')
+    attribute: Attribute;
 }
 
 export type IAttrValue = {
+    id?: string;
     value: string;
     attr_id: number;
     product_variant_id: number;

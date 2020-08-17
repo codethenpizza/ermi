@@ -11,14 +11,14 @@ import {ProductVariantController} from "@controllers/./ProductVariantController"
 
 const Controller = Router();
 
-Controller.use('/user', UserController);
-Controller.use('/attr', AttributeController);
-Controller.use('/attr_type', AttrTypeController);
-Controller.use('/attr_set', AttrSetController);
-Controller.use('/attr_value', AttrValueController);
-Controller.use('/product_cat', ProductCatController);
-Controller.use('/product', ProductController);
-Controller.use('/product_var', ProductVariantController);
+Controller.use('/users', UserController);
+Controller.use('/attrs', AttributeController);
+Controller.use('/attr_types', AttrTypeController);
+Controller.use('/attr_sets', AttrSetController);
+Controller.use('/attr_values', AttrValueController);
+Controller.use('/product_cats', ProductCatController);
+Controller.use('/products', ProductController);
+Controller.use('/product_vars', ProductVariantController);
 
 
 

@@ -6,5 +6,22 @@
     "dbName": "ermi",
     "user": "ermi",
     "pass": "ermi123456"
+  },
+  "suppliers": {
+    "Slik": {
+      "ftp": {
+        "host": "ftp.slik.com.ru",
+        "port": 2121,
+        "user": "slikpartner",
+        "password": "Dg23aw7CvL"
+      },
+      "ftp_file": "/home/replay.xml"
+    },
+    "Discovery": {
+      "api": {
+        "host": "https://discovery.moscow/xmlprice/contract/422/",
+        "token": "$1$ONBHZjsp$xV6prHPQBp8RY7KDnBXtq0"
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import Product from "@models/Product.model";
-import AttrValue from "@models/AttrValue.model";
+import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 
 @Table({
     tableName: 'product_variant',
@@ -9,7 +9,9 @@ import AttrValue from "@models/AttrValue.model";
 })
 export default class ProductVariant extends Model<ProductVariant> {
     @ForeignKey(() => Product)
-    @Column
+    @Column({
+        allowNull: false
+    })
     product_id: number;
 
     @Column({
@@ -55,9 +57,19 @@ export default class ProductVariant extends Model<ProductVariant> {
     @BelongsTo(() => Product)
     product: Product;
 
+    static async CreateOrUpdate(variant: IProductVariant, transaction): Promise<number> {
+        if (variant.id) {
+            ProductVariant.update(variant, {where: {id: variant.id}, transaction});
+            return variant.id
+        } else {
+            const {id} = await ProductVariant.create(variant, {transaction});
+            return id
+        }
+    }
 }
 
 export type IProductVariant = {
+    id?: number;
     product_id: number;
     desc: string;
     price: number;
@@ -66,5 +78,5 @@ export type IProductVariant = {
     in_stock_qty: number;
     is_available: boolean;
     is_discount: boolean;
-    attrs: { attr_id: number, value: string }[]
+    attrs: IAttrValue[]
 }
