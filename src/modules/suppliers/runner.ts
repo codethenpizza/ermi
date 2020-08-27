@@ -1,9 +1,10 @@
-import {Supplier} from "../supplier";
+import {Supplier} from "./supplier";
 import {Discovery} from "./Discovery/Discovery";
-import Product from "@models/Product.model";
+import {ProductMapping} from "./ProductMapping";
 
 const suppliers: Supplier[] = [
-    new Discovery()
+    new Discovery(),
+    // new Slik()
 ];
 
 export const fetchAll = async () => {
@@ -13,9 +14,8 @@ export const fetchAll = async () => {
 };
 
 export const storeAll = async () => {
-    for (const supp of suppliers) {
-        const products: Product[] = await supp.getProductData();
-        // TODO updateOrCreate
-    }
+    const mapping = new ProductMapping();
+    await mapping.storeDisk([
+        new Discovery()
+    ]);
 };
-

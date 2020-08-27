@@ -1,6 +1,6 @@
 import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import Product from "@models/Product.model";
-import AttrValue, {IAttrValue} from "@models/AttrValue.model";
+import AttrValue, {IAttrValue, IAttrValueUpdateData} from "@models/AttrValue.model";
 
 @Table({
     tableName: 'product_variant',
@@ -13,6 +13,12 @@ export default class ProductVariant extends Model<ProductVariant> {
         allowNull: false
     })
     product_id: number;
+
+    @Column({
+        unique: true,
+        allowNull: false,
+    })
+    vendor_code: string;
 
     @Column({
         type: DataType.TEXT
@@ -57,9 +63,12 @@ export default class ProductVariant extends Model<ProductVariant> {
     @BelongsTo(() => Product)
     product: Product;
 
-    static async CreateOrUpdate(variant: IProductVariant, transaction): Promise<number> {
+    static async CreateOrUpdate(variant: IProductVariantUpdateData, transaction): Promise<number> {
         if (variant.id) {
-            ProductVariant.update(variant, {where: {id: variant.id}, transaction});
+            const attrs = [...variant.attrs];
+            delete variant.attrs;
+            await ProductVariant.update(variant, {where: {id: variant.id}, transaction});
+            await AttrValue.bulkCreate(attrs, {transaction, updateOnDuplicate: ["value"] });
             return variant.id
         } else {
             const {id} = await ProductVariant.create(variant, {transaction});
@@ -70,13 +79,28 @@ export default class ProductVariant extends Model<ProductVariant> {
 
 export type IProductVariant = {
     id?: number;
-    product_id: number;
-    desc: string;
+    product_id?: number;
+    vendor_code: string;
+    desc?: string;
     price: number;
-    price_discount: number;
-    weight: number;
-    in_stock_qty: number;
-    is_available: boolean;
-    is_discount: boolean;
+    price_discount?: number;
+    weight?: number;
+    in_stock_qty?: number;
+    is_available?: boolean;
+    is_discount?: boolean;
     attrs: IAttrValue[]
+}
+
+export type IProductVariantUpdateData = {
+    id?: number;
+    product_id?: number;
+    vendor_code?: string;
+    desc?: string;
+    price?: number;
+    price_discount?: number;
+    weight?: number;
+    in_stock_qty?: number;
+    is_available?: boolean;
+    is_discount?: boolean;
+    attrs: IAttrValueUpdateData[]
 }

@@ -5,9 +5,9 @@ import {ProductController} from "@controllers/ProductController";
 import {AttributeController} from "@controllers/AttributeController";
 import {AttrTypeController} from "@controllers/AttrTypeController";
 import {AttrSetController} from "@controllers/AttrSetController";
-import {AttrValueController} from "@controllers/./AttrValueController";
+import {AttrValueController} from "@controllers/AttrValueController";
 import {ProductCatController} from "@controllers/ProductCatController";
-import {ProductVariantController} from "@controllers/./ProductVariantController";
+import {ProductVariantController} from "@controllers/ProductVariantController";
 
 const Controller = Router();
 

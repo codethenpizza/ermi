@@ -5,125 +5,68 @@ import {Column, DataType, Model, Table} from "sequelize-typescript";
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
-export default class DiscoveryModel extends Model<IDiscovery> {
-
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    code: string;
+export default class DiscoveryModel extends Model<IDiscoveryRaw> {
 
     @Column({
         unique: true,
-        allowNull: false,
+        allowNull: false
     })
+    code: string;
+
+    @Column({})
     artikul: string;
 
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
+    @Column({})
     name: string;
 
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
+    @Column({})
     brand: string;
 
     @Column({
-        allowNull: false,
         type: DataType.TEXT
     })
     picture: string;
 
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
+    @Column({})
     model_name: string;
 
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    price: number;
+    @Column({})
+    price: string;
+
+    @Column({})
+    price_recommended: string;
+
+    @Column({})
+    rest_fast: string;
+
+    @Column({})
+    rest_middle: string;
 
     @Column({
-        allowNull: false,
-        type: DataType.FLOAT
+        type: DataType.JSON
     })
-    price_recommended: number;
+    param: string;
 
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    rest_fast: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    color: string;
-
-
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    color_name: string;
-
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    type: string;
-
-    @Column({
-        allowNull: false,
-        type: DataType.TEXT
-    })
-    pcd: string;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    diameter: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    dia: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    et: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    width: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    bolts_count: number;
-
-    @Column({
-        allowNull: false,
-        type: DataType.FLOAT
-    })
-    bolts_spacing: number;
 }
 
-export interface IDiscovery {
+//raw data
+export interface IDiscoveryRaw {
+    code: string;
+    artikul: string;
+    name: string;
+    brand: string;
+    picture: string;
+    model: string;
+    price: string;
+    price_recommended: string;
+    rest_fast: string;
+    rest_middle: string;
+    param: string;
+}
+
+
+// formatted data
+export interface IDiscoveryDisk {
     code: string;
     artikul: string;
     name: string;
@@ -136,7 +79,7 @@ export interface IDiscovery {
     color: string;
     color_name: string;
     type: string;
-    pcd: string;
+    pcd: number;
     diameter: number;
     dia: number;
     et: number;

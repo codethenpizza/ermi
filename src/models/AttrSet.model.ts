@@ -1,7 +1,7 @@
 import {BelongsToMany, Column, DataType, Model, Table, Unique} from "sequelize-typescript";
 import Attribute from "@models/Attribute.model";
 import AttrSetAttr, {IAttrSetAttr} from "@models/AttrSetAttr.model";
-import {CreateOptions, DestroyOptions, Op} from "sequelize";
+import {DestroyOptions, Op, Transaction} from "sequelize";
 
 @Table({
     tableName: 'attribute_set',
@@ -34,8 +34,8 @@ export default class AttrSet extends Model<AttrSet> {
         }
     }
 
-    static async createWR({name, desc, attributes}: IAttrSet): Promise<AttrSet> {
-        const transaction = await this.sequelize.transaction();
+    static async createWR({name, desc, attributes}: IAttrSet, trans?: Transaction): Promise<AttrSet> {
+        const transaction = trans ? trans : await this.sequelize.transaction();
         try {
             let attrSet = await this.create({name, desc}, {transaction});
             await AttrSetAttr.bulkCreate(attributes.map<IAttrSetAttr>(attr_id => ({
@@ -43,7 +43,7 @@ export default class AttrSet extends Model<AttrSet> {
                 attr_set_id: attrSet.id
             })), {transaction});
             attrSet = await attrSet.reload({include: [Attribute], transaction});
-            await transaction.commit();
+            trans || await transaction.commit();
             return attrSet;
         } catch (e) {
             await transaction.rollback();

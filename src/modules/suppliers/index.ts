@@ -2,12 +2,13 @@ import {fetchAll} from './runner'
 import "@db";
 
 const main = async () => {
-    await fetchAll()
+    await fetchAll();
+    //await storeAll();
 };
 
 main()
     .then(() => {
-        console.log('fetch complete')
+        console.log('store complete')
     })
     .catch((e) => {
         console.log('err', e)

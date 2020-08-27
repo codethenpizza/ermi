@@ -31,5 +31,12 @@ export type IAttrValue = {
     id?: string;
     value: string;
     attr_id: number;
-    product_variant_id: number;
+    product_variant_id?: number;
+}
+
+export type IAttrValueUpdateData = {
+    id?: string;
+    value?: string;
+    attr_id?: number;
+    product_variant_id?: number;
 }
