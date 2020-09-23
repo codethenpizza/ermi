@@ -7,6 +7,10 @@
     "user": "ermi",
     "pass": "ermi123456"
   },
+  "elastic": {
+    "url": "http://localhost:9200",
+    "index": "ermi"
+  },
   "suppliers": {
     "Slik": {
       "ftp": {
@@ -23,5 +27,8 @@
         "token": "$1$ONBHZjsp$xV6prHPQBp8RY7KDnBXtq0"
       }
     }
+  },
+  "wheelSize": {
+    "apiKey": "0a257eab46dd96b3d93eb0baf44db9d4"
   }
 }

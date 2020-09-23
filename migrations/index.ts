@@ -10,7 +10,7 @@ import ProductCategory, {IProductCategory} from "../src/models/ProductCategory.m
 
     await SetDefaultAttrTypes();
 
-    await SetDefaultAttributes();
+    // await SetDefaultAttributes();
 
     await SetDefaultProductCategories();
 

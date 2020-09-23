@@ -16,6 +16,19 @@ services:
       - /tmp
     ports:
       - 3306:3306
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
 volumes:
   mysql_data:
+    driver: local
+  es_data:
     driver: local
