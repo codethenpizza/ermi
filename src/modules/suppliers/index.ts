@@ -1,9 +1,9 @@
-import {fetchAll} from './runner'
+import {fetchAll, storeAll} from './runner'
 import "@db";
 
 const main = async () => {
     await fetchAll();
-    //await storeAll();
+    await storeAll();
 };
 
 main()

@@ -1,7 +1,8 @@
-import {BelongsTo, BelongsToMany, Column, ForeignKey, Model, Table, Unique} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table, Unique} from "sequelize-typescript";
 import AttrType from "@models/AttrType.model";
 import AttrSet from "@models/AttrSet.model";
 import AttrSetAttr from "@models/AttrSetAttr.model";
+import slugify from "slugify";
 
 @Table({
     tableName: 'attribute',
@@ -11,9 +12,22 @@ import AttrSetAttr from "@models/AttrSetAttr.model";
 export default class Attribute extends Model<Attribute> {
     @Unique
     @Column({
-        allowNull: false
+        allowNull: false,
+        type: DataType.STRING,
+        field: 'name'
     })
-    name: string;
+    set name(val: string) {
+        this.setDataValue('slug', slugify(val, {lower: true}));
+        this.setDataValue('name', val);
+    }
+    get name() {
+        return this.getDataValue('name');
+    }
+
+    @Column({
+        unique: true
+    })
+    slug: string;
 
     @ForeignKey(() => AttrType)
     @Column({
