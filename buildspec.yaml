@@ -6,7 +6,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password \
-        --region <region> \
+        --region us-east-2 \
         | docker login \
         --username AWS \
         --password-stdin 962883139480.dkr.ecr.us-east-2.amazonaws.com
