@@ -16,5 +16,5 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/api', Controller);
 
 app.listen(PORT, () => {
-    console.log('App is listening on port 3000!');
+    console.log(`App is listening on port ${PORT}!`);
 });
