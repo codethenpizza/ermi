@@ -2,6 +2,7 @@ import 'module-alias/register';
 import express, {Application} from 'express';
 import bodyParser from "body-parser";
 import config from 'config';
+import cors from 'cors';
 
 import {Controller} from "@controllers/index";
 
@@ -10,6 +11,7 @@ import "@db";
 const app: Application = express();
 const PORT = config.app.port;
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
