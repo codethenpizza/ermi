@@ -1,0 +1,17 @@
+{
+  "dbConfig": {
+    "host": "DB_HOST",
+    "port": "DB_PORT",
+    "name": "DB_NAME",
+    "user": "DB_USER",
+    "pass": "DB_PASS"
+  },
+  "elastic": {
+    "host": "ELACTIC_HOST",
+    "port": "ELACTIC_PORT",
+    "index": "ELACTIC_INDEX"
+  },
+  "wheelSize": {
+    "apiKey": "WHEEL_SIZE_API_KEY"
+  }
+}

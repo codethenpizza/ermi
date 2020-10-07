@@ -3,7 +3,9 @@ import {dbConfig} from 'config';
 
 export const sequelize = new Sequelize({
     dialect: 'mysql',
-    database: dbConfig.dbName,
+    host: dbConfig.host,
+    port: dbConfig.port,
+    database: dbConfig.name,
     username: dbConfig.user,
     password: dbConfig.pass,
     models: [
