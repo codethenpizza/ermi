@@ -49,6 +49,8 @@
     "@controllers": "dist/controllers",
     "@models": "dist/models",
     "@projTypes": "dist/types",
-    "@db": "dist/database.js"
+    "@db": "dist/database.js",
+    "@server": "dist/server",
+    "@core": "dist/core"
   }
 }

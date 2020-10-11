@@ -7,6 +7,7 @@ import {AttrValueController} from "@controllers/admin/AttrValueController";
 import {ProductCatController} from "@controllers/admin/ProductCatController";
 import {ProductVariantController} from "@controllers/admin/ProductVariantController";
 import {WheelSizeController} from "../../modules/wheel-size/Controller";
+import {SuppliersController} from "../../modules/suppliers/Controller";
 
 export const AdminController = createController([
     {method: 'use', path: '/attrs', action: AttributeController},
@@ -15,5 +16,6 @@ export const AdminController = createController([
     {method: 'use', path: '/attr_values', action: AttrValueController},
     {method: 'use', path: '/product_cats', action: ProductCatController},
     {method: 'use', path: '/products', action: ProductController},
-    {method: 'use', path: '/product_vars', action: ProductVariantController}
+    {method: 'use', path: '/product_vars', action: ProductVariantController},
+    {method: 'use', path: '/suppliers', action: SuppliersController},
 ]);

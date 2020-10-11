@@ -1,7 +1,7 @@
 import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
-import {Supplier, SupplierDisk} from "../supplier";
+import {Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
 import {DiskMap} from "../ProductMapping";
