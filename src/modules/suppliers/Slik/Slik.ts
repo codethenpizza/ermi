@@ -4,7 +4,7 @@ import XmlStream from 'xml-stream';
 import {Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
-import {DiskMap} from "../ProductMapping";
+import {DiskMap, diskType} from "../ProductMapping";
 
 
 export class Slik implements Supplier, SupplierDisk {
@@ -34,22 +34,49 @@ export class Slik implements Supplier, SupplierDisk {
             }
         });
     }
+
     async getProductData(): Promise<Product[]> {
         return undefined;
     }
 
     async getRims(): Promise<DiskMap[]> {
-        return undefined;
+        const rawData = await SlikModel.findAll();
+
+        return rawData.map<DiskMap>((item) => {
+            return {
+                uid: 'slik_' + item.code,
+                model_name: item.model,
+                brand: item.brand,
+                image: item.image,
+                // price: item.price ? parseDouble(item.price) : 0,
+                price: parseDouble(item.price),
+                pcd: item.bolts_spacing2 ? parseDouble(item.stock) : null,
+                inStock: item.stock ? parseDouble(item.stock) : 0,
+                width: parseDouble(item.width) || null,
+                color: item.color || null,
+                diameter: item.diameter ? parseDouble(item.diameter) : null,
+                bolts_count: item.bolts_count ? parseDouble(item.bolts_count) : null,
+                bolts_spacing: item.bolts_spacing ? parseDouble(item.bolts_spacing) : null,
+                et: item.et ? parseDouble(item.et) : null,
+                type: diskType.alloy,
+                dia: item.dia ? parseDouble(item.dia) : null,
+                color_name: item.color,
+            }
+        });
     }
 }
 
 
 export const parseDouble = (val: string): number => {
-    if (!val) return null;
+    if (!val) {
+        console.error(`parseDouble empty value`);
+        return null;
+    }
     const value = parseFloat(val.replace(',', '.'));
     if (!isNaN(value)) {
         return value;
     } else {
+        console.error(`parseDouble error with value: ${value}`);
         return null;
     }
 };
