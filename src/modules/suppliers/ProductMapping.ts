@@ -121,6 +121,7 @@ export class ProductMapping {
                         is_available: !!data.inStock
                     }]
                 };
+
                 try {
                     await Product.createWR(product);
                 } catch (e) {
