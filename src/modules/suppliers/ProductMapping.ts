@@ -8,6 +8,10 @@ import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import {sequelize} from '@db'
 
+export enum diskType {
+    alloy = 'литые'
+}
+
 export interface DiskMap {
     model_name: string; // ДИСК
     brand: string;
@@ -23,7 +27,6 @@ export interface DiskMap {
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     image: string;
     price: number;
-    priceMRC: number;
     inStock: number;
     type: string;
 
@@ -52,7 +55,6 @@ export interface DiskMapOptions {
     pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
     pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-    priceMRC: number;
     type: number;
     attr_set_id: number;
 }
@@ -200,7 +202,6 @@ export class ProductMapping {
             pcd: attrMap['PCD'],
             pcd2: attrMap['PCD2'],
             dia: attrMap['DIA'],
-            priceMRC: attrMap['Recommended price'],
             type: attrMap['Type'],
         };
 
