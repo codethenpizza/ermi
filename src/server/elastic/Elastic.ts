@@ -56,6 +56,24 @@ export class Elastic {
         }
     }
 
+    async clearIndex() {
+        return esClient.delete_by_query({
+            index: this.index,
+            type: this.type,
+            body: {
+                "query": {
+                    "bool": {
+                        "must_not": {
+                            "term": {
+                                "id": 0
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+
     async bulkCreate(data: Object & { id: number }[]) {
         const body = [];
 

@@ -2,24 +2,21 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {Supplier, SupplierDisk} from "../supplier";
+import {SupplierDisk} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 import {DiskMap} from "../ProductMapping";
 
-
-export class Discovery implements Supplier, SupplierDisk {
+export class Discovery implements SupplierDisk {
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
 
             console.log('Start fetch Discovery');
 
-            const host = config.get('suppliers.Discovery.api.host');
-            const token = config.get('suppliers.Discovery.api.token');
+            const {host, token} = config.get('suppliers.Discovery.api');
             const url = `${host}?token=${token}`;
 
             let counter = 0;
-            const rawData = [];
             try {
                 request.get(url)
                     .on('response', resp => {
@@ -31,7 +28,7 @@ export class Discovery implements Supplier, SupplierDisk {
 
                             item.param = JSON.stringify(item.param);
                             try {
-                                await DiscoveryModel.bulkCreate([item], {updateOnDuplicate: Object.keys(item)});
+                                await DiscoveryModel.upsert(item);
                             } catch (e) {
                                 console.error(e, item);
                             }
@@ -56,6 +53,8 @@ export class Discovery implements Supplier, SupplierDisk {
     }
 
     async getRims(): Promise<DiskMap[]> {
+        console.log('Start store Discovery');
+
         const rawData = await DiscoveryModel.findAll();
 
         return rawData.map<DiskMap>((item) => {

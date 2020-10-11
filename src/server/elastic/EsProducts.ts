@@ -28,6 +28,7 @@ export class EsProduct extends EsIndex {
                 ProductCategory,
                 {
                     model: ProductVariant,
+                    where: {is_available: true},
                     include: [{model: AttrValue, include: [{model: Attribute, include: [AttrType]}]}]
                 }
             ]

@@ -1,4 +1,4 @@
-import {SupplierDisk} from "./supplier";
+import {SupplierDisk} from "./types";
 import OptionsModel from "@models/Options.model";
 import Attribute, {AttributeI} from "@models/Attribute.model";
 import {Op, Transaction} from "sequelize";
@@ -90,6 +90,9 @@ export class ProductMapping {
         for (const supplier of suppliers) {
 
             const rims = await supplier.getRims();
+
+            const suppCode = rims[0].uid.split('_')[0];
+
             const existedProductVariants = await ProductVariant.findAll({
                 where: {vendor_code: {[Op.in]: rims.map(x => x.uid)}},
                 include: [Product, AttrValue]
@@ -122,6 +125,7 @@ export class ProductMapping {
                         }, []),
                         price: data.price,
                         in_stock_qty: data.inStock,
+                        is_available: !!data.inStock
                     }]
                 });
             }
@@ -147,11 +151,21 @@ export class ProductMapping {
                             return arr;
                         }, []),
                         price: data.price,
-                        in_stock_qty: data.inStock
+                        in_stock_qty: data.inStock,
+                        is_available: !!data.inStock
                     }]
                 };
 
                 await Product.createWR(product);
+                await ProductVariant.update({is_available: false, in_stock_qty: 0},
+                    {
+                        where: {
+                            [Op.and]: [
+                                {vendor_code: {[Op.regexp]: `^${suppCode}`}},
+                                {vendor_code: {[Op.notIn]: rims.map(x => x.uid)}},
+                            ]
+                        }
+                    });
             }
         }
 
