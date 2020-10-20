@@ -1,10 +1,11 @@
 import {SupplierDisk} from "./types";
 import {Discovery} from "./Discovery/Discovery";
 import {ProductMapping} from "./ProductMapping";
+import {Slik} from "./Slik/Slik"
 
 const suppliers: SupplierDisk[] = [
     new Discovery(),
-    // new Slik()
+    new Slik()
 ];
 
 export const fetchAll = async () => {

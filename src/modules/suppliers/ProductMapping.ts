@@ -1,3 +1,4 @@
+import progressBar from "../../helpers/progressBar"
 import {SupplierDisk} from "./types";
 import OptionsModel from "@models/Options.model";
 import Attribute, {AttributeI} from "@models/Attribute.model";
@@ -7,6 +8,10 @@ import Product, {IProduct} from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import {sequelize} from '@db'
+
+export enum diskType {
+    alloy = 'литые'
+}
 
 export interface DiskMap {
     model_name: string; // ДИСК
@@ -23,7 +28,6 @@ export interface DiskMap {
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     image: string;
     price: number;
-    priceMRC: number;
     inStock: number;
     type: string;
 
@@ -52,7 +56,6 @@ export interface DiskMapOptions {
     pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
     pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-    priceMRC: number;
     type: number;
     attr_set_id: number;
 }
@@ -92,7 +95,7 @@ export class ProductMapping {
             const rims = await supplier.getRims();
 
             const suppCode = rims[0].uid.split('_')[0];
-
+            console.log('Start store disk for', suppCode);
             const existedProductVariants = await ProductVariant.findAll({
                 where: {vendor_code: {[Op.in]: rims.map(x => x.uid)}},
                 include: [Product, AttrValue]
@@ -104,7 +107,7 @@ export class ProductMapping {
                 return map;
             }, {});
 
-            for (const rim of existedProductVariants) {
+            for (const [i, rim] of existedProductVariants.entries()) {
                 const data = rimsMap[rim.vendor_code];
                 await Product.updateWR(rim.product_id, {
                     name: data.model_name,
@@ -128,9 +131,10 @@ export class ProductMapping {
                         is_available: !!data.inStock
                     }]
                 });
+                progressBar(i + 1, existedProductVariants.length, 'existedProductVariants update');
             }
 
-            for (const rim of notExistedProductVariants) {
+            for (const [i, rim] of notExistedProductVariants.entries()) {
                 const data = rimsMap[rim.uid];
 
                 const product: IProduct = {
@@ -155,18 +159,22 @@ export class ProductMapping {
                         is_available: !!data.inStock
                     }]
                 };
-
-                await Product.createWR(product);
-                await ProductVariant.update({is_available: false, in_stock_qty: 0},
-                    {
-                        where: {
-                            [Op.and]: [
-                                {vendor_code: {[Op.regexp]: `^${suppCode}`}},
-                                {vendor_code: {[Op.notIn]: rims.map(x => x.uid)}},
-                            ]
-                        }
-                    });
+                try {
+                    await Product.createWR(product);
+                } catch (e) {
+                    console.error(e)
+                }
+                progressBar(i + 1, notExistedProductVariants.length, 'notExistedProductVariants create');
             }
+            await ProductVariant.update({is_available: false, in_stock_qty: 0},
+                {
+                    where: {
+                        [Op.and]: [
+                            {vendor_code: {[Op.regexp]: `^${suppCode}`}},
+                            {vendor_code: {[Op.notIn]: rims.map(x => x.uid)}},
+                        ]
+                    }
+                });
         }
 
     }
@@ -200,7 +208,6 @@ export class ProductMapping {
             pcd: attrMap['PCD'],
             pcd2: attrMap['PCD2'],
             dia: attrMap['DIA'],
-            priceMRC: attrMap['Recommended price'],
             type: attrMap['Type'],
         };
 
@@ -238,5 +245,3 @@ export class ProductMapping {
         }, transaction);
     }
 }
-
-

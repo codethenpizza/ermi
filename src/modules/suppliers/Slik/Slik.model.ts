@@ -20,28 +20,28 @@ export default class SlikModel extends Model<ISilkRaw> {
     color: string;
 
     @Column
-    width: number;
+    width: string;
 
     @Column
-    diameter: number;
+    diameter: string;
 
     @Column
-    bolts_count: number;
+    bolts_count: string;
 
     @Column
-    bolts_spacing: number;
+    bolts_spacing: string;
 
     @Column
-    bolts_spacing2: number;
+    bolts_spacing2: string;
 
     @Column
     fix: string;
 
     @Column
-    et: number;
+    et: string;
 
     @Column
-    dia: number;
+    dia: string;
 
     @Column
     fixcode: string;
@@ -61,31 +61,31 @@ export default class SlikModel extends Model<ISilkRaw> {
     image: string;
 
     @Column
-    price: number;
+    price: string;
 
     @Column
-    priceMRC: number;
+    priceMRC: string;
 
     @Column
-    USN: number;
+    USN: string;
 
     @Column
     stock: string;
 
     @Column
-    count: number;
+    count: string;
 
     @Column
-    countUSN: number;
+    countUSN: string;
 
     @Column
-    count_rst: number;
+    count_rst: string;
 
     @Column
-    count_chl: number;
+    count_chl: string;
 
     @Column
-    count_nsb: number;
+    count_nsb: string;
 }
 
 export interface ISilkRaw {
@@ -109,6 +109,7 @@ export interface ISilkRaw {
     price: string;
     priceMRC: string;
     USN: string;
+    stock: string;
     count: string;
     countUSN: string;
     count_rst: string;
