@@ -2,7 +2,7 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import bodybuilder from "bodybuilder";
 import Attribute from "@models/Attribute.model";
-import {EsProduct} from "../../../server/elastic/EsProducts";
+import {EsProduct} from "@server/elastic/EsProducts";
 
 export interface EsSearchReqBody {
     filters?: EsReqFilter[];
@@ -25,16 +25,22 @@ export class ProductElasticSearchAction implements Action {
         next();
     }
 
-    async handle({body}: Request<any, any, EsSearchReqBody, any>, res: Response) {
+    async handle({body: {filters, size = 20, from = 0}, cookies}: Request<any, any, EsSearchReqBody, any>, res: Response) {
+        console.log('filters', filters);
         try {
-            const query = await this.makeQuery(body.filters);
+            let cookieFilters: EsReqFilter[][] = [];
+            if (cookies['wheel-size-filter']) {
+                cookieFilters = JSON.parse(cookies['wheel-size-filter'])?.data || [];
+            }
+
+            const query = await this.makeQuery(filters, cookieFilters);
             console.log('query', JSON.stringify(query));
 
             const esProduct = new EsProduct();
             const resp = await esProduct.es.search({
                 body: query,
-                size: body.size || 20,
-                from: body.from || 0
+                size,
+                from
             });
             res.send(resp.body);
         } catch (error) {
@@ -42,27 +48,54 @@ export class ProductElasticSearchAction implements Action {
         }
     }
 
-    private async makeQuery(filters: EsReqFilter[]) {
+    private async makeQuery(filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
         const query = bodybuilder();
-        this.addFilters(query, filters);
+        this.addFilters(query, filters, cookieFilters);
         await this.addAggs(query);
         return query.build();
     }
 
-    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[]) {
-        if (filters) {
-            query.query('nested', 'path', 'variants', (q) => {
-                q.query('bool', 'filter', filters.map(({name, value}) =>
-                        ({
-                            terms: {
-                                [`variants.attrs.${name}.value`]: value
-                            }
-                        })
-                    )
-                );
-                return q;
-            });
-        }
+    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
+        console.log('filters', filters);
+        console.log('cookieFilters', cookieFilters);
+        query.query('nested', 'path', 'variants', (q) => {
+            q.query('bool', 'filter', [
+                {
+                    bool: this.setFilters(filters)
+                },
+                {
+                    bool: this.setCookieFilters(cookieFilters)
+                }
+            ]);
+            return q;
+        });
+    }
+
+    private setCookieFilters(cookieFilters: EsReqFilter[][]) {
+        return cookieFilters?.length ? {
+            should: cookieFilters.filter(x => x?.length).map(f => ({
+                bool: {
+                    filter: f.map(({name, value}) => ({
+                        [Array.isArray(value) ? 'terms' : 'term']: {
+                            [`variants.attrs.${name}.value`]: value
+                        }
+                    }))
+                }
+            }))
+        } : {};
+    }
+
+    private setFilters(filters: EsReqFilter[]) {
+        return filters?.length ? {
+            filter: filters.map(({name, value}) => {
+                    return {
+                        terms: {
+                            [`variants.attrs.${name}.value`]: value
+                        }
+                    };
+                }
+            )
+        } : {};
     }
 
     private async addAggs(query: bodybuilder.Bodybuilder) {

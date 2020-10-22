@@ -3,6 +3,7 @@ import express, {Application} from 'express';
 import bodyParser from "body-parser";
 import config from 'config';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import {Controller} from "@controllers/index";
 
@@ -12,6 +13,7 @@ const app: Application = express();
 const PORT = config.app.port;
 
 app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 

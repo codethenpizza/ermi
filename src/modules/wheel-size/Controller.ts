@@ -1,4 +1,4 @@
-import {createController} from "../../core/Controller";
+import {createController} from "@core/Controller";
 import {MakeListAction} from "./actions/MakeListAction";
 import {YearListAction} from "./actions/YearListAction";
 import {ModelListAction} from "./actions/ModelListAction";

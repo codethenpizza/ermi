@@ -1,10 +1,10 @@
 import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
-import {Supplier, SupplierDisk} from "../types";
+import {DiskMap, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
-import {DiskMap, diskType} from "../ProductMapping";
+import {diskType} from "../ProductMapping";
 
 
 export class Slik implements Supplier, SupplierDisk {

@@ -1,5 +1,15 @@
+import {
+    DISK_BOLTS_COUNT,
+    DISK_BOLTS_SPACING,
+    DISK_BRAND,
+    DISK_COLOR, DISK_DIA, DISK_DIAMETER, DISK_ET, DISK_PCD,
+    DISK_PCD2, DISK_RECOMMENDED_PRICE, DISK_TYPE,
+    DISK_WIDTH,
+    DiskMap,
+    DiskMapOptions,
+    SupplierDisk
+} from "./types";
 import progressBar from "../../helpers/progressBar"
-import {SupplierDisk} from "./types";
 import OptionsModel from "@models/Options.model";
 import Attribute, {AttributeI} from "@models/Attribute.model";
 import {Op, Transaction} from "sequelize";
@@ -13,70 +23,22 @@ export enum diskType {
     alloy = 'литые'
 }
 
-export interface DiskMap {
-    model_name: string; // ДИСК
-    brand: string;
-    uid: string;
-    color: string;
-    width: number; //ШИРИНА ДИСКА
-    et: number;  //ВЫЛЕТ
-    diameter: number; //ДИАМЕТР ДИСКА
-    bolts_count: number; //КОЛ-ВО ОТВЕРСТИЙ
-    bolts_spacing: number;
-    pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-    pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
-    dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-    image: string;
-    price: number;
-    inStock: number;
-    type: string;
-
-    // countUSN?: number;
-    // count_rst?: number;
-    // count_chl?: number;
-    // count_nsb?: number;
-    //
-    // //непонятная хуйня
-    // USN: boolean;
-    // cap: string;
-    // capR: string;
-    // auto: string;
-    // fix: string;
-    // fixcode: string;
-}
-
-export interface DiskMapOptions {
-    brand: number;
-    color: number;
-    width: number; //ШИРИНА ДИСКА
-    et: number;  //ВЫЛЕТ
-    diameter: number; //ДИАМЕТР ДИСКА
-    bolts_count: number; //КОЛ-ВО ОТВЕРСТИЙ
-    bolts_spacing: number;
-    pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-    pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
-    dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-    type: number;
-    attr_set_id: number;
-}
-
-
 export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
     private attrArr: AttributeI[] = [
-        {name: 'Brand', type_id: 1},
-        {name: 'Color', type_id: 1},
-        {name: 'Width', type_id: 3}, //ШИРИНА ДИСКА
-        {name: 'ET', type_id: 3}, //ВЫЛЕТ
-        {name: 'Diameter', type_id: 3}, //ДИАМЕТР ДИСКА
-        {name: 'Bolts count', type_id: 2}, //КОЛ-ВО ОТВЕРСТИЙ
-        {name: 'Bolts spacing', type_id: 3},
-        {name: 'PCD', type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-        {name: 'PCD2', type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
-        {name: 'DIA', type_id: 3}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: 'Recommended price', type_id: 3},
-        {name: 'Type', type_id: 1}
+        {name: DISK_BRAND, type_id: 1},
+        {name: DISK_COLOR, type_id: 1},
+        {name: DISK_WIDTH, type_id: 3}, //ШИРИНА ДИСКА
+        {name: DISK_ET, type_id: 3}, //ВЫЛЕТ
+        {name: DISK_DIAMETER, type_id: 3}, //ДИАМЕТР ДИСКА
+        {name: DISK_BOLTS_COUNT, type_id: 2}, //КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_BOLTS_SPACING, type_id: 3},
+        {name: DISK_PCD, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
+        {name: DISK_PCD2, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
+        {name: DISK_DIA, type_id: 3}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
+        {name: DISK_RECOMMENDED_PRICE, type_id: 3},
+        {name: DISK_TYPE, type_id: 1}
     ];
 
     async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
