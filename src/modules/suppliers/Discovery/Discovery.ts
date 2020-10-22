@@ -2,10 +2,9 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {SupplierDisk} from "../types";
+import {DiskMap, SupplierDisk} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
-import {DiskMap} from "../ProductMapping";
 
 export class Discovery implements SupplierDisk {
     async fetchData(): Promise<void> {
