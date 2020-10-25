@@ -1,6 +1,7 @@
 import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
+import parseDouble from "../../../helpers/parseDouble";
 import {DiskMap, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
@@ -20,7 +21,7 @@ export class Slik implements Supplier, SupplierDisk {
                     const xml = new XmlStream(stream);
                     xml.on('endElement: gd', async (item: ISilkRaw) => {
                         counter++;
-                        await SlikModel.create(item);
+                        await SlikModel.upsert(item);
                     });
 
                     xml.on('end', () => {
@@ -52,7 +53,7 @@ export class Slik implements Supplier, SupplierDisk {
                 price: parseDouble(item.price),
                 pcd: item.bolts_spacing2 ? parseDouble(item.stock) : null,
                 inStock: item.stock ? parseDouble(item.stock) : 0,
-                width: parseDouble(item.width) || null,
+                width: item.width ? parseDouble(item.width) : null,
                 color: item.color || null,
                 diameter: item.diameter ? parseDouble(item.diameter) : null,
                 bolts_count: item.bolts_count ? parseDouble(item.bolts_count) : null,
@@ -66,18 +67,4 @@ export class Slik implements Supplier, SupplierDisk {
     }
 }
 
-
-export const parseDouble = (val: string): number => {
-    if (!val) {
-        console.error(`parseDouble empty value`);
-        return null;
-    }
-    const value = parseFloat(val.replace(',', '.'));
-    if (!isNaN(value)) {
-        return value;
-    } else {
-        console.error(`parseDouble error with value: ${value}`);
-        return null;
-    }
-};
 

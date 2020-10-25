@@ -24,6 +24,15 @@
       },
       "ftp_file": "/home/replay.xml"
     },
+    "Diskoptim": {
+      "ftp": {
+        "host": "ftp.diskoptim.ru",
+        "port": 21,
+        "user": "00-00000515",
+        "password": "onaMI32h"
+      },
+      "ftp_file": "/Diskoptim Ostatki Sklad.xml"
+    },
     "Discovery": {
       "api": {
         "host": "https://discovery.moscow/xmlprice/contract/422/",

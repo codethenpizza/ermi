@@ -24,7 +24,6 @@ export interface DiskMap {
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     image: string;
     price: number;
-    priceMRC: number;
     inStock: number;
     type: string;
 
@@ -53,7 +52,6 @@ export interface DiskMapOptions {
     pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
     pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-    priceMRC: number;
     type: number;
     attr_set_id: number;
 }
@@ -68,5 +66,4 @@ export const DISK_BOLTS_SPACING = 'Bolts spacing';
 export const DISK_PCD = 'PCD';
 export const DISK_PCD2 = 'PCD2';
 export const DISK_DIA = 'DIA';
-export const DISK_RECOMMENDED_PRICE = 'Recommended price';
 export const DISK_TYPE = 'Type';

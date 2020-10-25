@@ -1,8 +1,8 @@
-import {fetchAll, storeAll} from './runner'
+import {storeAll} from './runner'
 import "@db";
 
 const main = async () => {
-    await fetchAll();
+    // await fetchAll();
     await storeAll();
 };
 
@@ -13,4 +13,5 @@ main()
     })
     .catch((e) => {
         console.log('err', e);
+        process.exit(1);
     });
