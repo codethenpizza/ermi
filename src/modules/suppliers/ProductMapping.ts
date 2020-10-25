@@ -55,7 +55,10 @@ export class ProductMapping {
         for (const supplier of suppliers) {
 
             const rims = await supplier.getRims();
-
+            if (!rims || !rims.length) {
+                console.error('storeDisk error: supplier.getRims length 0'); //TODO: add try catch block/supplier name?
+                return;
+            }
             const suppCode = rims[0].uid.split('_')[0];
             console.log('Start store disk for', suppCode);
             const existedProductVariants = await ProductVariant.findAll({

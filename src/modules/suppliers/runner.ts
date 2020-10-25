@@ -1,14 +1,13 @@
-import {SupplierDisk} from "./types";
+// import {SupplierDisk} from "./types";
 import {ProductMapping} from "./ProductMapping";
+import {Supplier} from "./types"
 //suppliers
-import {Discovery} from "./Discovery/Discovery";
-import {Slik} from "./Slik/Slik"
 import {Diskoptim} from "./Diskoptim/Diskoptim"
 
-const suppliers: Supplier[] = [
-    // new Slik(),
-    new Diskoptim(),
+const suppliers: Supplier[] = [ //order should be saved for now
     // new Discovery(),
+    // new Slik(),
+    new Diskoptim(), //should be after SLik
 ];
 
 export const fetchAll = async () => {
@@ -21,6 +20,8 @@ export const storeAll = async () => {
     const mapping = new ProductMapping();
     // await mapping.storeDisk(suppliers);
     await mapping.storeDisk([
-        // new Discovery()
+        // new Discovery(),
+        // new Slik(),
+        new Diskoptim(),
     ]);
 };

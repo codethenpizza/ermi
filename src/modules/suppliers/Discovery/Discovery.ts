@@ -1,6 +1,7 @@
 import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
+import parseDouble from "../../../helpers/parseDouble";
 
 import {DiskMap, SupplierDisk} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
@@ -81,14 +82,3 @@ export class Discovery implements SupplierDisk {
         });
     }
 }
-
-
-export const parseDouble = (val: string): number => {
-    if (!val) return null;
-    const value = parseFloat(val.replace(',', '.'));
-    if (!isNaN(value)) {
-        return value;
-    } else {
-        return null;
-    }
-};
