@@ -149,7 +149,7 @@ export class ProductMapping {
 
     }
 
-    private async getMapping(transaction: Transaction): Promise<DiskMapOptions> {
+    public async getMapping(transaction?: Transaction): Promise<DiskMapOptions> {
         const mapping = await OptionsModel.findOne({where: {key: this.rimMappingKey}, transaction});
         if (!mapping) {
             return this.crateMapping(transaction)

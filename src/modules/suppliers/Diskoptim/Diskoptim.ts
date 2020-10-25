@@ -2,11 +2,11 @@ import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
-import Sequelize from "sequelize";
+import Sequelize, {Op} from "sequelize";
 
 import {DiskMap, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
-import {diskType} from "../ProductMapping";
+import {diskType, ProductMapping} from "../ProductMapping";
 import DiskoptimModel, {DiskoptimRawDiskMap} from "./Diskoptim.model"
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
@@ -83,7 +83,6 @@ export class Diskoptim implements Supplier, SupplierDisk {
             const compareBrand = item.brand.toString().toLowerCase();
             const isDiskForCompare = item.brand && diskBrandToCompare.includes(compareBrand);
             if (isDiskForCompare) {
-                console.log('compare this disk');
                 disk.codeSlik = item.codeSlik || null;
                 toCompare.push(disk);
                 continue;
@@ -91,52 +90,147 @@ export class Diskoptim implements Supplier, SupplierDisk {
             toCreate.push(disk)
         }
         if (toCompare.length) {
-            console.log(toCompare.length);
-            for (const item of toCompare) {
-                const isDiskInPriority = await this.compareRimsSlik(item);
-                if (isDiskInPriority) {
-                    console.log('is priority', item.uid);
-                }
-            }
+            const filteredRims = await this.compareRimsSlik(toCompare);
+            toCreate.push(...filteredRims)
         }
 
-        return undefined;
+        return toCreate;
     }
 
-    async compareRimsSlik(parsedRim): Promise<Boolean> { //item to be found
-        try {
-            if (parsedRim.codeSlik) {
-                // console.log('search by code', parsedRim.codeSlik);
-                const slikCode = 'slik_' + parsedRim.codeSlik;
+    async compareRimsSlik(parsedRimsArr: DiskoptimDiskMap[]): Promise<DiskMap[]> { //item to be found
+        console.log('start compare');
+        const toCompareByCode = [];
+        const toCompareByParams = [];
+        const toCreate = []; //filtered item which will be created
 
-                const slikDisk = await ProductVariant.findAll({
-                    where: {
-                        vendor_code: slikCode,
-                        price: Sequelize.where(
-                            Sequelize.literal('price'),
-                            '<',
-                            parsedRim.price
-                        )
-                    }
-                });
-                // console.log('found: ', slikDisk);
-                // console.log('is in priority', !!(slikDisk && !slikDisk.length));
-                return !!(slikDisk && !slikDisk.length);
+        for (const parsedRim of parsedRimsArr) {
+            if (parsedRim.codeSlik) {
+                toCompareByCode.push(parsedRim);
             } else {
-                //find by params
-                // console.log('skip', parsedRim.uid);
-                const slikDisk = await ProductVariant.findAll({
-                    where: {
-                        'attrs.color': 'GMFP'
-                    },
-                    include: [{model: AttrValue, as: AttrValue.tableName}]
-                });
-                console.log('found: ', slikDisk);
-                return false;
+                toCompareByParams.push(parsedRim)
             }
-        } catch (e) {
-            console.error('compare diskoptim error:', e)
         }
+
+        console.log('total', parsedRimsArr.length);
+        console.log('code', toCompareByCode.length);
+        console.log('params', toCompareByParams.length);
+
+        if (toCompareByCode.length) {
+            let compareByCodeCount = 0;
+            let lowestPriceByCode = 0;
+            let uniqueByCode = 0;
+
+            for (const parsedRim of toCompareByCode) {
+                try {
+                    const slikCode = 'slik_' + parsedRim.codeSlik;
+
+                    const slikDiskArr = await ProductVariant.findAll({
+                        where: {
+                            vendor_code: slikCode,
+                            price: Sequelize.where(
+                                Sequelize.literal('price'),
+                                '<',
+                                parsedRim.price
+                            )
+                        }
+                    });
+                    if (slikDiskArr && slikDiskArr.length) {
+                        compareByCodeCount++;
+                        const priceArr = slikDiskArr.map(disk => disk.price);
+                        const minPrice = Math.min(...priceArr);
+                        if (parsedRim.price < minPrice) {
+                            // console.log('compareRimsSlik: (params) lowest price!', parsedRim.uid);
+                            lowestPriceByCode++;
+                            toCreate.push(parsedRim)
+                        }
+                    }
+                    if (slikDiskArr && !slikDiskArr.length) {
+                        uniqueByCode++;
+                        toCreate.push(parsedRim)
+                    }
+                } catch (e) {
+                    console.log('compareRimsSlik error: compare by code. rim uid: ', parsedRim.uid)
+                }
+            }
+
+            console.log('compareRimsSlik: (code) to compare price by code count', compareByCodeCount);
+            console.log('compareRimsSlik: (code) lowest price count!', lowestPriceByCode);
+            console.log('compareRimsSlik: (code) unique disk count', uniqueByCode)
+        }
+
+        if (toCompareByParams.length) {
+            const productMapping = new ProductMapping;
+            const mapping = await productMapping.getMapping();
+
+            //dev
+            let toCompareByPrice = 0;
+            let lowestPriceCount = 0;
+            let uniqueCount = 0;
+
+            for (const parsedRim of toCompareByParams) {
+                try {
+                    const slikDiskArr = await ProductVariant.findAll({
+                        where: {
+                            vendor_code: {[Op.regexp]: `^slik`},
+                        },
+                        include: [
+                            {
+                                model: AttrValue, where: {
+                                    id: mapping['dia'],
+                                    value: parsedRim.dia
+                                }
+                            },
+                            {
+                                model: AttrValue, where: {
+                                    id: mapping['et'],
+                                    value: parsedRim.et
+                                }
+                            },
+                            {
+                                model: AttrValue, where: {
+                                    id: mapping['width'],
+                                    value: parsedRim.width
+                                }
+                            },
+                            {
+                                model: AttrValue, where: {
+                                    id: mapping['bolts_count'],
+                                    value: parsedRim.bolts_count
+                                }
+                            },
+                            {
+                                model: AttrValue, where: {
+                                    id: mapping['bolts_spacing'],
+                                    value: parsedRim.bolts_spacing
+                                }
+                            }
+                        ]
+                    });
+                    if (slikDiskArr && slikDiskArr.length) {
+                        toCompareByPrice++;
+                        const priceArr = slikDiskArr.map(disk => disk.price);
+                        const minPrice = Math.min(...priceArr);
+                        if (parsedRim.price < minPrice) {
+                            // console.log('compareRimsSlik: (params) lowest price!', parsedRim.uid);
+                            lowestPriceCount++;
+                            toCreate.push(parsedRim)
+                        }
+                    }
+                    if (slikDiskArr && !slikDiskArr.length) {
+                        // console.log('compareRimsSlik: (params) unique disk', parsedRim.uid);
+                        uniqueCount++;
+                        toCreate.push(parsedRim)
+                    }
+                } catch (e) {
+                    console.error('compareRimsSlik error: compare by params. rim uid: ', parsedRim.uid)
+                }
+            }
+            console.log('compareRimsSlik: (params) to compare price by params count', toCompareByPrice);
+            console.log('compareRimsSlik: (params) lowest price count!', lowestPriceCount);
+            console.log('compareRimsSlik: (params) unique disk count', uniqueCount);
+        }
+        console.log('End compare. Total to create', toCreate.length);
+        return toCreate;
     }
 }
 
