@@ -2,8 +2,13 @@ import {
     DISK_BOLTS_COUNT,
     DISK_BOLTS_SPACING,
     DISK_BRAND,
-    DISK_COLOR, DISK_DIA, DISK_DIAMETER, DISK_ET, DISK_PCD,
-    DISK_PCD2, DISK_RECOMMENDED_PRICE, DISK_TYPE,
+    DISK_COLOR,
+    DISK_DIA,
+    DISK_DIAMETER,
+    DISK_ET,
+    DISK_PCD,
+    DISK_PCD2,
+    DISK_TYPE,
     DISK_WIDTH,
     DiskMap,
     DiskMapOptions,
@@ -37,7 +42,6 @@ export class ProductMapping {
         {name: DISK_PCD, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
         {name: DISK_PCD2, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
         {name: DISK_DIA, type_id: 3}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: DISK_RECOMMENDED_PRICE, type_id: 3},
         {name: DISK_TYPE, type_id: 1}
     ];
 

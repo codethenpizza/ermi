@@ -4,12 +4,13 @@ import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 import Sequelize from "sequelize";
 
-import {Supplier, SupplierDisk} from "../types";
+import {DiskMap, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
-import {DiskMap, diskType} from "../ProductMapping";
+import {diskType} from "../ProductMapping";
 import DiskoptimModel, {DiskoptimRawDiskMap} from "./Diskoptim.model"
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
+
 
 export class Diskoptim implements Supplier, SupplierDisk {
     async fetchData(): Promise<void> {
