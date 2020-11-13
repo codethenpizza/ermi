@@ -62,7 +62,7 @@ export class Discovery implements SupplierDisk {
 
             return {
                 uid: 'discovery_' + item.code,
-                model_name: item.name,
+                model: item.name,
                 brand: item.brand,
                 image: item.picture,
                 price: parseDouble(item.price),

@@ -28,7 +28,7 @@ export default class DiscoveryModel extends Model<IDiscoveryRaw> {
     picture: string;
 
     @Column({})
-    model_name: string;
+    model: string;
 
     @Column({})
     price: string;
