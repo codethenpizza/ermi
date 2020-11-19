@@ -10,7 +10,7 @@ import {Slik} from "./Slik/Slik";
 const suppliers: Supplier[] = [ //order should be saved for now
     new Discovery(),
     new Slik(),
-    new Diskoptim(), //should be after SLik
+    // new Diskoptim(), //should be after SLik
 ];
 
 export const fetchAll = async () => {
@@ -25,6 +25,6 @@ export const storeAll = async () => {
     await mapping.storeDisk([
         new Discovery(),
         new Slik(),
-        new Diskoptim(),
+        // new Diskoptim(),
     ]);
 };

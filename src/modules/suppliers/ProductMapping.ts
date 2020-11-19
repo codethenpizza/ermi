@@ -23,6 +23,7 @@ import Product, {IProduct} from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import {sequelize} from '@db'
+import Image from "@models/Image.model";
 
 export enum diskType {
     alloy = 'литые'
@@ -97,7 +98,7 @@ export class ProductMapping {
                         }, []),
                         price: data.price,
                         in_stock_qty: data.inStock,
-                        is_available: !!data.inStock
+                        is_available: !!data.inStock,
                     }]
                 });
                 progressBar(i + 1, existedProductVariants.length, 'existedProductVariants update');
@@ -125,9 +126,14 @@ export class ProductMapping {
                         }, []),
                         price: data.price,
                         in_stock_qty: data.inStock,
-                        is_available: !!data.inStock
+                        is_available: !!data.inStock,
                     }]
                 };
+
+                if (rim.image) {
+                    const img = await Image.create({original_uri: rim.image});
+                    product.variants[0].images = [{id: img.id}];
+                }
 
                 try {
                     await Product.createWR(product);

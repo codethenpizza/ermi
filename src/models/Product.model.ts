@@ -6,6 +6,8 @@ import ProductCatsProduct from "@models/ProductCatsProduct.model";
 import Attribute from "@models/Attribute.model";
 import AttrSet from "@models/AttrSet.model";
 import {Op} from "sequelize";
+import Image from "@models/Image.model";
+import ProductVariantImg from "@models/ProductVariantImg.model";
 
 @Table({
     tableName: 'product',
@@ -45,9 +47,21 @@ export default class Product extends Model<Product> {
                 ]
             });
 
+            for (let i = 0; i < product.variants.length; i++) {
+                const variant = data.variants[i];
+                if (variant.images) {
+                    for (const image of variant.images) {
+                        await ProductVariantImg.create({
+                            image_id: image.id,
+                            product_variant_id: product.variants[i].id
+                        }, {transaction});
+                    }
+                }
+            }
+
             product = await product.reload({
                 transaction, include: [
-                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}]}
+                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}, Image]}
                 ]
             });
             await transaction.commit();
@@ -80,7 +94,7 @@ export default class Product extends Model<Product> {
             }
             await transaction.commit();
         } catch (e) {
-            console.error('Product updateWR ERROR', id, product, product.variants);
+            console.error('Product updateWR ERROR', id, product, product.variants, e);
             await transaction.rollback();
             throw e;
         }
@@ -95,6 +109,7 @@ export type IProduct = {
     cats_ids: number[];
     variants: IProductVariant[];
     attr_set_id?: number;
+    attrs?: Attr;
 }
 
 export type IProductUpdateData = {

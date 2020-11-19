@@ -26,7 +26,6 @@ export class ProductElasticSearchAction implements Action {
     }
 
     async handle({body: {filters, size = 20, from = 0}, cookies}: Request<any, any, EsSearchReqBody, any>, res: Response) {
-        console.log('filters', filters);
         try {
             let cookieFilters: EsReqFilter[][] = [];
             if (cookies['wheel-size-filter']) {
@@ -34,7 +33,6 @@ export class ProductElasticSearchAction implements Action {
             }
 
             const query = await this.makeQuery(filters, cookieFilters);
-            console.log('query', JSON.stringify(query));
 
             const esProduct = new EsProduct();
             const resp = await esProduct.es.search({
@@ -56,8 +54,6 @@ export class ProductElasticSearchAction implements Action {
     }
 
     private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
-        console.log('filters', filters);
-        console.log('cookieFilters', cookieFilters);
         query.query('nested', 'path', 'variants', (q) => {
             q.query('bool', 'filter', [
                 {

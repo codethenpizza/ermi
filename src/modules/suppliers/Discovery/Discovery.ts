@@ -67,7 +67,7 @@ export class Discovery implements SupplierDisk {
                 image: item.picture,
                 price: parseDouble(item.price),
                 pcd: parseDouble(param.find((e) => e.$.name === 'H/PCD')?.$text || null),
-                inStock: parseDouble(item.rest_fast),
+                inStock: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast),
                 width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text) || null,
                 color: param.find((e) => e.$.name === 'Цвет')?.$text || null,
                 diameter: parseDouble(param.find((e) => e.$.name === 'Диаметр колеса')?.$text) || null,

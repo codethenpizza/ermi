@@ -1,6 +1,8 @@
 {
   "app": {
-    "port": 3000
+    "host": "localhost",
+    "port": 3000,
+    "protocol": "http"
   },
   "dbConfig": {
     "host": "localhost",
@@ -42,5 +44,26 @@
   },
   "wheelSize": {
     "apiKey": "0a257eab46dd96b3d93eb0baf44db9d4"
+  },
+  "fileStrategy": "local",
+  "images": {
+    "sizes": {
+      "large": {
+        "width": 2400,
+        "height": null
+      },
+      "medium": {
+        "width": 1500,
+        "height": null
+      },
+      "small": {
+        "width": 720,
+        "height": null
+      },
+      "thumbnail": {
+        "width": 320,
+        "height": null
+      }
+    }
   }
 }
