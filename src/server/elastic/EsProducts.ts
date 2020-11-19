@@ -4,6 +4,7 @@ import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import Attribute from "@models/Attribute.model";
 import AttrType from "@models/AttrType.model";
+import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
 import {EsProductVariant, IEsProduct} from "./types";
 import {ProductScheme} from "./schemas/ProductScheme";
@@ -29,7 +30,13 @@ export class EsProduct extends EsIndex {
                 {
                     model: ProductVariant,
                     where: {is_available: true},
-                    include: [{model: AttrValue, include: [{model: Attribute, include: [AttrType]}]}]
+                    include: [
+                        {
+                            model: AttrValue,
+                            include: [{model: Attribute, include: [AttrType]}]
+                        },
+                        Image
+                    ]
                 }
             ]
         });

@@ -2,13 +2,15 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Response, Request} from "express";
 import {WheelSizeApi} from "../index";
 import {EsReqFilter} from "@actions/front/Product/ProductElasticSearchAction";
-import {DISK_DIAMETER, DISK_ET, DISK_WIDTH} from "../../suppliers/types";
+import {DISK_BOLTS_COUNT, DISK_BOLTS_SPACING, DISK_DIAMETER, DISK_ET, DISK_WIDTH} from "../../suppliers/types";
 import slugify from "slugify";
 
 type ReqBody = {
     make: string;
     year: string;
     model: string;
+    generation: string;
+    trim: string;
 }
 
 export class WheelsSearchAction implements Action {
@@ -20,15 +22,16 @@ export class WheelsSearchAction implements Action {
         next();
     }
 
-    async handle({body: {make, year, model}}: Request<any, any, ReqBody, any>, res: Response) {
+    async handle({body: {make, year, model, generation, trim}}: Request<any, any, ReqBody, any>, res: Response) {
         const apiResp = await WheelSizeApi.searchByModel(make, year, model);
 
-        console.log('apiResp', JSON.stringify(apiResp));
-
         const filters: EsReqFilter[][] = [];
-        apiResp.forEach((item) => {
+        apiResp
+            .filter((item) => item.trim === trim && item.generation.name === generation)
+            .forEach((item) => {
 
-            const variants: EsReqFilter[][] = item.wheels.map(({front: {rim_diameter, rim_width, rim_offset}}) => {
+            const variants: EsReqFilter[][] = item.wheels
+                .map(({front: {rim_diameter, rim_width, rim_offset}}) => {
                 if (!rim_diameter || !rim_offset || !rim_width) {
                     return [];
                 }
@@ -44,6 +47,14 @@ export class WheelsSearchAction implements Action {
                     {
                         name: slugify(DISK_ET, {lower: true}),
                         value: rim_offset
+                    },
+                    {
+                        name: slugify(DISK_BOLTS_COUNT, {lower: true}),
+                        value: item.stud_holes
+                    },
+                    {
+                        name: slugify(DISK_BOLTS_SPACING, {lower: true}),
+                        value: item.pcd
                     }
                 ]
             });
