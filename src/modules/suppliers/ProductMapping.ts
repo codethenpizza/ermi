@@ -22,6 +22,9 @@ import Product, {IProduct} from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import {sequelize} from '@db'
+import {log} from "util";
+import ts from "typescript/lib/tsserverlibrary";
+import ProjectLoadingFinishEvent = ts.server.ProjectLoadingFinishEvent;
 import Image from "@models/Image.model";
 
 export enum diskType {
@@ -57,6 +60,7 @@ export class ProductMapping {
             await transaction.rollback();
             throw e;
         }
+
         for (const supplier of suppliers) {
 
             const rims = await supplier.getRims();
@@ -70,7 +74,7 @@ export class ProductMapping {
 
             let created = 0;
             for (const [index, rim] of rims.entries()) {
-                console.log('current', index)
+                // console.log('current', index)
 
                 //find one
                 const variantByCode = await ProductVariant.findOne({
@@ -78,7 +82,6 @@ export class ProductMapping {
                         vendor_code: rim.uid
                     }
                 })
-                // console.log('variantByCode', variantByCode)
                 if (variantByCode) {
                     //update variant
                     ProductVariant.update(rim, {
@@ -89,19 +92,19 @@ export class ProductMapping {
                     continue;
                 }
 
-                const product_id = await this.getProductIdByVariantAndModel(mapping, rim.brand, rim.model)
+                const product_id = await this.getProductIdByBrandAndModel(mapping, rim.brand, rim.model)
+                // console.log(product_id)
                 if (product_id) {
                     //create variant with rim
-                    console.log('UPDATE BY PRODUCT ID')
-                    // ProductVariant.create(rim, {
-                    //     where: {
-                    //         product_id: product_id
-                    //     }
-                    // })
-                    // Product.update()
+                    // console.log('UPDATE BY ADD PRODUCT VARIANT')
+                    await ProductVariant.create({
+                        ...rim,
+                        vendor_code: rim.uid,
+                        product_id
+                    })
                     continue;
                 }
-                console.log('CREATE PRODUCT')
+                // console.log('CREATE PRODUCT')
 
                 //create product
                 const product: IProduct = {
@@ -139,20 +142,11 @@ export class ProductMapping {
                     console.error(e)
                 }
             }
-            await ProductVariant.update({is_available: false, in_stock_qty: 0},
-                {
-                    where: {
-                        [Op.and]: [
-                            {vendor_code: {[Op.regexp]: `^${suppCode}`}},
-                            {vendor_code: {[Op.notIn]: rims.map(x => x.uid)}},
-                        ]
-                    }
-                });
         }
-
     }
 
-    public async getMapping(transaction?: Transaction): Promise<DiskMapOptions> {
+
+    public async getMapping(transaction ?: Transaction): Promise<DiskMapOptions> {
         const mapping = await OptionsModel.findOne({where: {key: this.rimMappingKey}, transaction});
         if (!mapping) {
             return this.crateMapping(transaction)
@@ -218,9 +212,9 @@ export class ProductMapping {
         }, transaction);
     }
 
-    private async getProductIdByVariantAndModel(mapping, brand, model): Promise<number | null> {
+    private async getProductIdByBrandAndModel(mapping, brand, model): Promise<any | null> {
         const existedProductVariantsModels = await ProductVariant.findAll({
-            include: [Product, {
+            include: [{
                 model: AttrValue,
                 where: {
                     attr_id: [mapping.model, mapping.brand],
@@ -255,7 +249,7 @@ export class ProductMapping {
             }
         })
         if (existedProductVariant) {
-            console.log('find by model and brand', existedProductVariant.product_id);
+            // console.log('find by model and brand', existedProductVariant);
             return existedProductVariant.product_id
         }
 
