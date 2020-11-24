@@ -26,6 +26,8 @@ import {log} from "util";
 import ts from "typescript/lib/tsserverlibrary";
 import ProjectLoadingFinishEvent = ts.server.ProjectLoadingFinishEvent;
 import Image from "@models/Image.model";
+import ProductVariantImg from "@models/ProductVariantImg.model";
+import progressBar from "../../helpers/progressBar";
 
 export enum diskType {
     alloy = 'литые'
@@ -83,12 +85,19 @@ export class ProductMapping {
                     }
                 })
                 if (variantByCode) {
+                    // console.log('UPDATE BY VENDOR CODE');
                     //update variant
-                    ProductVariant.update(rim, {
+                    const propertyForUpdate = {
+                        price: rim.price,
+                        inStock: rim.inStock
+                    };
+
+                    await ProductVariant.update(propertyForUpdate, {
                         where: {
                             vendor_code: rim.uid
                         }
                     })
+                    progressBar(index, rims.length)
                     continue;
                 }
 
@@ -96,12 +105,53 @@ export class ProductMapping {
                 // console.log(product_id)
                 if (product_id) {
                     //create variant with rim
-                    // console.log('UPDATE BY ADD PRODUCT VARIANT')
-                    await ProductVariant.create({
+                    // console.log('UPDATE BY ADD PRODUCT VARIANT');
+                    const attrs = Object.keys(mapping).reduce<IAttrValue[]>((arr, key) => {
+                        const value = rim[key];
+
+                        if (value) {
+                            arr.push({
+                                attr_id: mapping[key],
+                                value
+                            });
+                        }
+                        return arr;
+                    }, []);
+
+                    // console.log('attrs created by product id', attrs);
+
+                    // console.log('attrs', attrs)
+                    const images = [];
+                    // if (rim.image) {
+                    //     try {
+                    //         const img = await Image.create({original_uri: rim.image});
+                    //         images.push({id: img.id});
+                    //     } catch (e) {
+                    //         console.log('Error with, ', rim.image, ' id', rim.uid);
+                    //         console.log(e)
+                    //     }
+                    //     // product.variants[0].images = [{id: img.id}];
+                    // }
+
+                    const productVariant = await ProductVariant.create({
                         ...rim,
+                        product_id,
                         vendor_code: rim.uid,
-                        product_id
-                    })
+                        attrs,
+                        images,
+                        price: rim.price,
+                        in_stock_qty: rim.inStock,
+                        is_available: !!rim.inStock
+                    }, {include: [AttrValue, Image]});
+
+
+                    for (const img of images) {
+                        await ProductVariantImg.create({
+                            image_id: img.id,
+                            product_variant_id: productVariant.id
+                        })
+                    }
+                    progressBar(index, rims.length)
                     continue;
                 }
                 // console.log('CREATE PRODUCT')
@@ -130,14 +180,20 @@ export class ProductMapping {
                     }]
                 };
 
-                if (rim.image) {
-                    const img = await Image.create({original_uri: rim.image});
-                    product.variants[0].images = [{id: img.id}];
-                }
+                // if (rim.image) {
+                //     try {
+                //         const img = await Image.create({original_uri: rim.image});
+                //         product.variants[0].images = [{id: img.id}];
+                //     } catch (e) {
+                //         console.log('Error with, ', rim.image, ' id', rim.uid);
+                //         console.log(e)
+                //     }
+                // }
 
                 try {
                     await Product.createWR(product);
-                    created++
+                    progressBar(index, rims.length)
+                    // created++
                 } catch (e) {
                     console.error(e)
                 }
