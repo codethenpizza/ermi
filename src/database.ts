@@ -12,5 +12,6 @@ export const sequelize = new Sequelize({
         __dirname + '/models/**/*.model.*',
         __dirname + '/modules/**/*.model.*'
     ],
+    // logging: console.log
     logging: false
 });

@@ -10,7 +10,7 @@ export abstract class SupplierDisk extends Supplier {
 }
 
 export interface DiskMap {
-    model_name: string; // ДИСК
+    model: string; // ДИСК
     brand: string;
     uid: string;
     color: string;
@@ -42,6 +42,7 @@ export interface DiskMap {
 }
 
 export interface DiskMapOptions {
+    model: number;
     brand: number;
     color: number;
     width: number; //ШИРИНА ДИСКА
@@ -56,6 +57,7 @@ export interface DiskMapOptions {
     attr_set_id: number;
 }
 
+export const DISK_MODEL = 'Model';
 export const DISK_BRAND = 'Brand';
 export const DISK_COLOR = 'Color';
 export const DISK_WIDTH = 'Width';

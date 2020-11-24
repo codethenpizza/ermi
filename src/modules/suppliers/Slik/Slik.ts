@@ -44,15 +44,17 @@ export class Slik implements Supplier, SupplierDisk {
         const rawData = await SlikModel.findAll();
 
         return rawData.map<DiskMap>((item) => {
+            const inStock = item.stock ? item.stock === '+' ? 20 : parseDouble(item.stock) : 0; //TODO use 20 as maximum?
+            const pcd = item.bolts_spacing2 ? item.bolts_spacing2 === 'нет' ? 0 : parseDouble(item.bolts_spacing2) : 0;
+
             return {
                 uid: 'slik_' + item.code,
-                model_name: item.model,
+                model: item.model,
                 brand: item.brand,
                 image: item.image,
-                // price: item.price ? parseDouble(item.price) : 0,
+                inStock,
                 price: parseDouble(item.price),
-                pcd: item.bolts_spacing2 ? parseDouble(item.bolts_spacing2) : null,
-                inStock: item.count ? parseDouble(item.count) : 0,
+                pcd,
                 width: item.width ? parseDouble(item.width) : null,
                 color: item.color || null,
                 diameter: item.diameter ? parseDouble(item.diameter) : null,
