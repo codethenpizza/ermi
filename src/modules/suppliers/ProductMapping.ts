@@ -10,7 +10,7 @@ import {
     DISK_PCD,
     DISK_PCD2,
     DISK_TYPE,
-    DISK_WIDTH,
+    DISK_WIDTH, DiskMap,
     DiskMapOptions,
     SupplierDisk
 } from "./types";
@@ -74,129 +74,25 @@ export class ProductMapping {
             const suppCode = rims[0].uid.split('_')[0];
             console.log('Start store disk for', suppCode);
 
-            let created = 0;
             for (const [index, rim] of rims.entries()) {
-                // console.log('current', index)
-
-                //find one
-                const variantByCode = await ProductVariant.findOne({
-                    where: {
-                        vendor_code: rim.uid
-                    }
-                })
-                if (variantByCode) {
-                    // console.log('UPDATE BY VENDOR CODE');
-                    //update variant
-                    const propertyForUpdate = {
-                        price: rim.price,
-                        inStock: rim.inStock
-                    };
-
-                    await ProductVariant.update(propertyForUpdate, {
-                        where: {
-                            vendor_code: rim.uid
-                        }
-                    })
-                    progressBar(index, rims.length)
-                    continue;
-                }
-
-                const product_id = await this.getProductIdByBrandAndModel(mapping, rim.brand, rim.model)
-                // console.log(product_id)
-                if (product_id) {
-                    //create variant with rim
-                    // console.log('UPDATE BY ADD PRODUCT VARIANT');
-                    const attrs = Object.keys(mapping).reduce<IAttrValue[]>((arr, key) => {
-                        const value = rim[key];
-
-                        if (value) {
-                            arr.push({
-                                attr_id: mapping[key],
-                                value
-                            });
-                        }
-                        return arr;
-                    }, []);
-
-                    // console.log('attrs created by product id', attrs);
-
-                    // console.log('attrs', attrs)
-                    const images = [];
-                    // if (rim.image) {
-                    //     try {
-                    //         const img = await Image.create({original_uri: rim.image});
-                    //         images.push({id: img.id});
-                    //     } catch (e) {
-                    //         console.log('Error with, ', rim.image, ' id', rim.uid);
-                    //         console.log(e)
-                    //     }
-                    //     // product.variants[0].images = [{id: img.id}];
-                    // }
-
-                    const productVariant = await ProductVariant.create({
-                        ...rim,
-                        product_id,
-                        vendor_code: rim.uid,
-                        attrs,
-                        images,
-                        price: rim.price,
-                        in_stock_qty: rim.inStock,
-                        is_available: !!rim.inStock
-                    }, {include: [AttrValue, Image]});
-
-
-                    for (const img of images) {
-                        await ProductVariantImg.create({
-                            image_id: img.id,
-                            product_variant_id: productVariant.id
-                        })
-                    }
-                    progressBar(index, rims.length)
-                    continue;
-                }
-                // console.log('CREATE PRODUCT')
-
-                //create product
-                const product: IProduct = {
-                    cats_ids: [0],
-                    name: `${rim.brand} ${rim.model}`,
-                    attr_set_id: mapping.attr_set_id,
-                    variants: [{
-                        vendor_code: rim.uid,
-                        attrs: Object.keys(mapping).reduce<IAttrValue[]>((arr, key) => {
-                            const value = rim[key];
-
-                            if (value) {
-                                arr.push({
-                                    attr_id: mapping[key],
-                                    value
-                                });
-                            }
-                            return arr;
-                        }, []),
-                        price: rim.price,
-                        in_stock_qty: rim.inStock,
-                        is_available: !!rim.inStock
-                    }]
-                };
-
-                // if (rim.image) {
-                //     try {
-                //         const img = await Image.create({original_uri: rim.image});
-                //         product.variants[0].images = [{id: img.id}];
-                //     } catch (e) {
-                //         console.log('Error with, ', rim.image, ' id', rim.uid);
-                //         console.log(e)
-                //     }
-                // }
 
                 try {
-                    await Product.createWR(product);
+                    if (await this.updateByCode(rim)) {
+                        progressBar(index, rims.length)
+                        continue;
+                    }
+
+                    if (await this.updateByBrandAndModel(mapping, rim)) {
+                        progressBar(index, rims.length)
+                        continue;
+                    }
+
+                    await this.createProduct(mapping, rim);
                     progressBar(index, rims.length)
-                    // created++
                 } catch (e) {
                     console.error(e)
                 }
+
             }
         }
     }
@@ -310,5 +206,105 @@ export class ProductMapping {
         }
 
         return null
+    }
+
+    private async updateByCode(rim: DiskMap): Promise<boolean> {
+        const variantByCode = await ProductVariant.findOne({
+            where: {
+                vendor_code: rim.uid
+            }
+        });
+
+        if (variantByCode) {
+            variantByCode.price = rim.price;
+            variantByCode.in_stock_qty = rim.inStock;
+
+            await variantByCode.save();
+            return true;
+        }
+
+        return false;
+    }
+
+    private async updateByBrandAndModel(mapping: DiskMapOptions, rim: DiskMap): Promise<boolean> {
+        const product_id = await this.getProductIdByBrandAndModel(mapping, rim.brand, rim.model)
+
+        if (product_id) {
+            //create variant with rim
+            const attrs = Object.keys(mapping).reduce<IAttrValue[]>((arr, key) => {
+                const value = rim[key];
+
+                if (value) {
+                    arr.push({
+                        attr_id: mapping[key],
+                        value
+                    });
+                }
+                return arr;
+            }, []);
+
+            const productVariant = await ProductVariant.create({
+                ...rim,
+                product_id,
+                vendor_code: rim.uid,
+                attrs,
+                price: rim.price,
+                in_stock_qty: rim.inStock,
+                is_available: !!rim.inStock
+            }, {include: [AttrValue]});
+
+            if (rim.image) {
+                try {
+                    const img = await Image.create({original_uri: rim.image});
+
+                    await ProductVariantImg.create({
+                        image_id: img.id,
+                        product_variant_id: productVariant.id
+                    });
+                } catch (e) {
+                    console.log('Error with, ', rim.image, ' id', rim.uid, e);
+                }
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private async createProduct(mapping: DiskMapOptions, rim: DiskMap) {
+        const product: IProduct = {
+            cats_ids: [0],
+            name: `${rim.brand} ${rim.model}`,
+            attr_set_id: mapping.attr_set_id,
+            variants: [{
+                vendor_code: rim.uid,
+                attrs: Object.keys(mapping).reduce<IAttrValue[]>((arr, key) => {
+                    const value = rim[key];
+
+                    if (value) {
+                        arr.push({
+                            attr_id: mapping[key],
+                            value
+                        });
+                    }
+                    return arr;
+                }, []),
+                price: rim.price,
+                in_stock_qty: rim.inStock,
+                is_available: !!rim.inStock
+            }]
+        };
+
+        if (rim.image) {
+            try {
+                const img = await Image.create({original_uri: rim.image});
+                product.variants[0].images = [{id: img.id}];
+            } catch (e) {
+                console.log('Error with, ', rim.image, ' id', rim.uid);
+                console.log(e)
+            }
+        }
+
+        await Product.createWR(product);
     }
 }

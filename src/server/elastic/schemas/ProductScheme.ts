@@ -110,6 +110,19 @@ export const ProductScheme = {
                             }
                         }
                     },
+                    "model" : {
+                        "properties" : {
+                            "name" : {
+                                "type" : "text",
+                            },
+                            "slug" : {
+                                "type" : "keyword",
+                            },
+                            "value" : {
+                                "type" : "keyword",
+                            }
+                        }
+                    },
                     "pcd": {
                         "properties": {
                             "name": {
