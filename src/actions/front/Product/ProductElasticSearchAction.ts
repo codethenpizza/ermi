@@ -2,7 +2,10 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import bodybuilder from "bodybuilder";
 import Attribute from "@models/Attribute.model";
+import {EsProdAggAttr, EsProductVariant, EsRespProduct} from "@actions/front/types";
 import {EsProduct} from "@server/elastic/EsProducts";
+
+const MAX_INT = 2147483647;
 
 export interface EsSearchReqBody {
     filters?: EsReqFilter[];
@@ -15,6 +18,18 @@ export interface EsReqFilter {
     type?: any; // TODO add filter type
     value: string | number | string[] | number[];
 }
+
+export interface RespData {
+    total: number;
+    products: EsProductVariant[];
+    aggregations: {
+        attrs: {
+            doc_count: number;
+            [x: string]: EsProdAggAttr | number;
+        }
+    }
+}
+
 
 export class ProductElasticSearchAction implements Action {
     get action() {
@@ -34,13 +49,30 @@ export class ProductElasticSearchAction implements Action {
 
             const query = await this.makeQuery(filters, cookieFilters);
 
+            console.log('query', JSON.stringify(query));
+
             const esProduct = new EsProduct();
             const resp = await esProduct.es.search({
                 body: query,
                 size,
-                from
+                from,
             });
-            res.send(resp.body);
+
+
+            const body: EsRespProduct = resp.body as EsRespProduct;
+
+            const total = body.hits.total.value;
+
+            const products: EsProductVariant[] = body.hits.hits
+                .map<EsProductVariant>((item) => item._source);
+
+            const respData: RespData = {
+                products,
+                total,
+                aggregations: body.aggregations
+            };
+
+            res.send(respData);
         } catch (error) {
             res.status(500).send({error});
         }
@@ -54,17 +86,14 @@ export class ProductElasticSearchAction implements Action {
     }
 
     private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
-        query.query('nested', 'path', 'variants', (q) => {
-            q.query('bool', 'filter', [
-                {
-                    bool: this.setFilters(filters)
-                },
-                {
-                    bool: this.setCookieFilters(cookieFilters)
-                }
-            ]);
-            return q;
-        });
+        query.query('bool', 'filter', [
+            {
+                bool: this.setFilters(filters)
+            },
+            {
+                bool: this.setCookieFilters(cookieFilters)
+            }
+        ]);
     }
 
     private setCookieFilters(cookieFilters: EsReqFilter[][]) {
@@ -73,7 +102,7 @@ export class ProductElasticSearchAction implements Action {
                 bool: {
                     filter: f.map(({name, value}) => ({
                         [Array.isArray(value) ? 'terms' : 'term']: {
-                            [`variants.attrs.${name}.value`]: value
+                            [`attrs.${name}.value`]: value
                         }
                     }))
                 }
@@ -86,7 +115,7 @@ export class ProductElasticSearchAction implements Action {
             filter: filters.map(({name, value}) => {
                     return {
                         terms: {
-                            [`variants.attrs.${name}.value`]: value
+                            [`attrs.${name}.value`]: value
                         }
                     };
                 }
@@ -95,14 +124,11 @@ export class ProductElasticSearchAction implements Action {
     }
 
     private async addAggs(query: bodybuilder.Bodybuilder) {
-        const attrs = await Attribute.findAll();
+        const attrs = await Attribute.findAggregatable();
 
-        query.aggregation('nested', null, {path: 'variants'}, 'attrs', (q) => {
-            attrs.forEach(({slug}) => {
-                const field = `variants.attrs.${slug}.value`;
-                q.agg('terms', field);
-            });
-            return q;
+        attrs.forEach(({slug}) => {
+            const field = `attrs.${slug}.value`;
+            query.agg('terms', field, {size: MAX_INT});
         });
     }
 }

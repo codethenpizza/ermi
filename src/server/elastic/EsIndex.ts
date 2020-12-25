@@ -5,11 +5,10 @@ export class EsIndex {
     public es: Elastic;
 
     constructor(
-        protected index,
-        protected type
+        protected index: string,
+        protected type?: string
     ) {
-        if (!index || !type) {
-            console.log(index, type);
+        if (!index) {
             throw new Error('Index and type are required');
         }
 

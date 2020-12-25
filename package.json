@@ -11,7 +11,7 @@
     "dev": "nodemon",
     "migrate": "ts-node -r tsconfig-paths/register migrations/index.ts",
     "runner": "ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
-    "comm": "ts-node -r tsconfig-paths/register src/server/commands.ts"
+    "reindex": "ts-node -r tsconfig-paths/register src/server/commands.ts es update-index"
   },
   "dependencies": {
     "@types/express-fileupload": "^1.1.5",

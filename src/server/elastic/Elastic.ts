@@ -9,7 +9,7 @@ export class Elastic {
 
     constructor(
         private index: string,
-        private type: string
+        private type = '_doc'
     ) {
     }
 

@@ -109,7 +109,6 @@ export type IProduct = {
     cats_ids: number[];
     variants: IProductVariant[];
     attr_set_id?: number;
-    attrs?: Attr;
 }
 
 export type IProductUpdateData = {

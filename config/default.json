@@ -13,8 +13,7 @@
   },
   "elastic": {
     "host": "localhost",
-    "port": "9200",
-    "index": "ermi"
+    "port": "9200"
   },
   "suppliers": {
     "Slik": {

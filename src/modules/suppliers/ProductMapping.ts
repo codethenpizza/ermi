@@ -37,18 +37,18 @@ export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
     private attrArr: AttributeI[] = [
-        {name: DISK_MODEL, type_id: 1},
-        {name: DISK_BRAND, type_id: 1},
-        {name: DISK_COLOR, type_id: 1},
-        {name: DISK_WIDTH, type_id: 3}, //ШИРИНА ДИСКА
-        {name: DISK_ET, type_id: 3}, //ВЫЛЕТ
-        {name: DISK_DIAMETER, type_id: 3}, //ДИАМЕТР ДИСКА
-        {name: DISK_BOLTS_COUNT, type_id: 2}, //КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_BOLTS_SPACING, type_id: 3},
-        {name: DISK_PCD, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-        {name: DISK_PCD2, type_id: 3}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
-        {name: DISK_DIA, type_id: 3}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: DISK_TYPE, type_id: 1}
+        {name: DISK_MODEL, type_id: 1, aggregatable: false},
+        {name: DISK_BRAND, type_id: 1, aggregatable: true},
+        {name: DISK_COLOR, type_id: 1, aggregatable: true},
+        {name: DISK_WIDTH, type_id: 3, aggregatable: true}, //ШИРИНА ДИСКА
+        {name: DISK_ET, type_id: 3, aggregatable: true}, //ВЫЛЕТ
+        {name: DISK_DIAMETER, type_id: 3, aggregatable: true}, //ДИАМЕТР ДИСКА
+        {name: DISK_BOLTS_COUNT, type_id: 2, aggregatable: true}, //КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_BOLTS_SPACING, type_id: 3, aggregatable: true},
+        {name: DISK_PCD, type_id: 3, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
+        {name: DISK_PCD2, type_id: 3, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
+        {name: DISK_DIA, type_id: 3, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
+        {name: DISK_TYPE, type_id: 1, aggregatable: true}
     ];
 
     async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
