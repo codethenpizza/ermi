@@ -9,7 +9,7 @@ export class Elastic {
 
     constructor(
         private index: string,
-        private type: string
+        private type = '_doc'
     ) {
     }
 
@@ -54,6 +54,24 @@ export class Elastic {
             console.error("An error occurred while setting the quotes mapping:");
             console.error(JSON.stringify(err));
         }
+    }
+
+    async clearIndex() {
+        return esClient.delete_by_query({
+            index: this.index,
+            type: this.type,
+            body: {
+                "query": {
+                    "bool": {
+                        "must_not": {
+                            "term": {
+                                "id": 0
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
 
     async bulkCreate(data: Object & { id: number }[]) {

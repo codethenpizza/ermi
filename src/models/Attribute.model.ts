@@ -29,6 +29,11 @@ export default class Attribute extends Model<Attribute> {
     })
     slug: string;
 
+    @Column({
+        defaultValue: false
+    })
+    aggregatable: boolean;
+
     @ForeignKey(() => AttrType)
     @Column({
         allowNull: false
@@ -40,9 +45,14 @@ export default class Attribute extends Model<Attribute> {
 
     @BelongsToMany(() => AttrSet, () => AttrSetAttr)
     attrSets: AttrSet[];
+
+    static async findAggregatable() {
+        return Attribute.findAll({where: {aggregatable: true}});
+    }
 }
 
 export type AttributeI = {
     name: string;
     type_id: number;
+    aggregatable?: boolean;
 };

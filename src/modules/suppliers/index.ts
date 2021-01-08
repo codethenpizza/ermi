@@ -8,8 +8,10 @@ const main = async () => {
 
 main()
     .then(() => {
-        console.log('store complete')
+        console.log('store complete');
+        process.exit(0);
     })
     .catch((e) => {
-        console.log('err', e)
+        console.log('err', e);
+        process.exit(1);
     });

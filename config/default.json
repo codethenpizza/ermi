@@ -1,6 +1,8 @@
 {
   "app": {
-    "port": 3000
+    "host": "localhost",
+    "port": 3000,
+    "protocol": "http"
   },
   "dbConfig": {
     "host": "localhost",
@@ -11,8 +13,7 @@
   },
   "elastic": {
     "host": "localhost",
-    "port": "9200",
-    "index": "ermi"
+    "port": "9200"
   },
   "suppliers": {
     "Slik": {
@@ -24,6 +25,15 @@
       },
       "ftp_file": "/home/replay.xml"
     },
+    "Diskoptim": {
+      "ftp": {
+        "host": "ftp.diskoptim.ru",
+        "port": 21,
+        "user": "00-00000515",
+        "password": "onaMI32h"
+      },
+      "ftp_file": "/Diskoptim Ostatki Sklad.xml"
+    },
     "Discovery": {
       "api": {
         "host": "https://discovery.moscow/xmlprice/contract/422/",
@@ -33,5 +43,26 @@
   },
   "wheelSize": {
     "apiKey": "0a257eab46dd96b3d93eb0baf44db9d4"
+  },
+  "fileStrategy": "local",
+  "images": {
+    "sizes": {
+      "large": {
+        "width": 2400,
+        "height": null
+      },
+      "medium": {
+        "width": 1500,
+        "height": null
+      },
+      "small": {
+        "width": 720,
+        "height": null
+      },
+      "thumbnail": {
+        "width": 320,
+        "height": null
+      }
+    }
   }
 }

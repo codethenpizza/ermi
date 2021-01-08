@@ -52,15 +52,3 @@ export class WheelSizeApiClient {
         };
     }
 }
-
-
-// const client = new WheelSizeApiClient('0a257eab46dd96b3d93eb0baf44db9d4');
-
-// client.searchByModel({slug: 'chevrolet', name: 'chevrolet'}, {slug: 2014, name: 2014}, {slug: 'aveo', name: 'aveo'})
-//     .then((resp) => {
-//         console.log(resp);
-//     }).catch((err) => {
-//     console.log(err);
-// });
-// https://api.wheel-size.com/v1/search/by_model/?make=chevrolet&year=2014&model=aveo&user_key=0a257eab46dd96b3d93eb0baf44db9d4
-// https://api.wheel-size.com/v1/search/by_model/?make=chevrolet&year=2014&model=aveo&user_key=0a257eab46dd96b3d93eb0baf44db9d4

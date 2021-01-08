@@ -2,11 +2,15 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Response, Request} from "express";
 import {WheelSizeApi} from "../index";
 import {EsReqFilter} from "@actions/front/Product/ProductElasticSearchAction";
+import {DISK_BOLTS_COUNT, DISK_BOLTS_SPACING, DISK_DIAMETER, DISK_ET, DISK_WIDTH} from "../../suppliers/types";
+import slugify from "slugify";
 
 type ReqBody = {
     make: string;
     year: string;
     model: string;
+    generation: string;
+    trim: string;
 }
 
 export class WheelsSearchAction implements Action {
@@ -18,28 +22,45 @@ export class WheelsSearchAction implements Action {
         next();
     }
 
-    async handle({body: {make, year, model}}: Request<any, any, ReqBody, any>, res: Response) {
+    async handle({body: {make, year, model, generation, trim}}: Request<any, any, ReqBody, any>, res: Response) {
         const apiResp = await WheelSizeApi.searchByModel(make, year, model);
 
         const filters: EsReqFilter[][] = [];
-        apiResp.forEach((item) => {
-            const filter: EsReqFilter[] = [
-                {
-                    name: 'diameter',
-                    value: Array.from(new Set(item.wheels.map(x => x.front.rim_diameter)))
-                },
-                {
-                    name: 'width',
-                    value: Array.from(new Set(item.wheels.map(x => x.front.rim_width)))
-                },
-                {
-                    name: 'et',
-                    value: Array.from(new Set(item.wheels.map(x => x.front.rim_offset)))
-                },
-            ];
-            filters.push(filter);
+        apiResp
+            .filter((item) => item.trim === trim && item.generation.name === generation)
+            .forEach((item) => {
+
+            const variants: EsReqFilter[][] = item.wheels
+                .map(({front: {rim_diameter, rim_width, rim_offset}}) => {
+                if (!rim_diameter || !rim_offset || !rim_width) {
+                    return [];
+                }
+                return [
+                    {
+                        name: slugify(DISK_DIAMETER, {lower: true}),
+                        value: rim_diameter
+                    },
+                    {
+                        name: slugify(DISK_WIDTH, {lower: true}),
+                        value: rim_width
+                    },
+                    {
+                        name: slugify(DISK_ET, {lower: true}),
+                        value: rim_offset
+                    },
+                    {
+                        name: slugify(DISK_BOLTS_COUNT, {lower: true}),
+                        value: item.stud_holes
+                    },
+                    {
+                        name: slugify(DISK_BOLTS_SPACING, {lower: true}),
+                        value: item.pcd
+                    }
+                ]
+            });
+            filters.push(...variants);
         });
 
-        res.send(apiResp.map(x => x.wheels));
+        res.send(filters);
     }
 }

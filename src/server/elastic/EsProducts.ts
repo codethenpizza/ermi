@@ -4,71 +4,67 @@ import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import Attribute from "@models/Attribute.model";
 import AttrType from "@models/AttrType.model";
+import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
-import {EsProductVariant, IEsProduct} from "./types";
+import {EsAttrValue, EsProductVariant, IEsProduct} from "./types";
 import {ProductScheme} from "./schemas/ProductScheme";
-import {elastic} from 'config';
 
-
-export const productType = 'product';
+export const productIndex = 'product';
 
 export class EsProduct extends EsIndex {
 
     constructor() {
-        super(elastic.index, productType);
+        super(productIndex);
     }
 
     protected createMapping() {
         return ProductScheme;
     }
 
-    protected async createData(): Promise<IEsProduct[]> {
-        const products = await Product.findAll({
+    protected async createData(): Promise<EsProductVariant[]> {
+        const variants = await ProductVariant.findAll({where: {is_available: true},
             include: [
-                ProductCategory,
                 {
-                    model: ProductVariant,
-                    include: [{model: AttrValue, include: [{model: Attribute, include: [AttrType]}]}]
-                }
-            ]
-        });
+                    model: AttrValue,
+                    include: [{model: Attribute, include: [AttrType]}]
+                },
+                Image
+            ]});
 
         // @ts-ignore
-        return products.map(x => x.dataValues).map((prod) => {
+        return variants.map(x => x.dataValues).map<EsProductVariant>((variant) => {
             return {
-                ...prod,
-                cats_ids: prod.cats.map(c => c.id),
-                variants: prod.variants.map(x => x.dataValues).map<EsProductVariant>((variant) => {
-                    return {
-                        ...variant,
-                        price: parseInt(variant.price),
-                        attrs: variant.attrs.map(x => x.dataValues)
-                            .reduce((obj, attr) => {
-                                let value = attr.value;
-
-                                switch (attr.attribute.type.type) {
-                                    case 'decimal':
-                                        value = parseFloat(value);
-                                        break;
-
-                                    case 'number':
-                                        value = parseInt(value);
-                                        break;
-                                }
-
-                                obj[attr.attribute.slug] = {
-                                    value,
-                                    name: attr.attribute.name,
-                                    slug: attr.attribute.slug
-                                };
-                                return obj;
-                            }, {})
-                    };
-                })
+                ...variant,
+                price: parseInt(variant.price),
+                attrs: this.makeAttrs(variant)
             };
-        });
+        })
     }
 
 
+    private makeAttrs(variant: ProductVariant): EsAttrValue[] {
+        // @ts-ignore
+        return variant.attrs.map(x => x.dataValues)
+            .reduce((obj, attr) => {
+                let value = attr.value;
+
+                switch (attr.attribute.type.type) {
+                    case 'decimal':
+                        value = parseFloat(value);
+                        break;
+
+                    case 'number':
+                        value = parseInt(value);
+                        break;
+                }
+
+                obj[attr.attribute.slug] = {
+                    value,
+                    name: attr.attribute.name,
+                    slug: attr.attribute.slug
+                };
+                return obj;
+            }, {});
+    }
 }
 

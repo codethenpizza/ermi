@@ -1,25 +1,22 @@
 import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
+import parseDouble from "../../../helpers/parseDouble";
 
-import {Supplier, SupplierDisk} from "../supplier";
+import {DiskMap, SupplierDisk} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
-import {DiskMap} from "../ProductMapping";
 
-
-export class Discovery implements Supplier, SupplierDisk {
+export class Discovery implements SupplierDisk {
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
 
             console.log('Start fetch Discovery');
 
-            const host = config.get('suppliers.Discovery.api.host');
-            const token = config.get('suppliers.Discovery.api.token');
+            const {host, token} = config.get('suppliers.Discovery.api');
             const url = `${host}?token=${token}`;
 
             let counter = 0;
-            const rawData = [];
             try {
                 request.get(url)
                     .on('response', resp => {
@@ -31,7 +28,7 @@ export class Discovery implements Supplier, SupplierDisk {
 
                             item.param = JSON.stringify(item.param);
                             try {
-                                await DiscoveryModel.bulkCreate([item], {updateOnDuplicate: Object.keys(item)});
+                                await DiscoveryModel.upsert(item);
                             } catch (e) {
                                 console.error(e, item);
                             }
@@ -56,6 +53,8 @@ export class Discovery implements Supplier, SupplierDisk {
     }
 
     async getRims(): Promise<DiskMap[]> {
+        console.log('Start store Discovery');
+
         const rawData = await DiscoveryModel.findAll();
 
         return rawData.map<DiskMap>((item) => {
@@ -63,13 +62,12 @@ export class Discovery implements Supplier, SupplierDisk {
 
             return {
                 uid: 'discovery_' + item.code,
-                model_name: item.name,
+                model: item.model,
                 brand: item.brand,
                 image: item.picture,
                 price: parseDouble(item.price),
-                priceMRC: parseDouble(item.price_recommended),
                 pcd: parseDouble(param.find((e) => e.$.name === 'H/PCD')?.$text || null),
-                inStock: parseDouble(item.rest_fast),
+                inStock: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast),
                 width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text) || null,
                 color: param.find((e) => e.$.name === 'Цвет')?.$text || null,
                 diameter: parseDouble(param.find((e) => e.$.name === 'Диаметр колеса')?.$text) || null,
@@ -83,14 +81,3 @@ export class Discovery implements Supplier, SupplierDisk {
         });
     }
 }
-
-
-export const parseDouble = (val: string): number => {
-    if (!val) return null;
-    const value = parseFloat(val.replace(',', '.'));
-    if (!isNaN(value)) {
-        return value;
-    } else {
-        return null;
-    }
-};

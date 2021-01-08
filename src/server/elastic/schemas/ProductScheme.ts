@@ -1,198 +1,191 @@
 export const ProductScheme = {
-    "attr_set_id": {
-        "type": "integer"
+    "id": {
+        "type": "long"
     },
     "created_at": {
         "type": "date"
     },
-    "id": {
+    "in_stock_qty": {
         "type": "integer"
     },
-    "name": {
-        "type": "text"
+    "is_available": {
+        "type": "boolean"
+    },
+    "is_discount": {
+        "type": "boolean"
+    },
+    "price": {
+        "type": "scaled_float",
+        "scaling_factor": 100
+    },
+    "product_id": {
+        "type": "integer"
     },
     "updated_at": {
         "type": "date"
     },
-    "variants": {
-        "type": "nested",
+    "vendor_code": {
+        "type": "keyword"
+    },
+    "attrs": {
         "properties": {
-            "attrs": {
+            "bolts-count": {
                 "properties": {
-                    "bolts-count": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "short"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
+                    "name": {
+                        "type": "text"
                     },
-                    "bolts-spacing": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "short"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
+                    "value": {
+                        "type": "short"
                     },
-                    "brand": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "keyword"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "color": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "keyword"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "dia": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "double"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "diameter": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "short"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "et": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "short"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "pcd": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "short"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "recommended-price": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "scaled_float",
-                                "scaling_factor": 100
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "type": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "keyword"
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
-                    },
-                    "width": {
-                        "properties": {
-                            "name": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "scaled_float",
-                                "scaling_factor": 10
-                            },
-                            "slug": {
-                                "type": "keyword"
-                            }
-                        }
+                    "slug": {
+                        "type": "keyword"
                     }
                 }
             },
-            "created_at": {
-                "type": "date"
+            "bolts-spacing": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "short"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "id": {
-                "type": "long"
+            "brand": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "keyword"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "in_stock_qty": {
-                "type": "integer"
+            "color": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "keyword"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "is_available": {
-                "type": "boolean"
+            "dia": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "double"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "is_discount": {
-                "type": "boolean"
+            "diameter": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "short"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "price": {
-                "type": "scaled_float",
-                "scaling_factor": 100
+            "et": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "short"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "product_id": {
-                "type": "integer"
+            "model": {
+                "properties": {
+                    "name": {
+                        "type": "text",
+                    },
+                    "slug": {
+                        "type": "keyword",
+                    },
+                    "value": {
+                        "type": "keyword",
+                    }
+                }
             },
-            "updated_at": {
-                "type": "date"
+            "pcd": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "short"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             },
-            "vendor_code": {
-                "type": "keyword"
+            "recommended-price": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "scaled_float",
+                        "scaling_factor": 100
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "type": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "keyword"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "width": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "scaled_float",
+                        "scaling_factor": 10
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             }
         }
     }

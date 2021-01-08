@@ -5,11 +5,10 @@ export class EsIndex {
     public es: Elastic;
 
     constructor(
-        protected index,
-        protected type
+        protected index: string,
+        protected type?: string
     ) {
-        if (!index || !type) {
-            console.log(index, type);
+        if (!index) {
             throw new Error('Index and type are required');
         }
 
@@ -32,6 +31,7 @@ export class EsIndex {
                 await this.es.setQuotesMapping(schema);
             }
 
+            await this.es.clearIndex();
             const data = await this.createData();
             await this.es.bulkCreate(data);
             console.log('[Index updated successfully]');

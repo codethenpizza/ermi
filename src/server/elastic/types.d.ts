@@ -8,7 +8,7 @@ export interface IEsProduct {
 }
 
 export interface EsProductVariant {
-    id?: number;
+    id: number;
     product_id: number;
     vendor_code: string;
     desc?: string;
