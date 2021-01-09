@@ -13,7 +13,8 @@
   },
   "elastic": {
     "host": "localhost",
-    "port": "9200"
+    "port": "9200",
+    "protocol": "http"
   },
   "suppliers": {
     "Slik": {
