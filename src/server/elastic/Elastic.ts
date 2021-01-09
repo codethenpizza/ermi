@@ -3,7 +3,8 @@ import {elastic} from 'config';
 import * as RequestParams from "es7/api/requestParams";
 import {ApiResponse, Context, RequestBody, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
 
-export const esClient = new Client({node: `http://${elastic.host}:${elastic.port}`});
+const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
+export const esClient = new Client({node});
 
 export class Elastic {
 
