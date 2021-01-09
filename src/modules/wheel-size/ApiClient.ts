@@ -31,6 +31,7 @@ export class WheelSizeApiClient {
         const apiClient = axios.create({
             baseURL: this.url,
             responseType: "json",
+            maxContentLength: 1_000_000,
             headers: {
                 'Content-Type': 'application/json'
             }
