@@ -9,6 +9,10 @@ const MAX_INT = 2147483647;
 
 export interface EsSearchReqBody {
     filters?: EsReqFilter[];
+    extFilters?: {
+        data: EsReqFilter[][];
+        filters: any
+    }
     size?: number;
     from?: number;
 }
@@ -40,14 +44,10 @@ export class ProductElasticSearchAction implements Action {
         next();
     }
 
-    async handle({body: {filters, size = 20, from = 0}, cookies}: Request<any, any, EsSearchReqBody, any>, res: Response) {
+    async handle({body: {filters, extFilters, size = 20, from = 0}}: Request<any, any, EsSearchReqBody, any>, res: Response) {
         try {
-            let cookieFilters: EsReqFilter[][] = [];
-            if (cookies['wheel-size-filter']) {
-                cookieFilters = JSON.parse(cookies['wheel-size-filter'])?.data || [];
-            }
 
-            const query = await this.makeQuery(filters, cookieFilters);
+            const query = await this.makeQuery(filters, extFilters?.data);
 
             console.log('query', JSON.stringify(query));
 
@@ -78,27 +78,27 @@ export class ProductElasticSearchAction implements Action {
         }
     }
 
-    private async makeQuery(filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
+    private async makeQuery(filters: EsReqFilter[], extFilters: EsReqFilter[][]) {
         const query = bodybuilder();
-        this.addFilters(query, filters, cookieFilters);
+        this.addFilters(query, filters, extFilters);
         await this.addAggs(query);
         return query.build();
     }
 
-    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], cookieFilters: EsReqFilter[][]) {
+    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], extFilters: EsReqFilter[][]) {
         query.query('bool', 'filter', [
             {
                 bool: this.setFilters(filters)
             },
             {
-                bool: this.setCookieFilters(cookieFilters)
+                bool: this.setExtFilters(extFilters)
             }
         ]);
     }
 
-    private setCookieFilters(cookieFilters: EsReqFilter[][]) {
-        return cookieFilters?.length ? {
-            should: cookieFilters.filter(x => x?.length).map(f => ({
+    private setExtFilters(extFilters: EsReqFilter[][]) {
+        return extFilters?.length ? {
+            should: extFilters.filter(x => x?.length).map(f => ({
                 bool: {
                     filter: f.map(({name, value}) => ({
                         [Array.isArray(value) ? 'terms' : 'term']: {
