@@ -9,7 +9,10 @@ export default class DiskoptimModel extends Model<IDiskoptimRaw> {
     @Column
     name: string;
 
-    @Column
+    @Column({
+        unique: true,
+        allowNull: false
+    })
     code: string;
 
     @Column

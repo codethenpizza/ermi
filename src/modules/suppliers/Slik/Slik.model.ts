@@ -7,7 +7,10 @@ import {Column, DataType, Model, Table} from "sequelize-typescript";
 })
 export default class SlikModel extends Model<ISilkRaw> {
 
-    @Column
+    @Column({
+        unique: true,
+        allowNull: false
+    })
     code: string;
 
     @Column
