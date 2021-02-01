@@ -28,15 +28,19 @@ export class EsProduct extends EsIndex {
                     model: AttrValue,
                     include: [{model: Attribute, include: [AttrType]}]
                 },
-                Image
+                Image,
+                Product
             ]});
 
         // @ts-ignore
-        return variants.map(x => x.dataValues).map<EsProductVariant>((variant) => {
+        return variants.map<ProductVariant>(x => x.dataValues).map<EsProductVariant>((variant) => {
+            const variantData = {...variant};
+            delete variantData.product;
             return {
-                ...variant,
-                price: parseInt(variant.price),
-                attrs: this.makeAttrs(variant)
+                ...variantData,
+                price: parseInt(variant.price.toString()),
+                attrs: this.makeAttrs(variant),
+                name: variant.product.name
             };
         })
     }

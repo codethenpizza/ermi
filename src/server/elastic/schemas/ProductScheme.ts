@@ -2,6 +2,9 @@ export const ProductScheme = {
     "id": {
         "type": "long"
     },
+    "name": {
+        "type": "keyword"
+    },
     "created_at": {
         "type": "date"
     },
