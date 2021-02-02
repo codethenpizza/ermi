@@ -1,3 +1,5 @@
+import {EsReqFilter} from "@actions/front/Product/ProductElasticSearchAction";
+
 export interface Make {
     slug: string;
     name: string;
@@ -78,4 +80,13 @@ export interface Wheel {
     tire_is_82series: boolean;
     load_index: number;
     speed_index: string;
+}
+
+export interface ParamsPair {
+    diameter: number;
+    width: number;
+    et: number;
+    boltsCount: number;
+    boltsSpacing: number;
+    esFilters: EsReqFilter[][];
 }
