@@ -60,24 +60,30 @@ export class Discovery implements SupplierDisk {
         return rawData.map<DiskMap>((item) => {
             const param = JSON.parse(item.param);
 
+            const bolts_count = parseDouble(param.find((e) => e.$.name === 'Количество отверстий')?.$text) || null;
+            const bolts_spacing = parseDouble(param.find((e) => e.$.name === 'Диаметр расположения отверстий')?.$text) || null;
+
+            const supplier = 'discovery';
+
             return {
-                uid: 'discovery_' + item.code,
+                uid: `${supplier}_${item.code}`,
+                supplier,
                 model: item.model,
                 brand: item.brand,
                 image: item.picture,
                 price: parseDouble(item.price),
-                pcd: parseDouble(param.find((e) => e.$.name === 'H/PCD')?.$text || null),
+                pcd: `${bolts_count}X${bolts_spacing}`,
                 inStock: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast),
-                width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text) || null,
+                width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text),
                 color: param.find((e) => e.$.name === 'Цвет')?.$text || null,
-                diameter: parseDouble(param.find((e) => e.$.name === 'Диаметр колеса')?.$text) || null,
-                bolts_count: parseDouble(param.find((e) => e.$.name === 'Количество отверстий')?.$text) || null,
-                bolts_spacing: parseDouble(param.find((e) => e.$.name === 'Диаметр расположения отверстий')?.$text) || null,
-                et: parseDouble(param.find((e) => e.$.name === 'Вылет ET')?.$text) || null,
+                diameter: parseDouble(param.find((e) => e.$.name === 'Диаметр колеса')?.$text),
+                bolts_count,
+                bolts_spacing,
+                et: parseDouble(param.find((e) => e.$.name === 'Вылет ET')?.$text),
                 type: param.find((e) => e.$.name === 'Тип диска')?.$text || null,
-                dia: parseDouble(param.find((e) => e.$.name === 'Диаметр ступицы Dia')?.$text) || null,
+                dia: parseDouble(param.find((e) => e.$.name === 'Диаметр ступицы Dia')?.$text),
                 color_name: param.find((e) => e.$.name === 'Расшифровка цвета RUS')?.$text || null,
-            }
+            };
         });
     }
 }

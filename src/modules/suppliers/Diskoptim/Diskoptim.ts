@@ -50,31 +50,31 @@ export class Diskoptim implements Supplier, SupplierDisk {
     }
 
     async getRims(): Promise<DiskMap[]> {
-        const getModelNameRegex = /\b(\w+)$/g
-
         const rawData = await DiskoptimModel.findAll();
 
         const toCreate = [];
         for (const item of rawData) { //parse raw disk and compare
 
             const [raw_bolts_count, raw_bolts_spacing] = item.PCD.split('x');
+            const supplier = 'diskoptim';
 
             const disk: DiskoptimDiskMap = {
-                uid: 'diskoptim_' + item.code,
+                uid: `${supplier}_${item.code}`,
+                supplier,
                 model: item.model,
                 brand: item.brand,
                 image: item.image,
                 price: parseDouble(item.price),
-                pcd: item.PCD ? parseDouble(item.PCD) : 0,
+                pcd: `${raw_bolts_count}X${raw_bolts_spacing}`,
                 inStock: item.countMSK ? parseDouble(item.countMSK) : 0,
-                width: item.width ? parseDouble(item.width) : null,
+                width: parseDouble(item.width),
                 color: item.color || null,
-                diameter: item.diameter ? parseDouble(item.diameter) : null,
-                bolts_count: raw_bolts_count ? parseDouble(raw_bolts_count) : null,
-                bolts_spacing: raw_bolts_spacing ? parseDouble(raw_bolts_spacing) : null,
-                et: item.et ? parseDouble(item.et) : null,
+                diameter: parseDouble(item.diameter),
+                bolts_count: parseDouble(raw_bolts_count),
+                bolts_spacing: parseDouble(raw_bolts_spacing),
+                et: parseDouble(item.et),
                 type: diskType.alloy,
-                dia: item.DIA ? parseDouble(item.DIA) : null,
+                dia: parseDouble(item.DIA),
             };
 
             toCreate.push(disk)

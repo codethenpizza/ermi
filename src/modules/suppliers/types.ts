@@ -10,6 +10,7 @@ export abstract class SupplierDisk extends Supplier {
 }
 
 export interface DiskMap {
+    supplier: string;
     model: string; // ДИСК
     brand: string;
     uid: string;
@@ -18,9 +19,8 @@ export interface DiskMap {
     et: number;  //ВЫЛЕТ
     diameter: number; //ДИАМЕТР ДИСКА
     bolts_count: number; //КОЛ-ВО ОТВЕРСТИЙ
-    bolts_spacing: number;
-    pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-    pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
+    bolts_spacing: number; // ДИАМЕТР ОКРУЖНОСТИ
+    pcd: string; //ДИАМЕТР ОКРУЖНОСТИ X КОЛ-ВО ОТВЕРСТИЙ
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     image: string;
     price: number;
@@ -55,6 +55,7 @@ export interface DiskMapOptions {
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     type: number;
     attr_set_id: number;
+    supplier: number;
 }
 
 export const DISK_MODEL = 'Model';
@@ -66,6 +67,6 @@ export const DISK_DIAMETER = 'Diameter';
 export const DISK_BOLTS_COUNT = 'Bolts count';
 export const DISK_BOLTS_SPACING = 'Bolts spacing';
 export const DISK_PCD = 'PCD';
-export const DISK_PCD2 = 'PCD2';
 export const DISK_DIA = 'DIA';
 export const DISK_TYPE = 'Type';
+export const DISK_SUPPLIER = 'Supplier';

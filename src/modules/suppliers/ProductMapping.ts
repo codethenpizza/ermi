@@ -7,8 +7,7 @@ import {
     DISK_DIAMETER,
     DISK_ET,
     DISK_MODEL,
-    DISK_PCD,
-    DISK_PCD2,
+    DISK_PCD, DISK_SUPPLIER,
     DISK_TYPE,
     DISK_WIDTH, DiskMap,
     DiskMapOptions,
@@ -22,9 +21,6 @@ import Product, {IProduct} from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import {sequelize} from '@db'
-import {log} from "util";
-import ts from "typescript/lib/tsserverlibrary";
-import ProjectLoadingFinishEvent = ts.server.ProjectLoadingFinishEvent;
 import Image from "@models/Image.model";
 import ProductVariantImg from "@models/ProductVariantImg.model";
 import progressBar from "../../helpers/progressBar";
@@ -33,22 +29,28 @@ export enum diskType {
     alloy = 'литые'
 }
 
+export enum attrType {
+    STRING = 1,
+    NUMBER,
+    DECIMAL
+}
+
 export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
     private attrArr: AttributeI[] = [
-        {name: DISK_MODEL, type_id: 1, aggregatable: false},
-        {name: DISK_BRAND, type_id: 1, aggregatable: true},
-        {name: DISK_COLOR, type_id: 1, aggregatable: true},
-        {name: DISK_WIDTH, type_id: 3, aggregatable: true}, //ШИРИНА ДИСКА
-        {name: DISK_ET, type_id: 3, aggregatable: true}, //ВЫЛЕТ
-        {name: DISK_DIAMETER, type_id: 3, aggregatable: true}, //ДИАМЕТР ДИСКА
-        {name: DISK_BOLTS_COUNT, type_id: 2, aggregatable: true}, //КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_BOLTS_SPACING, type_id: 3, aggregatable: true},
-        {name: DISK_PCD, type_id: 3, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-        {name: DISK_PCD2, type_id: 3, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
-        {name: DISK_DIA, type_id: 3, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: DISK_TYPE, type_id: 1, aggregatable: true}
+        {name: DISK_MODEL, type_id: attrType.STRING, aggregatable: false},
+        {name: DISK_BRAND, type_id: attrType.STRING, aggregatable: true},
+        {name: DISK_COLOR, type_id: attrType.STRING, aggregatable: true},
+        {name: DISK_WIDTH, type_id: attrType.DECIMAL, aggregatable: true}, //ШИРИНА ДИСКА
+        {name: DISK_ET, type_id: attrType.DECIMAL, aggregatable: true}, //ВЫЛЕТ
+        {name: DISK_DIAMETER, type_id: attrType.DECIMAL, aggregatable: true}, //ДИАМЕТР ДИСКА
+        {name: DISK_BOLTS_COUNT, type_id: attrType.NUMBER, aggregatable: false}, //КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_BOLTS_SPACING, type_id: attrType.DECIMAL, aggregatable: false}, //ДИАМЕТР ОКРУЖНОСТИ
+        {name: DISK_PCD, type_id: attrType.STRING, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ x КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_DIA, type_id: attrType.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
+        {name: DISK_TYPE, type_id: attrType.STRING, aggregatable: true},
+        {name: DISK_SUPPLIER, type_id: attrType.STRING, aggregatable: false},
     ];
 
     async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
@@ -117,18 +119,18 @@ export class ProductMapping {
         }, {});
         const mapping: DiskMapOptions = {
             attr_set_id: attrSet.id,
-            model: attrMap['Model'],
-            brand: attrMap['Brand'],
-            color: attrMap['Color'],
-            width: attrMap['Width'],
-            et: attrMap['ET'],
-            diameter: attrMap['Diameter'],
-            bolts_count: attrMap['Bolts count'],
-            bolts_spacing: attrMap['Bolts spacing'],
-            pcd: attrMap['PCD'],
-            pcd2: attrMap['PCD2'],
-            dia: attrMap['DIA'],
-            type: attrMap['Type'],
+            model: attrMap[DISK_MODEL],
+            brand: attrMap[DISK_BRAND],
+            color: attrMap[DISK_COLOR],
+            width: attrMap[DISK_WIDTH],
+            et: attrMap[DISK_ET],
+            diameter: attrMap[DISK_DIAMETER],
+            bolts_count: attrMap[DISK_BOLTS_COUNT],
+            bolts_spacing: attrMap[DISK_BOLTS_SPACING],
+            pcd: attrMap[DISK_PCD],
+            dia: attrMap[DISK_DIA],
+            type: attrMap[DISK_TYPE],
+            supplier: attrMap[DISK_SUPPLIER],
         };
 
         await this.saveMapping(mapping, transaction);
@@ -176,36 +178,32 @@ export class ProductMapping {
         })
 
         const existedProductVariant = existedProductVariantsModels.find(variant => {
-            //console.log(variant.attrs, rim)
-            const isSameBrand = variant.attrs.some(attr => {
-                const isAttrBrand = attr.attr_id === mapping.brand;
-                const isRimBrand = attr.value === brand;
-                // console.log(attr.value, rim.brand)
-                if (isAttrBrand && isRimBrand) {
-                    return attr
-                }
-            })
+            let isSameBrand = null;
+            let isSameModel = null;
 
-            const isSameModel = variant.attrs.some(attr => {
-                const isAttrModel = attr.attr_id === mapping.model;
-                const isRimModel = attr.value === model;
-                //console.log(attr.value, rim.model)
-                if (isAttrModel && isRimModel) {
-                    return attr
+            variant.attrs.forEach((attr) => {
+                if(!isSameBrand) {
+                    if(attr.attr_id === mapping.brand && attr.value === brand) {
+                        isSameBrand = attr;
+                    }
                 }
-            })
 
-            //console.log('what we find', isSameBrand, isSameModel)
+                if(!isSameModel) {
+                    if(attr.attr_id === mapping.model && attr.value === model) {
+                        isSameModel = attr;
+                    }
+                }
+            });
+
             if (isSameBrand && isSameModel) {
-                return variant
+                return variant;
             }
         })
         if (existedProductVariant) {
-            // console.log('find by model and brand', existedProductVariant);
-            return existedProductVariant.product_id
+            return existedProductVariant.product_id;
         }
 
-        return null
+        return null;
     }
 
     private async updateByCode(rim: DiskMap): Promise<boolean> {

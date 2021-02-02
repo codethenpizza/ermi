@@ -1,4 +1,4 @@
-export const ProductScheme = {
+export const DiskScheme = {
     "id": {
         "type": "long"
     },
@@ -142,7 +142,7 @@ export const ProductScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "short"
+                        "type": "keyword",
                     },
                     "slug": {
                         "type": "keyword"
@@ -164,6 +164,19 @@ export const ProductScheme = {
                 }
             },
             "type": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "keyword"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "supplier": {
                 "properties": {
                     "name": {
                         "type": "text"
