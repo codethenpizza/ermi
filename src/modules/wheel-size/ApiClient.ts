@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {Make, Model, SByModelResp, Year} from "./types";
+import {getCacheStrategy} from "@core/cache/CacheStrategy";
 
 export class WheelSizeApiClient {
 
@@ -7,7 +8,8 @@ export class WheelSizeApiClient {
 
     constructor(
         private apiKey: string,
-        private version = 'v1'
+        private version = 'v1',
+        private cache = getCacheStrategy()
     ) {
     }
 
@@ -28,6 +30,14 @@ export class WheelSizeApiClient {
     }
 
     private async request<T>(url: string, params: any = {}): Promise<T> {
+        params = this.setParams(params);
+
+        const cacheKey = `wheel-size-cache_${url}_${JSON.stringify(params)}`;
+        const cached = await this.cache.get(cacheKey);
+        if(cached) {
+            return cached;
+        }
+
         const apiClient = axios.create({
             baseURL: this.url,
             responseType: "json",
@@ -37,11 +47,12 @@ export class WheelSizeApiClient {
             }
         });
 
-        params = this.setParams(params);
 
         const resp = await apiClient.get<T>(url, {
             params
         });
+
+        await this.cache.set(cacheKey, resp.data);
 
         return resp.data;
     }

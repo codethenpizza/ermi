@@ -45,26 +45,28 @@ export class Slik implements Supplier, SupplierDisk {
 
         return rawData.map<DiskMap>((item) => {
             const inStock = item.stock ? item.stock === '+' ? 20 : parseDouble(item.stock) : 0; //TODO use 20 as maximum?
-            const pcd = item.bolts_spacing2 ? item.bolts_spacing2 === 'нет' ? 0 : parseDouble(item.bolts_spacing2) : 0;
+
+            const supplier = 'slik';
 
             return {
-                uid: 'slik_' + item.code,
+                uid: `${supplier}_${item.code}`,
+                supplier,
                 model: item.model,
                 brand: item.brand,
                 image: item.image,
                 inStock,
                 price: parseDouble(item.price),
-                pcd,
-                width: item.width ? parseDouble(item.width) : null,
+                pcd: `${item.bolts_count}X${item.bolts_spacing}`,
+                width: parseDouble(item.width),
                 color: item.color || null,
-                diameter: item.diameter ? parseDouble(item.diameter) : null,
-                bolts_count: item.bolts_count ? parseDouble(item.bolts_count) : null,
-                bolts_spacing: item.bolts_spacing ? parseDouble(item.bolts_spacing) : null,
-                et: item.et ? parseDouble(item.et) : null,
+                diameter: parseDouble(item.diameter),
+                bolts_count: parseDouble(item.bolts_count),
+                bolts_spacing: parseDouble(item.bolts_spacing),
+                et: parseDouble(item.et),
                 type: diskType.alloy,
-                dia: item.dia ? parseDouble(item.dia) : null,
+                dia: parseDouble(item.dia),
                 color_name: item.color,
-            }
+            };
         });
     }
 }

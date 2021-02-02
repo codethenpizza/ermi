@@ -7,7 +7,7 @@ import AttrType from "@models/AttrType.model";
 import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
 import {EsAttrValue, EsProductVariant, IEsProduct} from "./types";
-import {ProductScheme} from "./schemas/ProductScheme";
+import {DiskScheme} from "./schemas/DiskScheme";
 
 export const productIndex = 'product';
 
@@ -18,7 +18,7 @@ export class EsProduct extends EsIndex {
     }
 
     protected createMapping() {
-        return ProductScheme;
+        return DiskScheme;
     }
 
     protected async createData(): Promise<EsProductVariant[]> {
@@ -28,15 +28,18 @@ export class EsProduct extends EsIndex {
                     model: AttrValue,
                     include: [{model: Attribute, include: [AttrType]}]
                 },
-                Image
+                Image,
+                Product
             ]});
 
         // @ts-ignore
-        return variants.map(x => x.dataValues).map<EsProductVariant>((variant) => {
+        return variants.map<ProductVariant>(x => x.dataValues).map<EsProductVariant>((variant) => {
+            const variantData = {...variant};
+            delete variantData.product;
             return {
-                ...variant,
-                price: parseInt(variant.price),
-                attrs: this.makeAttrs(variant)
+                ...variantData,
+                attrs: this.makeAttrs(variant),
+                name: variant.product.name
             };
         })
     }

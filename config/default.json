@@ -16,6 +16,10 @@
     "port": "9200",
     "protocol": "http"
   },
+  "redis": {
+    "host": "localhost",
+    "port": "6379"
+  },
   "suppliers": {
     "Slik": {
       "ftp": {
@@ -46,6 +50,7 @@
     "apiKey": "0a257eab46dd96b3d93eb0baf44db9d4"
   },
   "fileStrategy": "local",
+  "cacheStrategy": "local",
   "images": {
     "sizes": {
       "large": {

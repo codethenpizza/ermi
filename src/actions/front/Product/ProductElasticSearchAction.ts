@@ -15,6 +15,7 @@ export interface EsSearchReqBody {
     }
     size?: number;
     from?: number;
+    searchString?: string;
 }
 
 export interface EsReqFilter {
@@ -44,10 +45,18 @@ export class ProductElasticSearchAction implements Action {
         next();
     }
 
-    async handle({body: {filters, extFilters, size = 20, from = 0}}: Request<any, any, EsSearchReqBody, any>, res: Response) {
+    async handle({
+                     body: {
+                         filters,
+                         extFilters,
+                         size = 20,
+                         from = 0,
+                         searchString
+                     }
+                 }: Request<any, any, EsSearchReqBody, any>, res: Response) {
         try {
 
-            const query = await this.makeQuery(filters, extFilters?.data);
+            const query = await this.makeQuery(filters, searchString, extFilters?.data);
 
             console.log('query', JSON.stringify(query));
 
@@ -78,22 +87,32 @@ export class ProductElasticSearchAction implements Action {
         }
     }
 
-    private async makeQuery(filters: EsReqFilter[], extFilters: EsReqFilter[][]) {
+    private async makeQuery(filters: EsReqFilter[], searchString: string, extFilters: EsReqFilter[][]) {
         const query = bodybuilder();
-        this.addFilters(query, filters, extFilters);
+        this.addFilters(query, filters, searchString, extFilters);
         await this.addAggs(query);
         return query.build();
     }
 
-    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], extFilters: EsReqFilter[][]) {
-        query.query('bool', 'filter', [
+    private addFilters(query: bodybuilder.Bodybuilder, filters: EsReqFilter[], searchString: string, extFilters: EsReqFilter[][]) {
+        const boolArr = [
             {
                 bool: this.setFilters(filters)
             },
             {
                 bool: this.setExtFilters(extFilters)
             }
-        ]);
+        ];
+
+        if (searchString) {
+            boolArr.push({
+            // @ts-ignore
+                query_string: {
+                    query: `*${searchString}*`
+                }
+            });
+        }
+        query.query('bool', 'filter', boolArr);
     }
 
     private setExtFilters(extFilters: EsReqFilter[][]) {
