@@ -1,4 +1,4 @@
 import {createClient} from 'redis';
-import {redis} from 'config';
+import {redis, cacheStrategy} from 'config';
 
-export const RedisClient = createClient(redis);
+export const RedisClient = cacheStrategy === 'redis' ? createClient(redis) : null;
