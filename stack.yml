@@ -26,9 +26,17 @@ services:
       - es_data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/var/lib/redis
 
 volumes:
   mysql_data:
     driver: local
   es_data:
+    driver: local
+  redis_data:
     driver: local

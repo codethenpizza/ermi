@@ -1,4 +1,3 @@
-import {UploadedFile} from "express-fileupload";
 import {fileStrategy} from 'config';
 import {LocalStrategy} from "@core/Files/LocalStrategy";
 
