@@ -1,4 +1,4 @@
-import {EsReqFilter} from "@actions/front/Product/ProductElasticSearchAction";
+import {EsReqFilter} from "@actions/front/types";
 
 export interface Make {
     slug: string;
