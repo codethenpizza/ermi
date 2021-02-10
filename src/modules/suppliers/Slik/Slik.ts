@@ -53,7 +53,7 @@ export class Slik implements Supplier, SupplierDisk {
                 supplier,
                 model: item.model,
                 brand: item.brand,
-                image: item.image,
+                image: encodeURI(item.image),
                 inStock,
                 price: parseDouble(item.price),
                 pcd: `${item.bolts_count}X${item.bolts_spacing}`,

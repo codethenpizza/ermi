@@ -70,7 +70,7 @@ export class Discovery implements SupplierDisk {
                 supplier,
                 model: item.model,
                 brand: item.brand,
-                image: item.picture,
+                image: encodeURI(item.picture),
                 price: parseDouble(item.price),
                 pcd: `${bolts_count}X${bolts_spacing}`,
                 inStock: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast),

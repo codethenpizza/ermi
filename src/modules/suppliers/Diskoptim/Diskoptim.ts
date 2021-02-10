@@ -63,7 +63,7 @@ export class Diskoptim implements Supplier, SupplierDisk {
                 supplier,
                 model: item.model,
                 brand: item.brand,
-                image: item.image,
+                image: encodeURI(item.image),
                 price: parseDouble(item.price),
                 pcd: `${raw_bolts_count}X${raw_bolts_spacing}`,
                 inStock: item.countMSK ? parseDouble(item.countMSK) : 0,
