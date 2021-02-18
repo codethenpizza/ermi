@@ -3,7 +3,8 @@ export const DiskScheme = {
         "type": "long"
     },
     "name": {
-        "type": "keyword"
+        "type": "keyword",
+        "normalizer": "lowercase_normalizer"
     },
     "created_at": {
         "type": "date"
@@ -28,7 +29,8 @@ export const DiskScheme = {
         "type": "date"
     },
     "vendor_code": {
-        "type": "keyword"
+        "type": "keyword",
+        "normalizer": "lowercase_normalizer"
     },
     "attrs": {
         "properties": {
@@ -64,7 +66,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -77,7 +80,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -130,6 +134,7 @@ export const DiskScheme = {
                     },
                     "slug": {
                         "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "value": {
                         "type": "keyword",
@@ -143,6 +148,7 @@ export const DiskScheme = {
                     },
                     "value": {
                         "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -169,7 +175,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -182,7 +189,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
