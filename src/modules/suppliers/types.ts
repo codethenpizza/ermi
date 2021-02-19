@@ -26,19 +26,13 @@ export interface DiskMap {
     price: number;
     inStock: number;
     type: string;
+    stock: string;
+}
 
-    // countUSN?: number;
-    // count_rst?: number;
-    // count_chl?: number;
-    // count_nsb?: number;
-    //
-    // //непонятная хуйня
-    // USN: boolean;
-    // cap: string;
-    // capR: string;
-    // auto: string;
-    // fix: string;
-    // fixcode: string;
+export interface DiskStock {
+    name: string;
+    shippingTime: string;
+    count: number;
 }
 
 export interface DiskMapOptions {
@@ -49,13 +43,13 @@ export interface DiskMapOptions {
     et: number;  //ВЫЛЕТ
     diameter: number; //ДИАМЕТР ДИСКА
     bolts_count: number; //КОЛ-ВО ОТВЕРСТИЙ
-    bolts_spacing: number;
-    pcd: number; //ДИАМЕТР ОКРУЖНОСТИ* bolts_spacing
-    pcd2?: number; //ДИАМЕТР ОКРУЖНОСТИ 2 bolts_spacing 2
+    bolts_spacing: number; // ДИАМЕТР ОКРУЖНОСТИ
+    pcd: number; //ДИАМЕТР ОКРУЖНОСТИ X КОЛ-ВО ОТВЕРСТИЙ
     dia: number; // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
     type: number;
     attr_set_id: number;
     supplier: number;
+    stock: number;
 }
 
 export const DISK_MODEL = 'Model';
@@ -70,3 +64,8 @@ export const DISK_PCD = 'PCD';
 export const DISK_DIA = 'DIA';
 export const DISK_TYPE = 'Type';
 export const DISK_SUPPLIER = 'Supplier';
+export const DISK_SUPPLIER_STOCK = 'Stock';
+
+export const STOCK_MSK = 'Москва';
+export const STOCK_SPB = 'Санкт-Петербург';
+export const STOCK_TOLYATTI = 'Тольятти';

@@ -7,7 +7,7 @@ import {
     DISK_DIAMETER,
     DISK_ET,
     DISK_MODEL,
-    DISK_PCD, DISK_SUPPLIER,
+    DISK_PCD, DISK_SUPPLIER, DISK_SUPPLIER_STOCK,
     DISK_TYPE,
     DISK_WIDTH, DiskMap,
     DiskMapOptions,
@@ -32,7 +32,8 @@ export enum diskType {
 export enum attrType {
     STRING = 1,
     NUMBER,
-    DECIMAL
+    DECIMAL,
+    JSON
 }
 
 export class ProductMapping {
@@ -51,6 +52,7 @@ export class ProductMapping {
         {name: DISK_DIA, type_id: attrType.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
         {name: DISK_TYPE, type_id: attrType.STRING, aggregatable: true},
         {name: DISK_SUPPLIER, type_id: attrType.STRING, aggregatable: false},
+        {name: DISK_SUPPLIER_STOCK, type_id: attrType.JSON, aggregatable: false},
     ];
 
     async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
@@ -79,7 +81,7 @@ export class ProductMapping {
             for (const [index, rim] of rims.entries()) {
 
                 try {
-                    if (await this.updateByCode(rim)) {
+                    if (await this.updateByCode(mapping, rim)) {
                         progressBar(index, rims.length)
                         continue;
                     }
@@ -131,6 +133,7 @@ export class ProductMapping {
             dia: attrMap[DISK_DIA],
             type: attrMap[DISK_TYPE],
             supplier: attrMap[DISK_SUPPLIER],
+            stock: attrMap[DISK_SUPPLIER_STOCK],
         };
 
         await this.saveMapping(mapping, transaction);
@@ -166,47 +169,25 @@ export class ProductMapping {
         }, transaction);
     }
 
-    private async getProductIdByBrandAndModel(mapping, brand, model): Promise<any | null> {
-        const existedProductVariantsModels = await ProductVariant.findAll({
-            include: [{
-                model: AttrValue,
-                where: {
-                    attr_id: [mapping.model, mapping.brand],
-                    value: [model, brand]
-                },
-            }]
-        })
-
-        const existedProductVariant = existedProductVariantsModels.find(variant => {
-            let isSameBrand = null;
-            let isSameModel = null;
-
-            variant.attrs.forEach((attr) => {
-                if(!isSameBrand) {
-                    if(attr.attr_id === mapping.brand && attr.value === brand) {
-                        isSameBrand = attr;
-                    }
-                }
-
-                if(!isSameModel) {
-                    if(attr.attr_id === mapping.model && attr.value === model) {
-                        isSameModel = attr;
-                    }
-                }
-            });
-
-            if (isSameBrand && isSameModel) {
-                return variant;
-            }
-        })
-        if (existedProductVariant) {
-            return existedProductVariant.product_id;
-        }
-
-        return null;
+    private async getProductIdByBrandAndModel(brand, model): Promise<number> {
+        const query = await AttrValue.sequelize.query(`
+            SELECT C.product_id 
+             FROM ${AttrValue.tableName} A
+            LEFT JOIN ${AttrValue.tableName} B
+             ON A.product_variant_id = B.product_variant_id
+            LEFT JOIN ${ProductVariant.tableName} C
+             ON A.product_variant_id  = C.id
+            WHERE
+             A.value = '${brand}'
+             AND B.value = '${model}'
+            LIMIT 1
+        `);
+        // @ts-ignore
+        const id: string = query[0][0]?.product_id;
+        return id ? parseInt(id) : null;
     }
 
-    private async updateByCode(rim: DiskMap): Promise<boolean> {
+    private async updateByCode(mapping: DiskMapOptions, rim: DiskMap): Promise<boolean> {
         const variantByCode = await ProductVariant.findOne({
             where: {
                 vendor_code: rim.uid
@@ -218,6 +199,16 @@ export class ProductMapping {
             variantByCode.in_stock_qty = rim.inStock;
 
             await variantByCode.save();
+
+            const stockAttr = await AttrValue.findOne({
+                where: {
+                    product_variant_id: variantByCode.id,
+                    attr_id: mapping.stock
+                }
+            });
+            stockAttr.value = rim.stock;
+
+            await stockAttr.save();
             return true;
         }
 
@@ -225,7 +216,7 @@ export class ProductMapping {
     }
 
     private async updateByBrandAndModel(mapping: DiskMapOptions, rim: DiskMap): Promise<boolean> {
-        const product_id = await this.getProductIdByBrandAndModel(mapping, rim.brand, rim.model)
+        const product_id = await this.getProductIdByBrandAndModel(rim.brand, rim.model)
 
         if (product_id) {
             //create variant with rim
@@ -241,27 +232,36 @@ export class ProductMapping {
                 return arr;
             }, []);
 
-            const productVariant = await ProductVariant.create({
-                ...rim,
-                product_id,
-                vendor_code: rim.uid,
-                attrs,
-                price: rim.price,
-                in_stock_qty: rim.inStock,
-                is_available: !!rim.inStock
-            }, {include: [AttrValue]});
+            try {
 
-            if (rim.image) {
-                try {
-                    const img = await Image.create({original_uri: rim.image});
 
-                    await ProductVariantImg.create({
-                        image_id: img.id,
-                        product_variant_id: productVariant.id
-                    });
-                } catch (e) {
-                    console.log('Error with, ', rim.image, ' id', rim.uid, e);
+                const productVariant = await ProductVariant.create({
+                    ...rim,
+                    product_id,
+                    vendor_code: rim.uid,
+                    attrs,
+                    price: rim.price,
+                    in_stock_qty: rim.inStock,
+                    is_available: !!rim.inStock
+                }, {include: [AttrValue]});
+
+
+                if (rim.image) {
+                    try {
+                        const img = await Image.create({original_uri: rim.image});
+
+                        await ProductVariantImg.create({
+                            image_id: img.id,
+                            product_variant_id: productVariant.id
+                        });
+                    } catch (e) {
+                        console.log('Error with, ', rim.image, ' id', rim.uid, e);
+                    }
                 }
+            } catch (e) {
+                console.log('ERROR', e);
+                const product = await Product.findByPk(product_id);
+                console.log('PRODUCT', product);
             }
 
             return true;

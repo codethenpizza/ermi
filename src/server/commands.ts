@@ -1,6 +1,6 @@
 import program from 'commander';
 import {updateIndexes} from "./elastic";
-import {getCacheStrategy} from "@core/cache/CacheStrategy";
+import AttrValue from "@models/AttrValue.model";
 
 // TODO move js to root/scripts
 

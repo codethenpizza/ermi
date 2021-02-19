@@ -3,7 +3,7 @@ import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 
-import {DiskMap, Supplier, SupplierDisk} from "../types";
+import {DiskMap, DiskStock, STOCK_MSK, STOCK_SPB, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import {diskType} from "../ProductMapping";
 import DiskoptimModel, {DiskoptimRawDiskMap} from "./Diskoptim.model"
@@ -35,7 +35,7 @@ export class Diskoptim implements Supplier, SupplierDisk {
 
                     xml.on('end', () => {
                         ftp.end();
-                        console.log(`End fetch Slik [${counter}]`);
+                        console.log(`End fetch Diskoptim [${counter}]`);
                         resolve();
                     });
                 });
@@ -58,6 +58,19 @@ export class Diskoptim implements Supplier, SupplierDisk {
             const [raw_bolts_count, raw_bolts_spacing] = item.PCD.split('x');
             const supplier = 'diskoptim';
 
+            const stock: DiskStock[] = [
+                {
+                    name: STOCK_MSK,
+                    shippingTime: '1-2',
+                    count: parseDouble(item.countMSK) || 0
+                },
+                {
+                    name: STOCK_SPB,
+                    shippingTime: '4-5',
+                    count: parseDouble(item.countSPB) || 0
+                }
+            ];
+
             const disk: DiskoptimDiskMap = {
                 uid: `${supplier}_${item.code}`,
                 supplier,
@@ -66,7 +79,6 @@ export class Diskoptim implements Supplier, SupplierDisk {
                 image: encodeURI(item.image),
                 price: parseDouble(item.price),
                 pcd: `${raw_bolts_count}X${raw_bolts_spacing}`,
-                inStock: item.countMSK ? parseDouble(item.countMSK) : 0,
                 width: parseDouble(item.width),
                 color: item.color || null,
                 diameter: parseDouble(item.diameter),
@@ -75,6 +87,8 @@ export class Diskoptim implements Supplier, SupplierDisk {
                 et: parseDouble(item.et),
                 type: diskType.alloy,
                 dia: parseDouble(item.DIA),
+                stock: JSON.stringify(stock),
+                inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
             };
 
             toCreate.push(disk)

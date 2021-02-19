@@ -60,6 +60,10 @@ export class EsProduct extends EsIndex {
                     case 'number':
                         value = parseInt(value);
                         break;
+
+                    case 'json':
+                        value = JSON.parse(value);
+                        break;
                 }
 
                 obj[attr.attribute.slug] = {

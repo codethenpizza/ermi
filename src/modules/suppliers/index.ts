@@ -2,8 +2,10 @@ import {fetchAll, storeAll} from './runner'
 import "@db";
 
 const main = async () => {
+    console.log(new Date());
     await fetchAll();
     await storeAll();
+    console.log(new Date());
 };
 
 main()
