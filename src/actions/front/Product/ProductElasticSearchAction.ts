@@ -109,16 +109,41 @@ export class ProductElasticSearchAction implements Action {
     }
 
     private setFilters(filters: EsReqFilter[]) {
-        return filters?.length ? {
-            filter: filters.map(({name, value, type}) => {
-                    return {
-                        [this.getOperatorByValue(value)]: {
-                            [this.getNameByType(type, name)]: value
-                        }
-                    };
+        if (!filters?.length) {
+            return {};
+        }
+
+        const groupedFilters = filters.reduce<{ [x: string]: EsReqFilter[] }>((group, item) => {
+            if (!group[item.name]) {
+                group[item.name] = [];
+            }
+            group[item.name].push(item);
+
+            return group;
+        }, {});
+
+        return {
+            filter: Object.entries(groupedFilters).map(([key, items]) => {
+
+                if (items.length === 1) {
+                    return this.makeFilter(items[0]);
                 }
-            )
-        } : {};
+
+                return {
+                    bool: {
+                        should: items.map((item) => this.makeFilter(item))
+                    }
+                };
+            })
+        };
+    }
+
+    private makeFilter({value, type, name}: EsReqFilter) {
+        return {
+            [this.getOperatorByValue(value)]: {
+                [this.getNameByType(type, name)]: value
+            }
+        }
     }
 
     private getNameByType(type: EsReqFilterType, name: string): string {
@@ -138,11 +163,11 @@ export class ProductElasticSearchAction implements Action {
             (value as RangeFilter)?.gte !== undefined ||
             (value as RangeFilter)?.lt !== undefined ||
             (value as RangeFilter)?.lte !== undefined
-        if(isRange) {
+        if (isRange) {
             return 'range';
         }
 
-        if(Array.isArray(value)) {
+        if (Array.isArray(value)) {
             return 'terms'
         }
 
