@@ -3,7 +3,8 @@ export const DiskScheme = {
         "type": "long"
     },
     "name": {
-        "type": "keyword"
+        "type": "keyword",
+        "normalizer": "lowercase_normalizer"
     },
     "created_at": {
         "type": "date"
@@ -28,7 +29,8 @@ export const DiskScheme = {
         "type": "date"
     },
     "vendor_code": {
-        "type": "keyword"
+        "type": "keyword",
+        "normalizer": "lowercase_normalizer"
     },
     "attrs": {
         "properties": {
@@ -64,7 +66,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -77,7 +80,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -130,6 +134,7 @@ export const DiskScheme = {
                     },
                     "slug": {
                         "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "value": {
                         "type": "keyword",
@@ -143,6 +148,7 @@ export const DiskScheme = {
                     },
                     "value": {
                         "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -169,7 +175,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -182,7 +189,8 @@ export const DiskScheme = {
                         "type": "text"
                     },
                     "value": {
-                        "type": "keyword"
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer"
                     },
                     "slug": {
                         "type": "keyword"
@@ -202,7 +210,99 @@ export const DiskScheme = {
                         "type": "keyword"
                     }
                 }
+            },
+            "stock": {
+                "properties": {
+                    "value": {
+                        "type": "nested",
+                        "properties": {
+                            "name": {
+                                "type" : "text",
+                                "index": false
+                            },
+                            "shippingTime": {
+                                "type" : "text",
+                                "index": false
+                            },
+                            "count": {
+                                "type" : "integer",
+                                "index": false
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "slug": {
+                        "type": "keyword"
+                    }
+                }
             }
+        }
+    },
+    "images": {
+        "type": "nested",
+        "properties": {
+            "ProductVariantImgModel" : {
+                "properties" : {
+                    "image_id" : {
+                        "type" : "long",
+                        "index": false
+                    },
+                    "position" : {
+                        "type" : "long",
+                        "index": false
+                    },
+                    "product_variant_id" : {
+                        "type" : "long",
+                        "index": false
+                    }
+                }
+            },
+            "id" : {
+                "type" : "long",
+                "index": false
+            },
+            "original_uri" : {
+                "type" : "text",
+                "index": false
+            },
+            "large_uri" : {
+                "type" : "text",
+                "index": false
+            },
+            "medium_uri" : {
+                "type" : "text",
+                "index": false
+            },
+            "small_uri" : {
+                "type" : "text",
+                "index": false
+            },
+            "thumbnail_uri" : {
+                "type" : "text",
+                "index": false
+            },
+            "name" : {
+                "type" : "text",
+                "index": false
+            },
+            "mimetype" : {
+                "type" : "text",
+                "index": false
+            },
+            "size" : {
+                "type" : "long",
+                "index": false
+            },
+            "updated_at" : {
+                "type" : "date",
+                "index": false
+            },
+            "created_at" : {
+                "type" : "date",
+                "index": false
+            },
         }
     }
 };

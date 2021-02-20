@@ -1,7 +1,7 @@
 import {Client} from 'es7';
 import {elastic} from 'config';
 import * as RequestParams from "es7/api/requestParams";
-import {ApiResponse, Context, RequestBody, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
+import {ApiResponse, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
 
 const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
 export const esClient = new Client({node});
@@ -39,6 +39,25 @@ export class Elastic {
         }
     }
 
+    async setSettings(settings: Object) {
+        try {
+            await esClient.indices.close({
+                index: this.index
+            });
+            await esClient.indices.putSettings({
+                index: this.index,
+                body: settings
+            });
+            await esClient.indices.open({
+                index: this.index
+            });
+            console.log("Settings created successfully");
+        } catch (err) {
+            console.error("An error occurred while setting the settings:");
+            console.error(JSON.stringify(err));
+        }
+    }
+
     async setQuotesMapping(schema: Object) {
         try {
             await esClient.indices.putMapping({
@@ -46,8 +65,8 @@ export class Elastic {
                 type: this.type,
                 include_type_name: true,
                 body: {
-                    properties: schema
-                }
+                    properties: schema,
+                },
             });
 
             console.log("Quotes mapping created successfully");

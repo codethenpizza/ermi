@@ -3,7 +3,7 @@ import request from 'request';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 
-import {DiskMap, SupplierDisk} from "../types";
+import {DiskMap, DiskStock, STOCK_MSK, SupplierDisk} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 
@@ -65,15 +65,22 @@ export class Discovery implements SupplierDisk {
 
             const supplier = 'discovery';
 
+            const stock: DiskStock[] = [
+                {
+                    name: STOCK_MSK,
+                    shippingTime: '1-2',
+                    count: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast) || 0
+                }
+            ];
+
             return {
                 uid: `${supplier}_${item.code}`,
                 supplier,
                 model: item.model,
                 brand: item.brand,
-                image: item.picture,
+                image: encodeURI(item.picture),
                 price: parseDouble(item.price),
                 pcd: `${bolts_count}X${bolts_spacing}`,
-                inStock: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast),
                 width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text),
                 color: param.find((e) => e.$.name === 'Цвет')?.$text || null,
                 diameter: parseDouble(param.find((e) => e.$.name === 'Диаметр колеса')?.$text),
@@ -83,6 +90,8 @@ export class Discovery implements SupplierDisk {
                 type: param.find((e) => e.$.name === 'Тип диска')?.$text || null,
                 dia: parseDouble(param.find((e) => e.$.name === 'Диаметр ступицы Dia')?.$text),
                 color_name: param.find((e) => e.$.name === 'Расшифровка цвета RUS')?.$text || null,
+                stock: JSON.stringify(stock),
+                inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
             };
         });
     }

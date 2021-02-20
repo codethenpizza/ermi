@@ -79,3 +79,42 @@ export interface ProductVariantImgModel {
     position: number;
     product_variant_id: number;
 }
+
+export interface EsSearchReqBody {
+    filters?: EsReqFilter[];
+    extFilters?: {
+        data: EsReqFilter[][];
+        filters: any
+    }
+    size?: number;
+    from?: number;
+    searchString?: string;
+}
+
+export interface EsReqFilter {
+    name: string;
+    type: EsReqFilterType;
+    value: EsReqFilterValue;
+}
+
+export type EsReqFilterType = 'attr' | 'prop';
+
+export type EsReqFilterValue = string | string[] | number | number[] | RangeFilter;
+
+export interface RangeFilter {
+    gt?: number;
+    gte?: number;
+    lt?: number;
+    lte?: number;
+}
+
+export interface RespData {
+    total: number;
+    products: EsProductVariant[];
+    aggregations: {
+        attrs: {
+            doc_count: number;
+            [x: string]: EsProdAggAttr | number;
+        }
+    }
+}

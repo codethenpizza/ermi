@@ -1,7 +1,6 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Response, Request} from "express";
 import {WheelSizeApi} from "../index";
-import {EsReqFilter} from "@actions/front/Product/ProductElasticSearchAction";
 import {DISK_BOLTS_COUNT, DISK_BOLTS_SPACING, DISK_DIAMETER, DISK_ET, DISK_WIDTH} from "../../suppliers/types";
 import slugify from "slugify";
 import {ParamsPair} from "../types";
@@ -45,26 +44,31 @@ export class WheelsSearchAction implements Action {
                     esFilters: [[
                         {
                             name: slugify(DISK_DIAMETER, {lower: true}),
-                            value: rim_diameter
+                            value: rim_diameter,
+                            type: 'attr'
                         },
                         {
                             name: slugify(DISK_WIDTH, {lower: true}),
-                            value: rim_width
+                            value: rim_width,
+                            type: 'attr'
                         },
                         {
                             name: slugify(DISK_ET, {lower: true}),
-                            value: rim_offset
+                            value: rim_offset,
+                            type: 'attr'
                         },
                         {
                             name: slugify(DISK_BOLTS_COUNT, {lower: true}),
-                            value: item.stud_holes
+                            value: item.stud_holes,
+                            type: 'attr'
                         },
                         {
                             name: slugify(DISK_BOLTS_SPACING, {lower: true}),
-                            value: item.pcd
+                            value: item.pcd,
+                            type: 'attr'
                         }
                     ]]
-                };
+                } as ParamsPair;
             }).filter(x => !!x);
             filters.push(...variants);
         });

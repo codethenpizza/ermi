@@ -25,6 +25,10 @@ export class EsIndex {
 
             await this.es.createIndex();
 
+            const settings = this.createSettings();
+            if(settings) {
+                await this.es.setSettings(settings);
+            }
 
             const schema = this.createMapping();
             if (schema) {
@@ -46,7 +50,11 @@ export class EsIndex {
     }
 
     protected createMapping(): any {
-        return false;
+        return null;
+    }
+
+    protected createSettings(): any {
+        return null;
     }
 
 }

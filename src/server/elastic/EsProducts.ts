@@ -8,6 +8,7 @@ import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
 import {EsAttrValue, EsProductVariant, IEsProduct} from "./types";
 import {DiskScheme} from "./schemas/DiskScheme";
+import {Normalizers} from "@server/elastic/schemas/Analysis";
 
 export const productIndex = 'product';
 
@@ -59,6 +60,10 @@ export class EsProduct extends EsIndex {
                     case 'number':
                         value = parseInt(value);
                         break;
+
+                    case 'json':
+                        value = JSON.parse(value);
+                        break;
                 }
 
                 obj[attr.attribute.slug] = {
@@ -68,6 +73,14 @@ export class EsProduct extends EsIndex {
                 };
                 return obj;
             }, {});
+    }
+
+    protected createSettings(): any {
+        return {
+            analysis: {
+                normalizer: Normalizers
+            }
+        };
     }
 }
 

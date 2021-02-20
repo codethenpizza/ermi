@@ -2,39 +2,17 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import bodybuilder from "bodybuilder";
 import Attribute from "@models/Attribute.model";
-import {EsProdAggAttr, EsProductVariant, EsRespProduct} from "@actions/front/types";
 import {EsProduct} from "@server/elastic/EsProducts";
+import {
+    EsProductVariant,
+    EsReqFilter,
+    EsReqFilterType, EsReqFilterValue,
+    EsRespProduct,
+    EsSearchReqBody, RangeFilter,
+    RespData
+} from "@actions/front/types";
 
 const MAX_INT = 2147483647;
-
-export interface EsSearchReqBody {
-    filters?: EsReqFilter[];
-    extFilters?: {
-        data: EsReqFilter[][];
-        filters: any
-    }
-    size?: number;
-    from?: number;
-    searchString?: string;
-}
-
-export interface EsReqFilter {
-    name: string;
-    type?: any; // TODO add filter type
-    value: string | number | string[] | number[];
-}
-
-export interface RespData {
-    total: number;
-    products: EsProductVariant[];
-    aggregations: {
-        attrs: {
-            doc_count: number;
-            [x: string]: EsProdAggAttr | number;
-        }
-    }
-}
-
 
 export class ProductElasticSearchAction implements Action {
     get action() {
@@ -45,15 +23,16 @@ export class ProductElasticSearchAction implements Action {
         next();
     }
 
-    async handle({
-                     body: {
-                         filters,
-                         extFilters,
-                         size = 20,
-                         from = 0,
-                         searchString
-                     }
-                 }: Request<any, any, EsSearchReqBody, any>, res: Response) {
+    async handle(
+        {
+            body: {
+                filters,
+                extFilters,
+                size = 20,
+                from = 0,
+                searchString
+            }
+        }: Request<any, any, EsSearchReqBody, any>, res: Response) {
         try {
 
             const query = await this.makeQuery(filters, searchString, extFilters?.data);
@@ -106,7 +85,7 @@ export class ProductElasticSearchAction implements Action {
 
         if (searchString) {
             boolArr.push({
-            // @ts-ignore
+                // @ts-ignore
                 query_string: {
                     query: `*${searchString}*`
                 }
@@ -130,16 +109,69 @@ export class ProductElasticSearchAction implements Action {
     }
 
     private setFilters(filters: EsReqFilter[]) {
-        return filters?.length ? {
-            filter: filters.map(({name, value}) => {
-                    return {
-                        terms: {
-                            [`attrs.${name}.value`]: value
-                        }
-                    };
+        if (!filters?.length) {
+            return {};
+        }
+
+        const groupedFilters = filters.reduce<{ [x: string]: EsReqFilter[] }>((group, item) => {
+            if (!group[item.name]) {
+                group[item.name] = [];
+            }
+            group[item.name].push(item);
+
+            return group;
+        }, {});
+
+        return {
+            filter: Object.entries(groupedFilters).map(([key, items]) => {
+
+                if (items.length === 1) {
+                    return this.makeFilter(items[0]);
                 }
-            )
-        } : {};
+
+                return {
+                    bool: {
+                        should: items.map((item) => this.makeFilter(item))
+                    }
+                };
+            })
+        };
+    }
+
+    private makeFilter({value, type, name}: EsReqFilter) {
+        return {
+            [this.getOperatorByValue(value)]: {
+                [this.getNameByType(type, name)]: value
+            }
+        }
+    }
+
+    private getNameByType(type: EsReqFilterType, name: string): string {
+        switch (type) {
+            case "attr":
+                return `attrs.${name}.value`;
+
+            case 'prop':
+            default:
+                return name;
+        }
+    }
+
+    private getOperatorByValue(value: EsReqFilterValue): string {
+        const isRange =
+            (value as RangeFilter)?.gt !== undefined ||
+            (value as RangeFilter)?.gte !== undefined ||
+            (value as RangeFilter)?.lt !== undefined ||
+            (value as RangeFilter)?.lte !== undefined
+        if (isRange) {
+            return 'range';
+        }
+
+        if (Array.isArray(value)) {
+            return 'terms'
+        }
+
+        return 'term';
     }
 
     private async addAggs(query: bodybuilder.Bodybuilder) {
