@@ -36,8 +36,8 @@ export class EsIndex {
             }
 
             await this.es.clearIndex();
-            const data = await this.createData();
-            await this.es.bulkCreate(data);
+
+            await this.createData(this.es.bulkCreate.bind(this));
             console.log('[Index updated successfully]');
         } catch (e) {
             console.error('Updating index error:');
@@ -45,7 +45,7 @@ export class EsIndex {
         }
     }
 
-    protected async createData(): Promise<(Object & { id: number })[]> {
+    protected async createData(storeFn: Function): Promise<void> {
         throw new Error('Override createData method');
     }
 

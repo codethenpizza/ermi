@@ -14,6 +14,8 @@ export const productIndex = 'product';
 
 export class EsProduct extends EsIndex {
 
+    private maxDataItemsInIter = 100;
+
     constructor() {
         super(productIndex);
     }
@@ -22,8 +24,30 @@ export class EsProduct extends EsIndex {
         return DiskScheme;
     }
 
-    protected async createData(): Promise<EsProductVariant[]> {
-        const variants = await ProductVariant.findAll({where: {is_available: true},
+    protected async createData(storeFn: Function): Promise<void> {
+        const total = await ProductVariant.count({where: {is_available: true}});
+        if(!total) {
+            console.log('No data');
+            return;
+        }
+
+        if(total < this.maxDataItemsInIter) {
+            await storeFn(await this.makeData());
+        } else {
+            const chunksCount = Math.ceil(total/this.maxDataItemsInIter);
+            console.log('Chunks count - ', chunksCount);
+            for(let page = 0; page < chunksCount; page++) {
+                await storeFn(await this.makeData(page));
+                console.log(`Chunk ${page + 1} done`);
+            }
+        }
+    }
+
+    private async makeData(page = 0): Promise<any> {
+        const variants = await ProductVariant.findAll({
+            offset: this.maxDataItemsInIter * page,
+            limit: this.maxDataItemsInIter,
+            where: {is_available: true},
             include: [
                 {
                     model: AttrValue,
