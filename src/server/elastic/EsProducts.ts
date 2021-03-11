@@ -1,14 +1,14 @@
 import Product from "@models/Product.model";
-import ProductCategory from "@models/ProductCategory.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import Attribute from "@models/Attribute.model";
 import AttrType from "@models/AttrType.model";
 import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
-import {EsAttrValue, EsProductVariant, IEsProduct} from "./types";
-import {DiskScheme} from "./schemas/DiskScheme";
+import {EsAttrValue, EsProductVariant} from "./types";
 import {Normalizers} from "@server/elastic/schemas/Analysis";
+import {ProductScheme} from "@server/elastic/schemas/ProductScheme";
+import AttrSet from "@models/AttrSet.model";
 
 export const productIndex = 'product';
 
@@ -16,12 +16,16 @@ export class EsProduct extends EsIndex {
 
     private maxDataItemsInIter = 100;
 
-    constructor() {
-        super(productIndex);
+    constructor(private productType?: string) {
+        super(productIndex, productType);
     }
 
-    protected createMapping() {
-        return DiskScheme;
+    protected async createMapping() {
+        const attrSet = await AttrSet.findOne({where: {slug: this.productType}});
+        if(attrSet) {
+            return ProductScheme(attrSet.scheme);
+        }
+        return ProductScheme();
     }
 
     protected async createData(storeFn: Function): Promise<void> {
@@ -50,11 +54,21 @@ export class EsProduct extends EsIndex {
             where: {is_available: true},
             include: [
                 {
+                    model: Product,
+                    include: [
+                        {
+                            model: AttrSet,
+                            where: {
+                                slug: this.productType
+                            }
+                        },
+                    ]
+                },
+                {
                     model: AttrValue,
-                    include: [{model: Attribute, include: [AttrType]}]
+                    include: [{model: Attribute, include: [AttrType]}],
                 },
                 Image,
-                Product
             ]});
 
         // @ts-ignore

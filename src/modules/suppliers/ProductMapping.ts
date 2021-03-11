@@ -24,6 +24,7 @@ import {sequelize} from '@db'
 import Image from "@models/Image.model";
 import ProductVariantImg from "@models/ProductVariantImg.model";
 import progressBar from "../../helpers/progressBar";
+import {RimAttrScheme} from "@server/elastic/schemas/RimAttrScheme";
 
 export enum diskType {
     alloy = 'литые'
@@ -165,7 +166,8 @@ export class ProductMapping {
         return AttrSet.createWR({
             name: 'Rim',
             desc: 'Rim attribute set from module',
-            attributes: attrs.map(x => x.id)
+            scheme: RimAttrScheme,
+            attributes: attrs.map(x => x.id),
         }, transaction);
     }
 

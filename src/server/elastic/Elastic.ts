@@ -23,7 +23,9 @@ export class Elastic {
                     await esClient.cluster.health({});
                     console.log("Successfully connected to ElasticSearch");
                     isConnected = true;
-                } catch (_) {
+                } catch (e) {
+                    console.log('Error', e);
+                    console.log('Trying to reconnect...');
                 }
             }
             resolve(true);

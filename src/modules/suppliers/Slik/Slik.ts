@@ -15,6 +15,7 @@ export class Slik implements Supplier, SupplierDisk {
             let counter = 0;
             try {
                 const ftp = new FTP();
+                console.log('config.get(\'suppliers.Slik.ftp\')', config.get('suppliers.Slik.ftp'));
                 ftp.connect(config.get('suppliers.Slik.ftp'));
 
                 ftp.get(config.get('suppliers.Slik.ftp_file'), (err, stream) => {
