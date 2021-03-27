@@ -92,12 +92,10 @@ export interface EsSearchReqBody {
 }
 
 export interface EsReqFilter {
-    name: string;
-    type: EsReqFilterType;
+    key: string;
+    nested?: string;
     value: EsReqFilterValue;
 }
-
-export type EsReqFilterType = 'attr' | 'prop';
 
 export type EsReqFilterValue = string | string[] | number | number[] | RangeFilter;
 

@@ -23,7 +23,9 @@ export class Elastic {
                     await esClient.cluster.health({});
                     console.log("Successfully connected to ElasticSearch");
                     isConnected = true;
-                } catch (_) {
+                } catch (e) {
+                    console.log('Error', e);
+                    console.log('Trying to reconnect...');
                 }
             }
             resolve(true);
@@ -135,6 +137,19 @@ export class Elastic {
             type: this.type,
             ...params
         }, options);
+    }
+
+    async get(id: string): Promise<TransportRequestPromise<ApiResponse>> {
+        return esClient.get({
+            index: this.index,
+            id
+        }).catch((e) => {
+            if(e.meta.statusCode === 404) {
+                return null;
+            }
+
+            throw e;
+        });
     }
 
 }

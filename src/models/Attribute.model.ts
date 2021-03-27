@@ -3,6 +3,7 @@ import AttrType from "@models/AttrType.model";
 import AttrSet from "@models/AttrSet.model";
 import AttrSetAttr from "@models/AttrSetAttr.model";
 import slugify from "slugify";
+import {Op} from "sequelize";
 
 @Table({
     tableName: 'attribute',
@@ -34,6 +35,9 @@ export default class Attribute extends Model<Attribute> {
     })
     aggregatable: boolean;
 
+    @Column
+    aggPath: string;
+
     @ForeignKey(() => AttrType)
     @Column({
         allowNull: false
@@ -47,7 +51,7 @@ export default class Attribute extends Model<Attribute> {
     attrSets: AttrSet[];
 
     static async findAggregatable() {
-        return Attribute.findAll({where: {aggregatable: true}});
+        return Attribute.findAll({where: {aggregatable: {[Op.not]: null}}, include: [AttrType]});
     }
 }
 
@@ -55,4 +59,13 @@ export type AttributeI = {
     name: string;
     type_id: number;
     aggregatable?: boolean;
+    aggPath?: string;
 };
+
+export enum ATTR_TYPE {
+    STRING = 1,
+    NUMBER,
+    DECIMAL,
+    JSON,
+    ARRAY
+}

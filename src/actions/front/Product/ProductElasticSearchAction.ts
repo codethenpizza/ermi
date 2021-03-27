@@ -6,7 +6,7 @@ import {EsProduct} from "@server/elastic/EsProducts";
 import {
     EsProductVariant,
     EsReqFilter,
-    EsReqFilterType, EsReqFilterValue,
+    EsReqFilterValue,
     EsRespProduct,
     EsSearchReqBody, RangeFilter,
     RespData
@@ -30,7 +30,7 @@ export class ProductElasticSearchAction implements Action {
                 extFilters,
                 size = 20,
                 from = 0,
-                searchString
+                searchString,
             }
         }: Request<any, any, EsSearchReqBody, any>, res: Response) {
         try {
@@ -98,9 +98,9 @@ export class ProductElasticSearchAction implements Action {
         return extFilters?.length ? {
             should: extFilters.filter(x => x?.length).map(f => ({
                 bool: {
-                    filter: f.map(({name, value}) => ({
-                        [Array.isArray(value) ? 'terms' : 'term']: {
-                            [`attrs.${name}.value`]: value
+                    filter: f.map(({key, value}) => ({
+                        [this.getOperatorByValue(value)]: {
+                            [key]: value
                         }
                     }))
                 }
@@ -114,16 +114,16 @@ export class ProductElasticSearchAction implements Action {
         }
 
         const groupedFilters = filters.reduce<{ [x: string]: EsReqFilter[] }>((group, item) => {
-            if (!group[item.name]) {
-                group[item.name] = [];
+            if (!group[item.key]) {
+                group[item.key] = [];
             }
-            group[item.name].push(item);
+            group[item.key].push(item);
 
             return group;
         }, {});
 
         return {
-            filter: Object.entries(groupedFilters).map(([key, items]) => {
+            filter: Object.values(groupedFilters).map((items) => {
 
                 if (items.length === 1) {
                     return this.makeFilter(items[0]);
@@ -138,22 +138,24 @@ export class ProductElasticSearchAction implements Action {
         };
     }
 
-    private makeFilter({value, type, name}: EsReqFilter) {
-        return {
-            [this.getOperatorByValue(value)]: {
-                [this.getNameByType(type, name)]: value
+    private makeFilter({value, key, nested}: EsReqFilter) {
+        if (nested) {
+            return {
+                nested: {
+                    path: nested,
+                    query: {
+                        [this.getOperatorByValue(value)]: {
+                            [key]: value
+                        }
+                    }
+                }
             }
         }
-    }
 
-    private getNameByType(type: EsReqFilterType, name: string): string {
-        switch (type) {
-            case "attr":
-                return `attrs.${name}.value`;
-
-            case 'prop':
-            default:
-                return name;
+        return {
+            [this.getOperatorByValue(value)]: {
+                [key]: value
+            }
         }
     }
 
@@ -177,9 +179,23 @@ export class ProductElasticSearchAction implements Action {
     private async addAggs(query: bodybuilder.Bodybuilder) {
         const attrs = await Attribute.findAggregatable();
 
-        attrs.forEach(({slug}) => {
-            const field = `attrs.${slug}.value`;
-            query.agg('terms', field, {size: MAX_INT});
+        attrs.forEach(({slug, type, aggPath}) => {
+            const path = `attrs.${slug}.value`;
+            let pathWithAgg = path;
+            if (aggPath) {
+                pathWithAgg += `.${aggPath}`;
+            }
+            switch (type.type) {
+                case 'json':
+                case 'array':
+                    query.agg('nested', path, {path, field: undefined}, agg => {
+                        return agg.agg('terms', pathWithAgg);
+                    });
+                    break;
+
+                default:
+                    query.agg('terms', pathWithAgg, {size: MAX_INT});
+            }
         });
     }
 }

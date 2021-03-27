@@ -26,53 +26,62 @@ export class WheelsSearchAction implements Action {
         const apiResp = await WheelSizeApi.searchByModel(make, year, model);
 
         const filters: ParamsPair[] = [];
+        const filtersDataSet = new Set();
         apiResp
             .filter((item) => item.trim === trim && item.generation.name === generation)
             .forEach((item) => {
 
-            const variants: ParamsPair[] = item.wheels
-                .map(({front: {rim_diameter, rim_width, rim_offset}}) => {
-                if (!rim_diameter || !rim_offset || !rim_width) {
-                    return null;
-                }
-                return {
-                    boltsCount: item.stud_holes,
-                    boltsSpacing: item.pcd,
-                    et: rim_offset,
-                    width: rim_width,
-                    diameter: rim_diameter,
-                    esFilters: [[
-                        {
-                            name: slugify(DISK_DIAMETER, {lower: true}),
-                            value: rim_diameter,
-                            type: 'attr'
-                        },
-                        {
-                            name: slugify(DISK_WIDTH, {lower: true}),
-                            value: rim_width,
-                            type: 'attr'
-                        },
-                        {
-                            name: slugify(DISK_ET, {lower: true}),
-                            value: rim_offset,
-                            type: 'attr'
-                        },
-                        {
-                            name: slugify(DISK_BOLTS_COUNT, {lower: true}),
-                            value: item.stud_holes,
-                            type: 'attr'
-                        },
-                        {
-                            name: slugify(DISK_BOLTS_SPACING, {lower: true}),
-                            value: item.pcd,
-                            type: 'attr'
+                const variants: ParamsPair[] = item.wheels
+                    .map(({front: {rim_diameter, rim_width, rim_offset}}) => {
+                        if (!rim_diameter || !rim_offset || !rim_width) {
+                            return null;
                         }
-                    ]]
-                } as ParamsPair;
-            }).filter(x => !!x);
-            filters.push(...variants);
-        });
+
+                        const dataString = '' + rim_diameter + rim_offset + rim_width + item.stud_holes + item.pcd;
+
+                        if (filtersDataSet.has(dataString)) {
+                            return null;
+                        } else {
+                            filtersDataSet.add(dataString);
+                        }
+
+                        return {
+                            boltsCount: item.stud_holes,
+                            boltsSpacing: item.pcd,
+                            et: rim_offset,
+                            width: rim_width,
+                            diameter: rim_diameter,
+                            esFilters: [[
+                                {
+                                    key: WheelsSearchAction.generateAttrKey(DISK_DIAMETER),
+                                    value: rim_diameter,
+                                },
+                                {
+                                    key: WheelsSearchAction.generateAttrKey(DISK_WIDTH),
+                                    value: rim_width,
+                                },
+                                {
+                                    key: WheelsSearchAction.generateAttrKey(DISK_ET),
+                                    value: rim_offset,
+                                },
+                                {
+                                    key: WheelsSearchAction.generateAttrKey(DISK_BOLTS_COUNT),
+                                    value: item.stud_holes,
+                                },
+                                {
+                                    key: WheelsSearchAction.generateAttrKey(DISK_BOLTS_SPACING),
+                                    value: item.pcd,
+                                }
+                            ]]
+                        } as ParamsPair;
+                    }).filter(x => !!x);
+                filters.push(...variants);
+            });
 
         res.send(filters);
+    }
+
+    private static generateAttrKey(name: string): string {
+        return `attrs.${slugify(name, {lower: true})}.value`
     }
 }

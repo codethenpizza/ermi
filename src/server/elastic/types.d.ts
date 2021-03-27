@@ -1,12 +1,3 @@
-export interface IEsProduct {
-    id: number;
-    name: string;
-    desc?: string;
-    cats_ids: number[];
-    attr_set_id: number;
-    variants: EsProductVariant[]
-}
-
 export interface EsProductVariant {
     id: number;
     name: string;
@@ -19,6 +10,7 @@ export interface EsProductVariant {
     in_stock_qty: number;
     is_available: boolean;
     is_discount: boolean;
+    cat: number[];
     attrs: EsAttrValue[];
 }
 

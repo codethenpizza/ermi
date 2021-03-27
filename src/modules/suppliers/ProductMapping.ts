@@ -14,7 +14,7 @@ import {
     SupplierDisk
 } from "./types";
 import OptionsModel from "@models/Options.model";
-import Attribute, {AttributeI} from "@models/Attribute.model";
+import Attribute, {AttributeI, ATTR_TYPE} from "@models/Attribute.model";
 import {Op, Transaction} from "sequelize";
 import AttrSet from "@models/AttrSet.model";
 import Product, {IProduct} from "@models/Product.model";
@@ -24,35 +24,36 @@ import {sequelize} from '@db'
 import Image from "@models/Image.model";
 import ProductVariantImg from "@models/ProductVariantImg.model";
 import progressBar from "../../helpers/progressBar";
+import {RimAttrScheme} from "./RimAttrScheme";
+import slugify from "slugify";
+import ProductCategory from "@models/ProductCategory.model";
 
 export enum diskType {
     alloy = 'литые'
-}
-
-export enum attrType {
-    STRING = 1,
-    NUMBER,
-    DECIMAL,
-    JSON
 }
 
 export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
     private attrArr: AttributeI[] = [
-        {name: DISK_MODEL, type_id: attrType.STRING, aggregatable: false},
-        {name: DISK_BRAND, type_id: attrType.STRING, aggregatable: true},
-        {name: DISK_COLOR, type_id: attrType.STRING, aggregatable: true},
-        {name: DISK_WIDTH, type_id: attrType.DECIMAL, aggregatable: true}, //ШИРИНА ДИСКА
-        {name: DISK_ET, type_id: attrType.DECIMAL, aggregatable: true}, //ВЫЛЕТ
-        {name: DISK_DIAMETER, type_id: attrType.DECIMAL, aggregatable: true}, //ДИАМЕТР ДИСКА
-        {name: DISK_BOLTS_COUNT, type_id: attrType.NUMBER, aggregatable: false}, //КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_BOLTS_SPACING, type_id: attrType.DECIMAL, aggregatable: false}, //ДИАМЕТР ОКРУЖНОСТИ
-        {name: DISK_PCD, type_id: attrType.STRING, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ x КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_DIA, type_id: attrType.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: DISK_TYPE, type_id: attrType.STRING, aggregatable: true},
-        {name: DISK_SUPPLIER, type_id: attrType.STRING, aggregatable: false},
-        {name: DISK_SUPPLIER_STOCK, type_id: attrType.JSON, aggregatable: false},
+        {name: DISK_MODEL, type_id: ATTR_TYPE.STRING},
+        {name: DISK_BRAND, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: DISK_COLOR, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: DISK_WIDTH, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ШИРИНА ДИСКА
+        {name: DISK_ET, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ВЫЛЕТ
+        {name: DISK_DIAMETER, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ДИАМЕТР ДИСКА
+        {name: DISK_BOLTS_COUNT, type_id: ATTR_TYPE.NUMBER}, //КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_BOLTS_SPACING, type_id: ATTR_TYPE.DECIMAL}, //ДИАМЕТР ОКРУЖНОСТИ
+        {name: DISK_PCD, type_id: ATTR_TYPE.STRING, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ x КОЛ-ВО ОТВЕРСТИЙ
+        {name: DISK_DIA, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
+        {name: DISK_TYPE, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: DISK_SUPPLIER, type_id: ATTR_TYPE.STRING},
+        {
+            name: DISK_SUPPLIER_STOCK,
+            type_id: ATTR_TYPE.ARRAY,
+            aggregatable: true,
+            aggPath: 'shippingTime'
+        },
     ];
 
     async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
@@ -115,6 +116,8 @@ export class ProductMapping {
 
         const attrSet = await this.createAttrSet(attrs, transaction);
 
+        const cat = await this.createCat(transaction);
+
         const attrMap: { [key: string]: number } = attrs.reduce((map, item) => {
             map[item.name] = item.id;
             return map;
@@ -134,6 +137,7 @@ export class ProductMapping {
             type: attrMap[DISK_TYPE],
             supplier: attrMap[DISK_SUPPLIER],
             stock: attrMap[DISK_SUPPLIER_STOCK],
+            cat: cat.id
         };
 
         await this.saveMapping(mapping, transaction);
@@ -165,7 +169,8 @@ export class ProductMapping {
         return AttrSet.createWR({
             name: 'Rim',
             desc: 'Rim attribute set from module',
-            attributes: attrs.map(x => x.id)
+            scheme: RimAttrScheme,
+            attributes: attrs.map(x => x.id),
         }, transaction);
     }
 
@@ -271,7 +276,7 @@ export class ProductMapping {
 
     private async createProduct(mapping: DiskMapOptions, rim: DiskMap) {
         const product: IProduct = {
-            cats_ids: [0],
+            cats_ids: [mapping.cat],
             name: `${rim.brand} ${rim.model}`,
             attr_set_id: mapping.attr_set_id,
             variants: [{
@@ -304,5 +309,12 @@ export class ProductMapping {
         }
 
         await Product.createWR(product);
+    }
+
+    private async createCat(transaction: Transaction): Promise<ProductCategory> {
+        return  ProductCategory.create({
+            name: 'Rims',
+            parent_id: 0,
+        }, {transaction});
     }
 }

@@ -1,5 +1,5 @@
 import program from 'commander';
-import {updateIndexes} from "./elastic";
+import {updateProductIndexes} from "./elastic";
 import AttrValue from "@models/AttrValue.model";
 
 // TODO move js to root/scripts
@@ -10,7 +10,7 @@ program
     .action(async (action) => {
         switch (action) {
             case 'update-index':
-                await updateIndexes();
+                await updateProductIndexes();
                 process.exit(0);
                 break;
 
