@@ -53,7 +53,7 @@ export class Slik implements Supplier, SupplierDisk {
                 {
                     name: STOCK_TOLYATTI,
                     shippingTime: '6-8',
-                    count: item.stock === '+' ? 20 : parseDouble(item.stock) || 0
+                    count: item.count === '*' ? 20 : parseDouble(item.count) || 0
                 }
             ];
 
