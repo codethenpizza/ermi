@@ -50,6 +50,7 @@ export interface DiskMapOptions {
     attr_set_id: number;
     supplier: number;
     stock: number;
+    cat: number;
 }
 
 export const DISK_MODEL = 'Model';

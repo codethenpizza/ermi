@@ -6,39 +6,26 @@ export class EsIndex {
 
     constructor(
         protected index: string,
-        protected type?: string
     ) {
         if (!index) {
             throw new Error('Index and type are required');
         }
 
-        this.es = new Elastic(index, type);
+        this.es = new Elastic(index);
     }
 
-    public async start() {
-        await this.run();
+    public async updateData() {
+        await this.updateIndexData();
     }
 
-    private async run() {
+    private async updateIndexData() {
         try {
             await Elastic.checkConnection();
 
-            await this.es.createIndex();
-
-            const settings = this.createSettings();
-            if(settings) {
-                await this.es.setSettings(settings);
-            }
-
-            const schema = this.createMapping();
-            if (schema) {
-                await this.es.setQuotesMapping(schema);
-            }
-
-            await this.es.clearIndex();
+            await this.resetIndex();
 
             await this.createData(this.es.bulkCreate.bind(this));
-            console.log('[Index updated successfully]');
+            console.log('[Index data updated successfully]');
         } catch (e) {
             console.error('Updating index error:');
             console.error(e);
@@ -49,7 +36,7 @@ export class EsIndex {
         throw new Error('Override createData method');
     }
 
-    protected createMapping(): any {
+    protected async createMapping(): Promise<Object> {
         return null;
     }
 
@@ -57,4 +44,19 @@ export class EsIndex {
         return null;
     }
 
+    private async resetIndex() {
+        await this.es.createIndex();
+
+        await this.es.clearIndex();
+
+        const settings = this.createSettings();
+        if(settings) {
+            await this.es.setSettings(settings);
+        }
+
+        const schema = await this.createMapping();
+        if (schema) {
+            await this.es.setQuotesMapping(schema);
+        }
+    }
 }

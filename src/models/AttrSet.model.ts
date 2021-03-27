@@ -1,7 +1,9 @@
-import {BelongsToMany, Column, DataType, Model, Table, Unique} from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, HasMany, Model, Table, Unique} from "sequelize-typescript";
 import Attribute from "@models/Attribute.model";
 import AttrSetAttr, {IAttrSetAttr} from "@models/AttrSetAttr.model";
 import {DestroyOptions, Op, Transaction} from "sequelize";
+import slugify from "slugify";
+import Product from "@models/Product.model";
 
 @Table({
     tableName: 'attribute_set',
@@ -14,15 +16,34 @@ export default class AttrSet extends Model<AttrSet> {
     @Column({
         allowNull: false
     })
-    name: string;
+    set name(val: string) {
+        this.setDataValue('slug', slugify(val, {lower: true}));
+        this.setDataValue('name', val);
+    }
+    get name() {
+        return this.getDataValue('name');
+    }
+
+    @Column({
+        unique: true
+    })
+    slug: string;
 
     @Column({
         type: DataType.TEXT
     })
     desc: string;
 
+    @Column({
+        type: DataType.JSON
+    })
+    scheme: string;
+
     @BelongsToMany(() => Attribute, () => AttrSetAttr)
     attributes: Attribute[];
+
+    @HasMany(() => Product)
+    products: Product[];
 
     async saveWR() {
         const attributes = this.attributes.map(x => x.id);
@@ -34,10 +55,10 @@ export default class AttrSet extends Model<AttrSet> {
         }
     }
 
-    static async createWR({name, desc, attributes}: IAttrSet, trans?: Transaction): Promise<AttrSet> {
+    static async createWR({name, desc, scheme, attributes}: IAttrSet, trans?: Transaction): Promise<AttrSet> {
         const transaction = trans ? trans : await this.sequelize.transaction();
         try {
-            let attrSet = await this.create({name, desc}, {transaction});
+            let attrSet = await this.create({name, desc, scheme}, {transaction});
             await AttrSetAttr.bulkCreate(attributes.map<IAttrSetAttr>(attr_id => ({
                 attr_id,
                 attr_set_id: attrSet.id
@@ -95,4 +116,5 @@ export interface IAttrSet {
     name?: string;
     desc?: string;
     attributes?: number[];
+    scheme?: Object;
 }

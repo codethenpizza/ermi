@@ -1,7 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {fetchAll, storeAll} from "../runner";
-import {updateIndexes} from "@server/elastic";
+import {updateProductIndexes} from "@server/elastic";
 
 export class UpdateSuppliersProductsAction implements Action {
 
@@ -16,7 +16,7 @@ export class UpdateSuppliersProductsAction implements Action {
     async handle(req: Request<any, any, any, any>, res: Response) {
         await fetchAll();
         await storeAll();
-        await updateIndexes();
+        await updateProductIndexes();
         res.send();
     }
 
