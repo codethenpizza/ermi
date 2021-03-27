@@ -9,23 +9,26 @@ import {EsAttrValue, EsProductVariant} from "./types";
 import {Normalizers} from "@server/elastic/schemas/Analysis";
 import {ProductScheme} from "@server/elastic/schemas/ProductScheme";
 import AttrSet from "@models/AttrSet.model";
+import ProductCategory from "@models/ProductCategory.model";
 
 export const productIndex = 'product';
 
 export class EsProduct extends EsIndex {
 
+    private static schemas: Object[] = [];
+
     private maxDataItemsInIter = 100;
 
-    constructor(private productType?: string) {
-        super(productIndex, productType);
+    static addSchemes(schemes: Object[]): void {
+        this.schemas.push(...schemes);
+    }
+
+    constructor() {
+        super(productIndex);
     }
 
     protected async createMapping() {
-        const attrSet = await AttrSet.findOne({where: {slug: this.productType}});
-        if(attrSet) {
-            return ProductScheme(attrSet.scheme);
-        }
-        return ProductScheme();
+        return ProductScheme(EsProduct.schemas);
     }
 
     protected async createData(storeFn: Function): Promise<void> {
@@ -41,7 +44,8 @@ export class EsProduct extends EsIndex {
             const chunksCount = Math.ceil(total/this.maxDataItemsInIter);
             console.log('Chunks count - ', chunksCount);
             for(let page = 0; page < chunksCount; page++) {
-                await storeFn(await this.makeData(page));
+                const data = await this.makeData(page);
+                await storeFn(data);
                 console.log(`Chunk ${page + 1} done`);
             }
         }
@@ -55,14 +59,7 @@ export class EsProduct extends EsIndex {
             include: [
                 {
                     model: Product,
-                    include: [
-                        {
-                            model: AttrSet,
-                            where: {
-                                slug: this.productType
-                            }
-                        },
-                    ]
+                    include: [ProductCategory]
                 },
                 {
                     model: AttrValue,
@@ -78,7 +75,8 @@ export class EsProduct extends EsIndex {
             return {
                 ...variantData,
                 attrs: this.makeAttrs(variant),
-                name: variant.product.name
+                name: variant.product.name,
+                cat: variant.product.cats.map(c => c.id)
             };
         })
     }
@@ -99,6 +97,7 @@ export class EsProduct extends EsIndex {
                         value = parseInt(value);
                         break;
 
+                    case 'array':
                     case 'json':
                         value = JSON.parse(value);
                         break;

@@ -22,7 +22,8 @@ const SetDefaultAttrTypes = async () => {
         'string',
         'number',
         'decimal',
-        'json'
+        'json',
+        'array'
     ];
 
     for (let type of types) {

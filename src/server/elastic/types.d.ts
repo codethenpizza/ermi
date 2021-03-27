@@ -10,6 +10,7 @@ export interface EsProductVariant {
     in_stock_qty: number;
     is_available: boolean;
     is_discount: boolean;
+    cat: number[];
     attrs: EsAttrValue[];
 }
 

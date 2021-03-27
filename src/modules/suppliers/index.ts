@@ -1,5 +1,7 @@
 import {fetchAll, storeAll} from './runner'
 import "@db";
+import {EsProduct} from "@server/elastic/EsProducts";
+import {RimAttrScheme} from "./RimAttrScheme";
 
 const main = async () => {
     console.log(new Date());

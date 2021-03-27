@@ -2,11 +2,14 @@ import {LOWERCASE_NORMALIZER} from "@server/elastic/schemas/Analysis";
 
 
 
-export const ProductScheme = (attrScheme?: Object): Object => {
+export const ProductScheme = (attrSchemes?: Object[]): Object => {
     const scheme = {...DefaultScheme};
-    if(attrScheme) {
+    if(attrSchemes.length) {
         scheme['attrs'] = {
-            "properties": attrScheme
+            "properties": attrSchemes.reduce((acc, s) => {
+                acc = {...acc, ...s};
+                return acc;
+            }, {})
         }
     }
 
@@ -46,6 +49,9 @@ const DefaultScheme = {
     "vendor_code": {
         "type": "keyword",
         "normalizer": "lowercase_normalizer"
+    },
+    "cat": {
+        "type": "integer"
     },
     "images": {
         "type": "nested",

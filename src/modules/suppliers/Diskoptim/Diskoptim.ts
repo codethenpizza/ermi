@@ -16,29 +16,31 @@ export class Diskoptim implements Supplier, SupplierDisk {
             let counter = 0;
             try {
                 const ftp = new FTP();
-                ftp.connect(config.get('suppliers.Diskoptim.ftp'));
 
-                ftp.get(config.get('suppliers.Diskoptim.ftp_file'), (err, stream) => {
-                    const xml = new XmlStream(stream);
-                    xml.on('endElement: Диск', async (item) => {
-                        counter++;
-                        const formattedItem = {};
-                        for (const [key, value] of Object.entries(item)) {
-                            if (DiskoptimRawDiskMap[key]) {
-                                formattedItem[DiskoptimRawDiskMap[key]] = value
-                            } else {
-                                throw new Error(`undefined item key: ${key}`)
+                ftp.on('ready', () => {
+                    ftp.get(config.get('suppliers.Diskoptim.ftp_file'), (err, stream) => {
+                        const xml = new XmlStream(stream);
+                        xml.on('endElement: Диск', async (item) => {
+                            counter++;
+                            const formattedItem = {};
+                            for (const [key, value] of Object.entries(item)) {
+                                if (DiskoptimRawDiskMap[key]) {
+                                    formattedItem[DiskoptimRawDiskMap[key]] = value
+                                } else {
+                                    throw new Error(`undefined item key: ${key}`)
+                                }
                             }
-                        }
-                        await DiskoptimModel.upsert(formattedItem);
-                    });
+                            await DiskoptimModel.upsert(formattedItem);
+                        });
 
-                    xml.on('end', () => {
-                        ftp.end();
-                        console.log(`End fetch Diskoptim [${counter}]`);
-                        resolve();
+                        xml.on('end', () => {
+                            ftp.end();
+                            console.log(`End fetch Diskoptim [${counter}]`);
+                            resolve();
+                        });
                     });
                 });
+                ftp.connect(config.get('suppliers.Diskoptim.ftp'));
             } catch (e) {
                 reject(e);
             }

@@ -188,8 +188,7 @@ export const RimAttrScheme = {
                         "index": false
                     },
                     "shippingTime": {
-                        "type" : "text",
-                        "index": false
+                        "type" : "keyword",
                     },
                     "count": {
                         "type" : "integer",

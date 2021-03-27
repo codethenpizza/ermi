@@ -1,4 +1,14 @@
-import {BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript"
+import {
+    BelongsTo,
+    BelongsToMany,
+    Column,
+    DataType,
+    ForeignKey,
+    HasMany,
+    HasOne,
+    Model,
+    Table
+} from "sequelize-typescript"
 import ProductVariant, {IProductVariant, IProductVariantUpdateData} from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import ProductCategory from "@models/ProductCategory.model";
@@ -31,6 +41,9 @@ export default class Product extends Model<Product> {
     })
     attr_set_id: number;
 
+    @BelongsTo(() => AttrSet)
+    attrSet: AttrSet;
+
     @BelongsToMany(() => ProductCategory, () => ProductCatsProduct)
     cats: ProductCategory[];
 
@@ -43,7 +56,8 @@ export default class Product extends Model<Product> {
         try {
             let product = await Product.create(data, {
                 transaction, include: [
-                    {model: ProductVariant, include: [AttrValue]}
+                    {model: ProductVariant, include: [AttrValue]},
+                    ProductCategory
                 ]
             });
 
@@ -59,9 +73,12 @@ export default class Product extends Model<Product> {
                 }
             }
 
+            await ProductCatsProduct.bulkCreate(data.cats_ids.map(id => ({product_cat_id: id, product_id: product.id})), {transaction});
+
             product = await product.reload({
                 transaction, include: [
-                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}, Image]}
+                    {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}, Image]},
+                    ProductCategory
                 ]
             });
             await transaction.commit();

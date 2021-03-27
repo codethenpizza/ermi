@@ -34,27 +34,32 @@ export class WheelSizeApiClient {
 
         const cacheKey = `wheel-size-cache_${url}_${JSON.stringify(params)}`;
         const cached = await this.cache.get(cacheKey);
-        if(cached) {
+        if (cached) {
             return cached;
         }
 
         const apiClient = axios.create({
             baseURL: this.url,
             responseType: "json",
-            maxContentLength: 1_000_000,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept-Encoding': 'gzip'
             }
         });
 
 
-        const resp = await apiClient.get<T>(url, {
-            params
-        });
+        try {
+            const resp = await apiClient.get<T>(url, {
+                params
+            });
 
-        await this.cache.set(cacheKey, resp.data);
+            await this.cache.set(cacheKey, resp.data);
 
-        return resp.data;
+            return resp.data;
+        } catch (e) {
+            console.log('ERROR', e);
+            return [] as unknown as T;
+        }
     }
 
     private setParams(params: Object): Object {

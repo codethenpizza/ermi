@@ -139,4 +139,17 @@ export class Elastic {
         }, options);
     }
 
+    async get(id: string): Promise<TransportRequestPromise<ApiResponse>> {
+        return esClient.get({
+            index: this.index,
+            id
+        }).catch((e) => {
+            if(e.meta.statusCode === 404) {
+                return null;
+            }
+
+            throw e;
+        });
+    }
+
 }

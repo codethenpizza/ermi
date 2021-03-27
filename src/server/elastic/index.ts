@@ -1,19 +1,14 @@
 import '@db';
-import {EsIndex} from "./EsIndex";
 import {EsProduct} from "./EsProducts";
-import AttrSet from "@models/AttrSet.model";
+import {RimAttrScheme} from "../../modules/suppliers/RimAttrScheme";
 
 export const updateProductIndexes = async () => {
 
-    const items: EsIndex[] = [];
+    EsProduct.addSchemes([
+        RimAttrScheme
+    ]);
 
-    const attrSets = await AttrSet.findAll();
-    for (let set of attrSets) {
-        items.push(new EsProduct(set.slug));
-    }
-
-    for (const item of items) {
-        await item.updateData();
-    }
+    const es = new EsProduct();
+    await es.updateData()
 
 }

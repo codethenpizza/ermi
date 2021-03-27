@@ -15,22 +15,24 @@ export class Slik implements Supplier, SupplierDisk {
             let counter = 0;
             try {
                 const ftp = new FTP();
-                console.log('config.get(\'suppliers.Slik.ftp\')', config.get('suppliers.Slik.ftp'));
-                ftp.connect(config.get('suppliers.Slik.ftp'));
 
-                ftp.get(config.get('suppliers.Slik.ftp_file'), (err, stream) => {
-                    const xml = new XmlStream(stream);
-                    xml.on('endElement: gd', async (item: ISilkRaw) => {
-                        counter++;
-                        await SlikModel.upsert(item);
-                    });
+                ftp.on('ready', () => {
+                    ftp.get(config.get('suppliers.Slik.ftp_file'), (err, stream) => {
+                        const xml = new XmlStream(stream);
+                        xml.on('endElement: gd', async (item: ISilkRaw) => {
+                            counter++;
+                            await SlikModel.upsert(item);
+                        });
 
-                    xml.on('end', () => {
-                        ftp.end();
-                        console.log(`End fetch Slik [${counter}]`);
-                        resolve();
+                        xml.on('end', () => {
+                            ftp.end();
+                            console.log(`End fetch Slik [${counter}]`);
+                            resolve();
+                        });
                     });
                 });
+
+                ftp.connect(config.get('suppliers.Slik.ftp'));
             } catch (e) {
                 reject(e);
             }

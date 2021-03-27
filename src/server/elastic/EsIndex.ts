@@ -6,13 +6,12 @@ export class EsIndex {
 
     constructor(
         protected index: string,
-        protected type?: string
     ) {
         if (!index) {
             throw new Error('Index and type are required');
         }
 
-        this.es = new Elastic(index, type);
+        this.es = new Elastic(index);
     }
 
     public async updateData() {

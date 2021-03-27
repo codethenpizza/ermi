@@ -1,8 +1,9 @@
-import {BelongsToMany, Column, DataType, Model, Table, Unique} from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, HasMany, Model, Table, Unique} from "sequelize-typescript";
 import Attribute from "@models/Attribute.model";
 import AttrSetAttr, {IAttrSetAttr} from "@models/AttrSetAttr.model";
 import {DestroyOptions, Op, Transaction} from "sequelize";
 import slugify from "slugify";
+import Product from "@models/Product.model";
 
 @Table({
     tableName: 'attribute_set',
@@ -40,6 +41,9 @@ export default class AttrSet extends Model<AttrSet> {
 
     @BelongsToMany(() => Attribute, () => AttrSetAttr)
     attributes: Attribute[];
+
+    @HasMany(() => Product)
+    products: Product[];
 
     async saveWR() {
         const attributes = this.attributes.map(x => x.id);
