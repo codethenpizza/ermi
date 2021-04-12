@@ -11,6 +11,7 @@ type ReqBody = {
     model: string;
     generation: string;
     trim: string;
+    diameters: number[];
 }
 
 export class WheelsSearchAction implements Action {
@@ -22,7 +23,7 @@ export class WheelsSearchAction implements Action {
         next();
     }
 
-    async handle({body: {make, year, model, generation, trim}}: Request<any, any, ReqBody, any>, res: Response) {
+    async handle({body: {make, year, model, generation, trim, diameters}}: Request<any, any, ReqBody, any>, res: Response) {
         const apiResp = await WheelSizeApi.searchByModel(make, year, model);
 
         const filters: ParamsPair[] = [];
@@ -31,7 +32,7 @@ export class WheelsSearchAction implements Action {
             .filter((item) => item.trim === trim && item.generation.name === generation)
             .forEach((item) => {
 
-                const variants: ParamsPair[] = item.wheels
+                const variants: ParamsPair[] = item.wheels.filter(x => diameters.includes(x.front.rim_diameter))
                     .map(({front: {rim_diameter, rim_width, rim_offset}}) => {
                         if (!rim_diameter || !rim_offset || !rim_width) {
                             return null;
