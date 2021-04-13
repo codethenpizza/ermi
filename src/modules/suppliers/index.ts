@@ -1,16 +1,14 @@
 import {fetchAll, storeAll} from './runner'
 import "@db";
-import {EsProduct} from "@server/elastic/EsProducts";
-import {RimAttrScheme} from "./RimAttrScheme";
 
-const main = async () => {
+const parseSuppliers = async () => {
     console.log(new Date());
     await fetchAll();
     await storeAll();
     console.log(new Date());
 };
 
-main()
+parseSuppliers()
     .then(() => {
         console.log('store complete');
         process.exit(0);
