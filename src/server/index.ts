@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 
 import {Controller} from "@controllers/index";
+import {setCronTasks} from "@server/crone";
 
 import "@db";
 
@@ -23,6 +24,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/public', express.static(`${__dirname}/../../public`));
 app.use('/api', Controller);
+
+setCronTasks();
 
 app.listen(PORT, () => {
     console.log(`App is listening on port ${PORT}!`);
