@@ -44,6 +44,13 @@
         "host": "https://discovery.moscow/xmlprice/contract/422/",
         "token": "$1$ONBHZjsp$xV6prHPQBp8RY7KDnBXtq0"
       }
+    },
+    "Kolrad": {
+      "api": {
+        "host": "https://b2b.kolrad.ru/xml/hannover",
+        "contractNum": "contract253",
+        "token": "$1$H3dxVSzo$mDqwwSdkS9vsiCnuK/uef1"
+      }
     }
   },
   "wheelSize": {
