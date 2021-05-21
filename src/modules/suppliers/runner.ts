@@ -4,12 +4,13 @@ import {SupplierDisk} from "./types"
 import {Diskoptim} from "./Diskoptim/Diskoptim"
 import {Slik} from "./Slik/Slik";
 import {Discovery} from "./Discovery/Discovery";
-
+import {Kolrad} from "./Kolrad/Kolrad";
 
 const suppliers: SupplierDisk[] = [
     new Discovery(),
     new Slik(),
     new Diskoptim(),
+    new Kolrad(),
 ];
 
 export const fetchAll = async () => {
