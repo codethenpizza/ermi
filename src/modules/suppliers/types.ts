@@ -1,12 +1,14 @@
 import Product from "@models/Product.model";
 
 export abstract class Supplier {
+    name: string
     abstract fetchData(): Promise<void>;
+    abstract getDataCount(): Promise<number>;
     abstract getProductData(): Promise<Product[]>;
 }
 
 export abstract class SupplierDisk extends Supplier {
-    abstract getRims(): Promise<DiskMap[]>;
+    abstract getRims(limit: number, offset: number): Promise<DiskMap[]>;
 }
 
 export interface DiskMap {

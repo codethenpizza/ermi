@@ -68,36 +68,39 @@ export class ProductMapping {
             throw e;
         }
 
+        const limit = 2000;
         for (const supplier of suppliers) {
+            let offset = 0
+            const total = await supplier.getDataCount();
+            console.log(`Start store disk for ${supplier.name}. Total rims: ${total}`);
 
-            const rims = await supplier.getRims();
-            if (!rims || !rims.length) {
-                console.error('storeDisk error: supplier.getRims length 0');
-                continue;
-            }
-            console.log(rims.length)
-            const suppCode = rims[0].uid.split('_')[0];
-            console.log('Start store disk for', suppCode);
-
-            for (const [index, rim] of rims.entries()) {
-
-                try {
-                    if (await this.updateByCode(mapping, rim)) {
-                        progressBar(index, rims.length)
-                        continue;
-                    }
-
-                    if (await this.updateByBrandAndModel(mapping, rim)) {
-                        progressBar(index, rims.length)
-                        continue;
-                    }
-
-                    await this.createProduct(mapping, rim);
-                    progressBar(index, rims.length)
-                } catch (e) {
-                    console.error(e)
+            for (let i = 0; i < total / limit; i++) {
+                const rims = await supplier.getRims(limit, offset);
+                if (!rims || !rims.length) {
+                    console.error('storeDisk error: supplier.getRims length 0');
+                    continue;
                 }
+                const currentPage = Math.round(total / limit)
+                for (const [index, rim] of rims.entries()) {
 
+                    try {
+                        if (await this.updateByCode(mapping, rim)) {
+                            progressBar(index, rims.length, `page ${i}/${currentPage}. rim ${index}/${rims.length}`)
+                            continue;
+                        }
+
+                        if (await this.updateByBrandAndModel(mapping, rim)) {
+                            progressBar(index, rims.length, `page ${i}/${currentPage}. rim ${index}/${rims.length}`)
+                            continue;
+                        }
+
+                        await this.createProduct(mapping, rim);
+                        progressBar(index, rims.length, `page ${i}/${currentPage}. rim ${index}/${rims.length}`)
+                    } catch (e) {
+                        console.error(e)
+                    }
+                }
+                offset += limit;
             }
         }
     }
@@ -176,17 +179,19 @@ export class ProductMapping {
 
     private async getProductIdByBrandAndModel(brand, model): Promise<number> {
         const query = await AttrValue.sequelize.query(`
-            SELECT C.product_id 
-             FROM ${AttrValue.tableName} A
-            LEFT JOIN ${AttrValue.tableName} B
-             ON A.product_variant_id = B.product_variant_id
-            LEFT JOIN ${ProductVariant.tableName} C
-             ON A.product_variant_id  = C.id
-            WHERE
-             A.value = '${brand}'
-             AND B.value = '${model}'
-            LIMIT 1
-        `);
+            SELECT C.product_id
+            FROM ${AttrValue.tableName} A
+                     LEFT JOIN ${AttrValue.tableName} B
+                               ON A.product_variant_id = B.product_variant_id
+                     LEFT JOIN ${ProductVariant.tableName} C
+                               ON A.product_variant_id = C.id
+            WHERE A.value = :brand
+              AND B.value = :model LIMIT 1
+        `, {
+            replacements: {
+                brand, model,
+            },
+        });
         // @ts-ignore
         const id: string = query[0][0]?.product_id;
         return id ? parseInt(id) : null;
@@ -312,7 +317,7 @@ export class ProductMapping {
     }
 
     private async createCat(transaction: Transaction): Promise<ProductCategory> {
-        return  ProductCategory.create({
+        return ProductCategory.create({
             name: 'Rims',
             parent_id: 0,
         }, {transaction});
