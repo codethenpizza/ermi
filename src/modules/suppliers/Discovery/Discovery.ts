@@ -8,6 +8,8 @@ import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 
 export class Discovery implements SupplierDisk {
+    readonly name = 'discovery'
+
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
 
@@ -48,14 +50,18 @@ export class Discovery implements SupplierDisk {
         });
     }
 
+    async getDataCount(): Promise<number> {
+        return DiscoveryModel.count();
+    }
+
     async getProductData(): Promise<Product[]> {
         return undefined;
     }
 
-    async getRims(): Promise<DiskMap[]> {
+    async getRims(limit, offset): Promise<DiskMap[]> {
         console.log('Start store Discovery');
 
-        const rawData = await DiscoveryModel.findAll();
+        const rawData = await DiscoveryModel.findAll({limit, offset});
 
         return rawData.map<DiskMap>((item) => {
             const param = JSON.parse(item.param);
@@ -74,8 +80,8 @@ export class Discovery implements SupplierDisk {
             ];
 
             return {
-                uid: `${supplier}_${item.code}`,
-                supplier,
+                uid: `${this.name}_${item.code}`,
+                supplier: this.name,
                 model: item.model,
                 brand: item.brand,
                 image: encodeURI(item.picture),

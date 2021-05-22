@@ -2,13 +2,15 @@ import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
-import {DiskMap, DiskStock, STOCK_MSK, STOCK_TOLYATTI, Supplier, SupplierDisk} from "../types";
+import {DiskMap, DiskStock, STOCK_TOLYATTI, Supplier, SupplierDisk} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
 import {diskType} from "../ProductMapping";
 
 
 export class Slik implements Supplier, SupplierDisk {
+    readonly name = 'slik'
+
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
             console.log('Start fetch Slik');
@@ -39,6 +41,10 @@ export class Slik implements Supplier, SupplierDisk {
         });
     }
 
+    async getDataCount(): Promise<number> {
+        return SlikModel.count();
+    }
+
     async getProductData(): Promise<Product[]> {
         return undefined;
     }
@@ -58,8 +64,8 @@ export class Slik implements Supplier, SupplierDisk {
             ];
 
             return {
-                uid: `${supplier}_${item.code}`,
-                supplier,
+                uid: `${this.name}_${item.code}`,
+                supplier: this.name,
                 model: item.model,
                 brand: item.brand,
                 image: encodeURI(item.image),

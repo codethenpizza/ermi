@@ -10,6 +10,8 @@ import DiskoptimModel, {DiskoptimRawDiskMap} from "./Diskoptim.model"
 
 
 export class Diskoptim implements Supplier, SupplierDisk {
+    readonly name = 'diskoptim';
+
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
             console.log('Start fetch Diskoptim');
@@ -47,18 +49,21 @@ export class Diskoptim implements Supplier, SupplierDisk {
         });
     }
 
+    async getDataCount(): Promise<number> {
+        return DiskoptimModel.count();
+    }
+
     async getProductData(): Promise<Product[]> {
         return undefined;
     }
 
-    async getRims(): Promise<DiskMap[]> {
-        const rawData = await DiskoptimModel.findAll();
+    async getRims(limit, offset): Promise<DiskMap[]> {
+        const rawData = await DiskoptimModel.findAll({limit, offset});
 
         const toCreate = [];
         for (const item of rawData) { //parse raw disk and compare
 
             const [raw_bolts_count, raw_bolts_spacing] = item.PCD.split('x');
-            const supplier = 'diskoptim';
 
             const stock: DiskStock[] = [
                 {
@@ -74,8 +79,8 @@ export class Diskoptim implements Supplier, SupplierDisk {
             ];
 
             const disk: DiskoptimDiskMap = {
-                uid: `${supplier}_${item.code}`,
-                supplier,
+                uid: `${this.name}_${item.code}`,
+                supplier: this.name,
                 model: item.model,
                 brand: item.brand,
                 image: encodeURI(item.image),

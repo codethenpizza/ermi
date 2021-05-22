@@ -7,8 +7,11 @@ import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
 import {diskType} from "../ProductMapping";
 import ParsedStocks = IKolrad.ParsedStocks;
+import progressBar from "../../../helpers/progressBar";
 
 export class Kolrad implements Supplier, SupplierDisk {
+    readonly name = 'kolrad';
+
     async fetchData(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             console.log('Start fetch Kolrad');
@@ -29,20 +32,24 @@ export class Kolrad implements Supplier, SupplierDisk {
                     return;
                 }
 
-                for (let i = 1; i <= totalPages; i++) {
-                    console.log(`${i} out of ${totalPages}`)
-                    const pageUrl = `${baseUrl}/page${i}/${params}`
-                    const pageCount = await this.parsePage(pageUrl)
+                for (let i = 10; i <= totalPages; i++) {
+                    const pageUrl = `${baseUrl}/page${i}/${params}`;
+                    const pageCount = await this.parsePage(pageUrl);
                     counter += pageCount;
+                    progressBar(i, totalPages, `fetch ${this.name}`);
                 }
 
                 console.log('counter:', counter)
                 resolve()
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 reject(e);
             }
         });
+    }
+
+    async getDataCount(): Promise<number> {
+        return KolradModel.count();
     }
 
     private async getTotalPages(url: string): Promise<number> {
@@ -76,6 +83,12 @@ export class Kolrad implements Supplier, SupplierDisk {
                         if (item.categoryId !== '5') {
                             return;
                         }
+
+                        const stock = item.stocks?.stock
+                        if (!stock || (stock['$']?.id !== '3' || stock.quantity === '0')) {
+                            return;
+                        }
+
                         try {
                             item.param = JSON.stringify(item.param);
                             item.prices = JSON.stringify(item.prices);
@@ -102,9 +115,8 @@ export class Kolrad implements Supplier, SupplierDisk {
         return undefined;
     }
 
-    async getRims(): Promise<DiskMap[]> {
-        const supplier = 'kolrad';
-        const rawData: IKolrad.Raw[] = await KolradModel.findAll();
+    async getRims(limit, offset): Promise<DiskMap[]> {
+        const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
         const toCreate: DiskMap[] = [];
         for (const item of rawData) {
             try {
@@ -119,8 +131,8 @@ export class Kolrad implements Supplier, SupplierDisk {
                 const params: IKolrad.ParsedParams = this.getRimParsedParams(item)
 
                 toCreate.push({
-                    uid: `${supplier}_${vendorCode}`,
-                    supplier,
+                    uid: `${this.name}_${vendorCode}`,
+                    supplier: this.name,
                     price,
                     brand,
                     image,
