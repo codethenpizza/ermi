@@ -2,13 +2,13 @@ import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
-import {DiskMap, DiskStock, STOCK_TOLYATTI, Supplier, SupplierDisk} from "../types";
+import {RimMap, RimStock, STOCK_TOLYATTI, Supplier, SupplierRim} from "../types";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
-import {diskType} from "../ProductMapping";
+import {rimType} from "../ProductMapping";
 
 
-export class Slik implements Supplier, SupplierDisk {
+export class Slik implements Supplier, SupplierRim {
     readonly name = 'slik'
 
     async fetchData(): Promise<void> {
@@ -49,13 +49,13 @@ export class Slik implements Supplier, SupplierDisk {
         return undefined;
     }
 
-    async getRims(): Promise<DiskMap[]> {
+    async getRims(): Promise<RimMap[]> {
         const rawData = await SlikModel.findAll();
 
-        return rawData.map<DiskMap>((item) => {
+        return rawData.map<RimMap>((item) => {
             const supplier = 'slik';
 
-            const stock: DiskStock[] = [
+            const stock: RimStock[] = [
                 {
                     name: STOCK_TOLYATTI,
                     shippingTime: '6-8',
@@ -77,7 +77,7 @@ export class Slik implements Supplier, SupplierDisk {
                 bolts_count: parseDouble(item.bolts_count),
                 bolts_spacing: parseDouble(item.bolts_spacing),
                 et: parseDouble(item.et),
-                type: diskType.alloy,
+                type: rimType.alloy,
                 dia: parseDouble(item.dia),
                 color_name: item.color,
                 stock: JSON.stringify(stock),

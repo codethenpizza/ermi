@@ -7,11 +7,11 @@ export abstract class Supplier {
     abstract getProductData(): Promise<Product[]>;
 }
 
-export abstract class SupplierDisk extends Supplier {
-    abstract getRims(limit: number, offset: number): Promise<DiskMap[]>;
+export abstract class SupplierRim extends Supplier {
+    abstract getRims(limit: number, offset: number): Promise<RimMap[]>;
 }
 
-export interface DiskMap {
+export interface RimMap {
     supplier: string;
     model: string; // ДИСК
     brand: string;
@@ -31,13 +31,13 @@ export interface DiskMap {
     stock: string;
 }
 
-export interface DiskStock {
+export interface RimStock {
     name: string;
     shippingTime: string;
     count: number;
 }
 
-export interface DiskMapOptions {
+export interface RimMapOptions {
     model: number;
     brand: number;
     color: number;
@@ -55,19 +55,19 @@ export interface DiskMapOptions {
     cat: number;
 }
 
-export const DISK_MODEL = 'Model';
-export const DISK_BRAND = 'Brand';
-export const DISK_COLOR = 'Color';
-export const DISK_WIDTH = 'Width';
-export const DISK_ET = 'ET';
-export const DISK_DIAMETER = 'Diameter';
-export const DISK_BOLTS_COUNT = 'Bolts count';
-export const DISK_BOLTS_SPACING = 'Bolts spacing';
-export const DISK_PCD = 'PCD';
-export const DISK_DIA = 'DIA';
-export const DISK_TYPE = 'Type';
-export const DISK_SUPPLIER = 'Supplier';
-export const DISK_SUPPLIER_STOCK = 'Stock';
+export const RIM_MODEL = 'Model';
+export const RIM_BRAND = 'Brand';
+export const RIM_COLOR = 'Color';
+export const RIM_WIDTH = 'Width';
+export const RIM_ET = 'ET';
+export const RIM_DIAMETER = 'Diameter';
+export const RIM_BOLTS_COUNT = 'Bolts count';
+export const RIM_BOLTS_SPACING = 'Bolts spacing';
+export const RIM_PCD = 'PCD';
+export const RIM_DIA = 'DIA';
+export const RIM_TYPE = 'Type';
+export const RIM_SUPPLIER = 'Supplier';
+export const RIM_SUPPLIER_STOCK = 'Stock';
 
 export const STOCK_MSK = 'Москва';
 export const STOCK_SPB = 'Санкт-Петербург';

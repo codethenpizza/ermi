@@ -1,17 +1,17 @@
 import {
-    DISK_BOLTS_COUNT,
-    DISK_BOLTS_SPACING,
-    DISK_BRAND,
-    DISK_COLOR,
-    DISK_DIA,
-    DISK_DIAMETER,
-    DISK_ET,
-    DISK_MODEL,
-    DISK_PCD, DISK_SUPPLIER, DISK_SUPPLIER_STOCK,
-    DISK_TYPE,
-    DISK_WIDTH, DiskMap,
-    DiskMapOptions,
-    SupplierDisk
+    RIM_BOLTS_COUNT,
+    RIM_BOLTS_SPACING,
+    RIM_BRAND,
+    RIM_COLOR,
+    RIM_DIA,
+    RIM_DIAMETER,
+    RIM_ET,
+    RIM_MODEL,
+    RIM_PCD, RIM_SUPPLIER, RIM_SUPPLIER_STOCK,
+    RIM_TYPE,
+    RIM_WIDTH, RimMap,
+    RimMapOptions,
+    SupplierRim
 } from "./types";
 import OptionsModel from "@models/Options.model";
 import Attribute, {AttributeI, ATTR_TYPE} from "@models/Attribute.model";
@@ -28,7 +28,7 @@ import {RimAttrScheme} from "./RimAttrScheme";
 import slugify from "slugify";
 import ProductCategory from "@models/ProductCategory.model";
 
-export enum diskType {
+export enum rimType {
     alloy = 'литые'
 }
 
@@ -36,29 +36,29 @@ export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
     private attrArr: AttributeI[] = [
-        {name: DISK_MODEL, type_id: ATTR_TYPE.STRING},
-        {name: DISK_BRAND, type_id: ATTR_TYPE.STRING, aggregatable: true},
-        {name: DISK_COLOR, type_id: ATTR_TYPE.STRING, aggregatable: true},
-        {name: DISK_WIDTH, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ШИРИНА ДИСКА
-        {name: DISK_ET, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ВЫЛЕТ
-        {name: DISK_DIAMETER, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ДИАМЕТР ДИСКА
-        {name: DISK_BOLTS_COUNT, type_id: ATTR_TYPE.NUMBER}, //КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_BOLTS_SPACING, type_id: ATTR_TYPE.DECIMAL}, //ДИАМЕТР ОКРУЖНОСТИ
-        {name: DISK_PCD, type_id: ATTR_TYPE.STRING, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ x КОЛ-ВО ОТВЕРСТИЙ
-        {name: DISK_DIA, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
-        {name: DISK_TYPE, type_id: ATTR_TYPE.STRING, aggregatable: true},
-        {name: DISK_SUPPLIER, type_id: ATTR_TYPE.STRING},
+        {name: RIM_MODEL, type_id: ATTR_TYPE.STRING},
+        {name: RIM_BRAND, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: RIM_COLOR, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: RIM_WIDTH, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ШИРИНА ДИСКА
+        {name: RIM_ET, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ВЫЛЕТ
+        {name: RIM_DIAMETER, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, //ДИАМЕТР ДИСКА
+        {name: RIM_BOLTS_COUNT, type_id: ATTR_TYPE.NUMBER}, //КОЛ-ВО ОТВЕРСТИЙ
+        {name: RIM_BOLTS_SPACING, type_id: ATTR_TYPE.DECIMAL}, //ДИАМЕТР ОКРУЖНОСТИ
+        {name: RIM_PCD, type_id: ATTR_TYPE.STRING, aggregatable: true}, //ДИАМЕТР ОКРУЖНОСТИ x КОЛ-ВО ОТВЕРСТИЙ
+        {name: RIM_DIA, type_id: ATTR_TYPE.DECIMAL, aggregatable: true}, // ЦЕНТРАЛЬНОЕ ОТВЕРСТИЕ*
+        {name: RIM_TYPE, type_id: ATTR_TYPE.STRING, aggregatable: true},
+        {name: RIM_SUPPLIER, type_id: ATTR_TYPE.STRING},
         {
-            name: DISK_SUPPLIER_STOCK,
+            name: RIM_SUPPLIER_STOCK,
             type_id: ATTR_TYPE.ARRAY,
             aggregatable: true,
             aggPath: 'shippingTime'
         },
     ];
 
-    async storeDisk(suppliers: SupplierDisk[]): Promise<void> {
+    async storeRim(suppliers: SupplierRim[]): Promise<void> {
         const transaction = await sequelize.transaction();
-        let mapping: DiskMapOptions;
+        let mapping: RimMapOptions;
         try {
             mapping = await this.getMapping(transaction);
             await transaction.commit();
@@ -72,12 +72,12 @@ export class ProductMapping {
         for (const supplier of suppliers) {
             let offset = 0
             const total = await supplier.getDataCount();
-            console.log(`Start store disk for ${supplier.name}. Total rims: ${total}`);
+            console.log(`Start store rim for ${supplier.name}. Total rims: ${total}`);
 
             for (let i = 0; i < total / limit; i++) {
                 const rims = await supplier.getRims(limit, offset);
                 if (!rims || !rims.length) {
-                    console.error('storeDisk error: supplier.getRims length 0');
+                    console.error('storeRim error: supplier.getRims length 0');
                     continue;
                 }
                 const currentPage = Math.round(total / limit)
@@ -106,7 +106,7 @@ export class ProductMapping {
     }
 
 
-    public async getMapping(transaction ?: Transaction): Promise<DiskMapOptions> {
+    public async getMapping(transaction ?: Transaction): Promise<RimMapOptions> {
         const mapping = await OptionsModel.findOne({where: {key: this.rimMappingKey}, transaction});
         if (!mapping) {
             return this.crateMapping(transaction)
@@ -114,7 +114,7 @@ export class ProductMapping {
         return JSON.parse(mapping.value);
     }
 
-    private async crateMapping(transaction: Transaction): Promise<DiskMapOptions> {
+    private async crateMapping(transaction: Transaction): Promise<RimMapOptions> {
         const attrs = await this.createAttributes(transaction);
 
         const attrSet = await this.createAttrSet(attrs, transaction);
@@ -125,21 +125,21 @@ export class ProductMapping {
             map[item.name] = item.id;
             return map;
         }, {});
-        const mapping: DiskMapOptions = {
+        const mapping: RimMapOptions = {
             attr_set_id: attrSet.id,
-            model: attrMap[DISK_MODEL],
-            brand: attrMap[DISK_BRAND],
-            color: attrMap[DISK_COLOR],
-            width: attrMap[DISK_WIDTH],
-            et: attrMap[DISK_ET],
-            diameter: attrMap[DISK_DIAMETER],
-            bolts_count: attrMap[DISK_BOLTS_COUNT],
-            bolts_spacing: attrMap[DISK_BOLTS_SPACING],
-            pcd: attrMap[DISK_PCD],
-            dia: attrMap[DISK_DIA],
-            type: attrMap[DISK_TYPE],
-            supplier: attrMap[DISK_SUPPLIER],
-            stock: attrMap[DISK_SUPPLIER_STOCK],
+            model: attrMap[RIM_MODEL],
+            brand: attrMap[RIM_BRAND],
+            color: attrMap[RIM_COLOR],
+            width: attrMap[RIM_WIDTH],
+            et: attrMap[RIM_ET],
+            diameter: attrMap[RIM_DIAMETER],
+            bolts_count: attrMap[RIM_BOLTS_COUNT],
+            bolts_spacing: attrMap[RIM_BOLTS_SPACING],
+            pcd: attrMap[RIM_PCD],
+            dia: attrMap[RIM_DIA],
+            type: attrMap[RIM_TYPE],
+            supplier: attrMap[RIM_SUPPLIER],
+            stock: attrMap[RIM_SUPPLIER_STOCK],
             cat: cat.id
         };
 
@@ -147,7 +147,7 @@ export class ProductMapping {
         return mapping;
     }
 
-    private async saveMapping(mapping: DiskMapOptions, transaction: Transaction): Promise<void> {
+    private async saveMapping(mapping: RimMapOptions, transaction: Transaction): Promise<void> {
         await OptionsModel.create({
             key: this.rimMappingKey,
             value: JSON.stringify(mapping)
@@ -197,7 +197,7 @@ export class ProductMapping {
         return id ? parseInt(id) : null;
     }
 
-    private async updateByCode(mapping: DiskMapOptions, rim: DiskMap): Promise<boolean> {
+    private async updateByCode(mapping: RimMapOptions, rim: RimMap): Promise<boolean> {
         const variantByCode = await ProductVariant.findOne({
             where: {
                 vendor_code: rim.uid
@@ -225,7 +225,7 @@ export class ProductMapping {
         return false;
     }
 
-    private async updateByBrandAndModel(mapping: DiskMapOptions, rim: DiskMap): Promise<boolean> {
+    private async updateByBrandAndModel(mapping: RimMapOptions, rim: RimMap): Promise<boolean> {
         const product_id = await this.getProductIdByBrandAndModel(rim.brand, rim.model)
 
         if (product_id) {
@@ -279,7 +279,7 @@ export class ProductMapping {
         return false;
     }
 
-    private async createProduct(mapping: DiskMapOptions, rim: DiskMap) {
+    private async createProduct(mapping: RimMapOptions, rim: RimMap) {
         const product: IProduct = {
             cats_ids: [mapping.cat],
             name: `${rim.brand} ${rim.model}`,

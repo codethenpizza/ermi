@@ -1,7 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Response, Request} from "express";
 import {WheelSizeApi} from "../index";
-import {DISK_BOLTS_COUNT, DISK_BOLTS_SPACING, DISK_DIAMETER, DISK_ET, DISK_WIDTH} from "../../suppliers/types";
+import {RIM_BOLTS_COUNT, RIM_BOLTS_SPACING, RIM_DIAMETER, RIM_ET, RIM_WIDTH} from "../../suppliers/types";
 import slugify from "slugify";
 import {ParamsPair} from "../types";
 
@@ -54,23 +54,23 @@ export class WheelsSearchAction implements Action {
                             diameter: rim_diameter,
                             esFilters: [[
                                 {
-                                    key: WheelsSearchAction.generateAttrKey(DISK_DIAMETER),
+                                    key: WheelsSearchAction.generateAttrKey(RIM_DIAMETER),
                                     value: rim_diameter,
                                 },
                                 {
-                                    key: WheelsSearchAction.generateAttrKey(DISK_WIDTH),
+                                    key: WheelsSearchAction.generateAttrKey(RIM_WIDTH),
                                     value: rim_width,
                                 },
                                 {
-                                    key: WheelsSearchAction.generateAttrKey(DISK_ET),
+                                    key: WheelsSearchAction.generateAttrKey(RIM_ET),
                                     value: rim_offset,
                                 },
                                 {
-                                    key: WheelsSearchAction.generateAttrKey(DISK_BOLTS_COUNT),
+                                    key: WheelsSearchAction.generateAttrKey(RIM_BOLTS_COUNT),
                                     value: item.stud_holes,
                                 },
                                 {
-                                    key: WheelsSearchAction.generateAttrKey(DISK_BOLTS_SPACING),
+                                    key: WheelsSearchAction.generateAttrKey(RIM_BOLTS_SPACING),
                                     value: item.pcd,
                                 }
                             ]]

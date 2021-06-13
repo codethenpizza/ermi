@@ -1,5 +1,5 @@
 import {Column, Model, Table} from "sequelize-typescript";
-import {DiskMap} from "../types";
+import {RimMap} from "../types";
 
 @Table({
     tableName: 'supplier_kolrad',
@@ -110,7 +110,7 @@ export namespace IKolrad {
         }
     }
 
-    export interface Disk extends DiskMap {
+    export interface Rim extends RimMap {
         // empty interface
     }
 }

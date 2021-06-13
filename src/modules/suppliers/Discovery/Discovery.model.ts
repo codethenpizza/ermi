@@ -66,7 +66,7 @@ export interface IDiscoveryRaw {
 
 
 // formatted data
-export interface IDiscoveryDisk {
+export interface IDiscoveryRim {
     code: string;
     artikul: string;
     name: string;

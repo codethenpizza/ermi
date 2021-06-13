@@ -3,11 +3,11 @@ import request from 'request';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 
-import {DiskMap, DiskStock, STOCK_MSK, SupplierDisk} from "../types";
+import {RimMap, RimStock, STOCK_MSK, SupplierRim} from "../types";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 
-export class Discovery implements SupplierDisk {
+export class Discovery implements SupplierRim {
     readonly name = 'discovery'
 
     async fetchData(): Promise<void> {
@@ -25,7 +25,7 @@ export class Discovery implements SupplierDisk {
                         const xml = new XmlStream(resp);
 
                         xml.collect('param');
-                        xml.on('endElement: disk', async (item: IDiscoveryRaw) => {
+                        xml.on('endElement: rim', async (item: IDiscoveryRaw) => {
                             counter++;
 
                             item.param = JSON.stringify(item.param);
@@ -58,12 +58,12 @@ export class Discovery implements SupplierDisk {
         return undefined;
     }
 
-    async getRims(limit, offset): Promise<DiskMap[]> {
+    async getRims(limit, offset): Promise<RimMap[]> {
         console.log('Start store Discovery');
 
         const rawData = await DiscoveryModel.findAll({limit, offset});
 
-        return rawData.map<DiskMap>((item) => {
+        return rawData.map<RimMap>((item) => {
             const param = JSON.parse(item.param);
 
             const bolts_count = parseDouble(param.find((e) => e.$.name === 'Количество отверстий')?.$text) || null;
@@ -71,7 +71,7 @@ export class Discovery implements SupplierDisk {
 
             const supplier = 'discovery';
 
-            const stock: DiskStock[] = [
+            const stock: RimStock[] = [
                 {
                     name: STOCK_MSK,
                     shippingTime: '1-2',

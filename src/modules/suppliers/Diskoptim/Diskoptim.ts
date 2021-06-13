@@ -3,14 +3,14 @@ import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 
-import {DiskMap, DiskStock, STOCK_MSK, STOCK_SPB, Supplier, SupplierDisk} from "../types";
+import {RimMap, RimStock, STOCK_MSK, STOCK_SPB, Supplier, SupplierRim} from "../types";
 import Product from "@models/Product.model";
-import {diskType} from "../ProductMapping";
-import DiskoptimModel, {DiskoptimRawDiskMap} from "./Diskoptim.model"
+import {rimType} from "../ProductMapping";
+import DiskoptimModel, {DiskoptimRawRimMap} from "./Diskoptim.model"
 
 
-export class Diskoptim implements Supplier, SupplierDisk {
-    readonly name = 'diskoptim';
+export class Diskoptim implements Supplier, SupplierRim {
+    readonly name = 'Diskoptim';
 
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -26,8 +26,8 @@ export class Diskoptim implements Supplier, SupplierDisk {
                             counter++;
                             const formattedItem = {};
                             for (const [key, value] of Object.entries(item)) {
-                                if (DiskoptimRawDiskMap[key]) {
-                                    formattedItem[DiskoptimRawDiskMap[key]] = value
+                                if (DiskoptimRawRimMap[key]) {
+                                    formattedItem[DiskoptimRawRimMap[key]] = value
                                 } else {
                                     throw new Error(`undefined item key: ${key}`)
                                 }
@@ -57,15 +57,15 @@ export class Diskoptim implements Supplier, SupplierDisk {
         return undefined;
     }
 
-    async getRims(limit, offset): Promise<DiskMap[]> {
+    async getRims(limit, offset): Promise<RimMap[]> {
         const rawData = await DiskoptimModel.findAll({limit, offset});
 
         const toCreate = [];
-        for (const item of rawData) { //parse raw disk and compare
+        for (const item of rawData) { //parse raw rim and compare
 
             const [raw_bolts_count, raw_bolts_spacing] = item.PCD.split('x');
 
-            const stock: DiskStock[] = [
+            const stock: RimStock[] = [
                 {
                     name: STOCK_MSK,
                     shippingTime: '1-2',
@@ -78,7 +78,7 @@ export class Diskoptim implements Supplier, SupplierDisk {
                 }
             ];
 
-            const disk: DiskoptimDiskMap = {
+            const rim: DiskoptimRimMap = {
                 uid: `${this.name}_${item.code}`,
                 supplier: this.name,
                 model: item.model,
@@ -92,13 +92,13 @@ export class Diskoptim implements Supplier, SupplierDisk {
                 bolts_count: parseDouble(raw_bolts_count),
                 bolts_spacing: parseDouble(raw_bolts_spacing),
                 et: parseDouble(item.et),
-                type: diskType.alloy,
+                type: rimType.alloy,
                 dia: parseDouble(item.DIA),
                 stock: JSON.stringify(stock),
                 inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
             };
 
-            toCreate.push(disk)
+            toCreate.push(rim)
         }
         return toCreate;
     }
@@ -108,5 +108,5 @@ interface IDiskoptimCodeSlik {
     codeSlik?: string
 }
 
-interface DiskoptimDiskMap extends DiskMap, IDiskoptimCodeSlik {
+interface DiskoptimRimMap extends RimMap, IDiskoptimCodeSlik {
 }

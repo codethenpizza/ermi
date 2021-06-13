@@ -2,14 +2,14 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {DiskMap, DiskStock, STOCK_MSK, Supplier, SupplierDisk} from "../types";
+import {RimMap, RimStock, STOCK_MSK, Supplier, SupplierRim} from "../types";
 import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
-import {diskType} from "../ProductMapping";
+import {rimType} from "../ProductMapping";
 import ParsedStocks = IKolrad.ParsedStocks;
 import progressBar from "../../../helpers/progressBar";
 
-export class Kolrad implements Supplier, SupplierDisk {
+export class Kolrad implements Supplier, SupplierRim {
     readonly name = 'kolrad';
 
     async fetchData(): Promise<void> {
@@ -115,9 +115,9 @@ export class Kolrad implements Supplier, SupplierDisk {
         return undefined;
     }
 
-    async getRims(limit, offset): Promise<DiskMap[]> {
+    async getRims(limit, offset): Promise<RimMap[]> {
         const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
-        const toCreate: DiskMap[] = [];
+        const toCreate: RimMap[] = [];
         for (const item of rawData) {
             try {
                 const {
@@ -136,7 +136,7 @@ export class Kolrad implements Supplier, SupplierDisk {
                     price,
                     brand,
                     image,
-                    type: diskType.alloy,
+                    type: rimType.alloy,
                     stock: JSON.stringify(stock),
                     inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
                     ...params
@@ -148,7 +148,7 @@ export class Kolrad implements Supplier, SupplierDisk {
         return toCreate
     }
 
-    private getRimStocks({stocks}: IKolrad.Raw): DiskStock[] {
+    private getRimStocks({stocks}: IKolrad.Raw): RimStock[] {
         const parsedStocks: ParsedStocks = JSON.parse(stocks);
         let count = 0
         if (parsedStocks?.stock?.quantity) {
