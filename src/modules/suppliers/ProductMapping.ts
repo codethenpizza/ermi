@@ -106,7 +106,7 @@ export class ProductMapping {
     }
 
 
-    public async getMapping(transaction ?: Transaction): Promise<RimMapOptions> {
+    public async getMapping(transaction ?: Transaction): Promise<RimMapOptions> { // props: mapping-key, attr-array
         const mapping = await OptionsModel.findOne({where: {key: this.rimMappingKey}, transaction});
         if (!mapping) {
             return this.crateMapping(transaction)
@@ -154,7 +154,7 @@ export class ProductMapping {
         }, {transaction})
     }
 
-    private async createAttributes(transaction: Transaction): Promise<Attribute[]> {
+    private async createAttributes(transaction: Transaction): Promise<Attribute[]> { // attr-array
         const [notExistAttrs, existAttrs] = await this.diffAttrs(transaction);
         const attrs = await Attribute.bulkCreate(notExistAttrs, {transaction});
         attrs.push(...existAttrs);
@@ -162,7 +162,7 @@ export class ProductMapping {
         return attrs;
     }
 
-    private async diffAttrs(transaction: Transaction): Promise<[AttributeI[], Attribute[]]> {
+    private async diffAttrs(transaction: Transaction): Promise<[AttributeI[], Attribute[]]> { // attr-array
         const attrs = await Attribute.findAll({where: {name: {[Op.in]: this.attrArr.map(x => x.name)}}, transaction});
 
         return [this.attrArr.filter(x => !attrs.find(a => a.name === x.name)), attrs];

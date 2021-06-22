@@ -6,13 +6,13 @@
   "author": "AlexU <Auteshev505@gmail.comi>",
   "license": "MIT",
   "scripts": {
-    "start": "npm run setMaxSpace && node dist/server/index.js",
+    "start": "npm run set-max-space && node dist/server/index.js",
     "build": "tsc",
     "dev": "nodemon",
     "migrate": "ts-node -r tsconfig-paths/register migrations/index.ts",
-    "runner": "npm run setMaxSpace && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
-    "reindex": "npm run setMaxSpace && ts-node -r tsconfig-paths/register src/server/commands.ts es update-index",
-    "setMaxSpace": "export NODE_OPTIONS=--max_old_space_size=4096"
+    "runner": "npm run set-max-space && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
+    "reindex": "npm run set-max-space && ts-node -r tsconfig-paths/register src/server/commands.ts es update-index",
+    "set-max-space": "export NODE_OPTIONS=--max_old_space_size=4096"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "ftp": "^0.3.10",
+    "lodash": "^4.17.21",
     "migrate": "^1.7.0",
     "module-alias": "^2.2.2",
     "mysql2": "^2.1.0",
@@ -46,6 +47,7 @@
     "@types/bluebird": "^3.5.32",
     "@types/express": "^4.17.7",
     "@types/express-fileupload": "^1.1.6",
+    "@types/lodash": "^4.14.170",
     "@types/node": "^14.6.0",
     "@types/node-cache": "^4.2.5",
     "@types/node-cron": "^2.0.3",
