@@ -2,6 +2,7 @@ import {Client} from 'es7';
 import {elastic} from 'config';
 import * as RequestParams from "es7/api/requestParams";
 import {ApiResponse, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
+import {throws} from "assert";
 
 const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
 export const esClient = new Client({node});
@@ -10,7 +11,7 @@ export class Elastic {
 
     constructor(
         private index: string,
-        private type = '_doc'
+        private type = null
     ) {
     }
 
@@ -136,7 +137,10 @@ export class Elastic {
             index: this.index,
             type: this.type,
             ...params
-        }, options);
+        }, options).catch(e => {
+            console.log('ES SEARCH ERROR', JSON.stringify(e));
+            throw e;
+        });
     }
 
     async get(id: string): Promise<TransportRequestPromise<ApiResponse>> {

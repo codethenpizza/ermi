@@ -83,8 +83,9 @@ export interface ProductVariantImgModel {
 export interface EsSearchReqBody {
     filters?: EsReqFilter[];
     extFilters?: {
-        data: EsReqFilter[][];
-        filters: any
+        data?: EsReqFilter[][];
+        filters?: any;
+        [x: string]: any;
     }
     size?: number;
     from?: number;
@@ -109,10 +110,12 @@ export interface RangeFilter {
 export interface RespData {
     total: number;
     products: EsProductVariant[];
-    aggregations: {
-        attrs: {
-            doc_count: number;
-            [x: string]: EsProdAggAttr | number;
-        }
+    aggregations: AttrsAggregations;
+}
+
+export interface AttrsAggregations {
+    attrs: {
+        doc_count: number;
+        [x: string]: EsProdAggAttr | number;
     }
 }

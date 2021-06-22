@@ -120,7 +120,7 @@ export interface ISilkRaw {
     count_nsb: string;
 }
 
-export interface ISilkDisk {
+export interface ISilkRim {
     code: string;
     brand: string;
     model_name: string;

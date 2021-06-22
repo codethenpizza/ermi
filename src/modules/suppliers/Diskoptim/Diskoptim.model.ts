@@ -1,7 +1,7 @@
 import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 @Table({
-    tableName: 'supplier_diskoptim',
+    tableName: 'supplier_Diskoptim',
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
@@ -93,7 +93,7 @@ export interface IDiskoptimRaw {
     image: string;
 }
 
-export interface IDiskoptimDisk {
+export interface IDiskoptimRim {
     name: string;
     code: string;
     codeSlik: string;
@@ -115,7 +115,7 @@ export interface IDiskoptimDisk {
     applicability: string;
 }
 
-export enum DiskoptimRawDiskMap {
+export enum DiskoptimRawRimMap {
     'Наименование' = 'name',
     'Артикул' = 'code',
     'АртикулСЛИК' = 'codeSlik',
