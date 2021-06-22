@@ -8,7 +8,7 @@ import {ModificationsListAction} from "./actions/ModificationsListAction";
 import {DiameterListAction} from "./actions/DiameterListAction";
 
 export const WheelSizeController = createController([
-    {method: 'get', path: '/makes', action: MakeListAction},
+    {method: 'get',  path: '/makes', action: MakeListAction},
     {method: 'post', path: '/years', action: YearListAction},
     {method: 'post', path: '/models', action: ModelListAction},
     {method: 'post', path: '/generations', action: GenerationListAction},

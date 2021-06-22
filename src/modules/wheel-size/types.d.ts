@@ -90,3 +90,20 @@ export interface ParamsPair {
     boltsSpacing: number;
     esFilters: EsReqFilter[][];
 }
+
+export interface SearchRespBodyItem {
+    general: {
+        boltsCount: number;
+        boltsSpacing: number;
+        filters: EsReqFilter[];
+    };
+    front: SearchRespBodyAxleItem;
+    rear: SearchRespBodyAxleItem;
+}
+
+export interface SearchRespBodyAxleItem {
+    width: number;
+    diameter: number;
+    et: number;
+    filters: EsReqFilter[];
+}
