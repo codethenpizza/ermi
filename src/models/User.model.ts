@@ -6,7 +6,9 @@ import {Column, Model, Table} from "sequelize-typescript";
     createdAt: 'created_at'
 })
 export default class User extends Model<User> {
-    @Column
+    @Column({
+        unique: true
+    })
     email: string;
 
     @Column
@@ -20,8 +22,9 @@ export default class User extends Model<User> {
 }
 
 export type UserI = {
+    id?: number;
     email: string;
     password: string;
     name: string;
-    is_admin: boolean;
+    is_admin?: boolean;
 };

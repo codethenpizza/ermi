@@ -20,6 +20,9 @@
     "host": "localhost",
     "port": "6379"
   },
+  "auth": {
+    "secret": "qwerty"
+  },
   "suppliers": {
     "Slik": {
       "ftp": {
