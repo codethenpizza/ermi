@@ -6,13 +6,17 @@ import Attribute, {AttributeI} from "../src/models/Attribute.model";
 import ProductCategory, {IProductCategory} from "../src/models/ProductCategory.model";
 
 (async () => {
-    await sequelize.sync({force: true});
+    try {
+        await sequelize.sync({alter: true});
+    } catch (e) {
+        console.error(e);
+    }
 
-    await SetDefaultAttrTypes();
+    // await SetDefaultAttrTypes();
 
     // await SetDefaultAttributes();
 
-    await SetDefaultProductCategories();
+    // await SetDefaultProductCategories();
 
     process.exit(0);
 })();
