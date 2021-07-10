@@ -31,3 +31,10 @@ export default class ShippingType extends Model<ShippingType> {
     enabled: boolean;
 
 }
+
+export interface IShippingType {
+    name: string;
+    desc: string;
+    strategy: string;
+    enabled?: boolean;
+}
