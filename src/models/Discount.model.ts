@@ -34,3 +34,10 @@ export default class Discount extends Model<Discount> {
     value: number;
 
 }
+
+export interface IDiscount {
+    id?: number;
+    order_id?: number;
+    discount_type_id: number;
+    value: number;
+}

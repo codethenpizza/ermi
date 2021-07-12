@@ -9,7 +9,7 @@
     "start": "npm run set-max-space && node dist/server/index.js",
     "build": "tsc",
     "dev": "nodemon",
-    "cmd": "ts-node -r tsconfig-paths/register src/server/commands.ts",
+    "cmd": "ts-node -r tsconfig-paths/register scripts/commands.ts",
     "migrate": "npm run cmd migrate",
     "runner": "npm run set-max-space && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
     "reindex": "npm run set-max-space && npm run cmd es update-index",

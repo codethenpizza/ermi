@@ -1,10 +1,9 @@
+// @ts-ignore
 import program, {Command} from 'commander';
-import {updateProductIndexes} from "./elastic";
-import {Migrate} from "../../migrations/service";
-import {MStore} from "../../migrations/service/store";
-import {sequelizeTs} from "@db";
-
-// TODO move js to root/scripts
+import {updateProductIndexes} from "../src/server/elastic";
+import {Migrate} from "../migrations/service";
+import {MStore} from "../migrations/service/store";
+import {sequelizeTs} from "../src/database";
 
 program
     .command('es <action>')

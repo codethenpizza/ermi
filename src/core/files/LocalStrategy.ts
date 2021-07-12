@@ -1,4 +1,4 @@
-import {FileStrategy} from "@core/Files/FileStrategy";
+import {FileStrategy} from "@core/files/FileStrategy";
 import fs from 'fs';
 import {app} from 'config';
 

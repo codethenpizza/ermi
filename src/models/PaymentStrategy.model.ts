@@ -1,19 +1,25 @@
 import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
+import ShippingType from "@models/ShippingType.model";
 import ShippingPayment from "@models/ShippingPayment.model";
-import PaymentStrategy from "@models/PaymentStrategy.model";
 
 @Table({
-    tableName: 'shipping_type',
+    tableName: 'payment_strategy',
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
-export default class ShippingType extends Model<ShippingType> {
+export default class PaymentStrategy extends Model<PaymentStrategy> {
 
     @Column({
-        unique: true,
         allowNull: false,
+        unique: true
     })
     name: string;
+
+    @Column({
+        allowNull: false,
+        unique: true
+    })
+    strategy: string;
 
     @Column({
         type: DataType.TEXT
@@ -21,24 +27,18 @@ export default class ShippingType extends Model<ShippingType> {
     desc: string;
 
     @Column({
-        unique: true,
-        allowNull: false,
-    })
-    strategy: string;
-
-    @Column({
         defaultValue: false
     })
     enabled: boolean;
 
-    @BelongsToMany(() => PaymentStrategy, () => ShippingPayment)
-    paymentStrategies: PaymentStrategy[];
+    @BelongsToMany(() => ShippingType, () => ShippingPayment)
+    shippingTypes: ShippingType[];
 
 }
 
-export interface IShippingType {
+export interface IPaymentStrategy {
     name: string;
-    desc: string;
     strategy: string;
+    desc: string;
     enabled?: boolean;
 }

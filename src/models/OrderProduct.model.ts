@@ -39,3 +39,12 @@ export default class OrderProduct extends Model<OrderProduct> {
     qty: number;
 
 }
+
+export interface IOrderProduct {
+    id?: number;
+    order_id?: number;
+    product_variant_id: number;
+    price: number;
+    qty: number;
+    shipping_id?: number;
+}

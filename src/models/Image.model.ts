@@ -3,7 +3,7 @@ import {UploadedFile} from "express-fileupload";
 import sharp from 'sharp';
 import ProductVariantImgModel from "@models/ProductVariantImg.model";
 import ProductVariant from "@models/ProductVariant.model";
-import {getFileStrategy} from "@core/Files/FileStrategy";
+import {getFileStrategy} from "@core/files/FileStrategy";
 import {images} from 'config';
 import {Transaction} from "sequelize";
 import {stringify} from "querystring";

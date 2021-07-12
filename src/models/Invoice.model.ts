@@ -1,5 +1,6 @@
-import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import Order from "@models/Order.model";
+import PaymentTransaction from "@models/PaymentTransaction.model";
 
 @Table({
     tableName: 'invoice',
@@ -18,6 +19,12 @@ export default class Invoice extends Model<Invoice> {
     order: Order;
 
     @Column({
+        allowNull: false,
+        type: DataType.TEXT
+    })
+    desc: string;
+
+    @Column({
         type: DataType.DECIMAL,
         allowNull: false
     })
@@ -30,4 +37,15 @@ export default class Invoice extends Model<Invoice> {
     })
     is_paid: boolean;
 
+    @HasMany(() => PaymentTransaction)
+    paymentTransactions: PaymentTransaction[];
+
+}
+
+export interface IInvoice {
+    id?: number;
+    order_id?: number;
+    desc: string;
+    value: number;
+    is_paid?: boolean;
 }

@@ -1,6 +1,6 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
-import {AuthService} from "@services/AuthService";
+import {AuthService} from "@core/services/AuthService";
 import {UserI} from "@models/User.model";
 
 export class Login implements Action {

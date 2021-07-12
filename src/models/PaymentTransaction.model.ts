@@ -1,13 +1,13 @@
 import {BelongsTo, Column, DataType, ForeignKey, HasOne, Model, Table} from "sequelize-typescript";
 import Invoice from "@models/Invoice.model";
-import PaymentMethod from "@models/PaymentMethod.model";
+import PaymentType from "@models/PaymentStrategy.model";
 
 @Table({
-    tableName: 'payment',
+    tableName: 'payment_transaction',
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
-export default class Payment extends Model<Payment> {
+export default class PaymentTransaction extends Model<PaymentTransaction> {
 
     @ForeignKey(() => Invoice)
     @Column({
@@ -34,14 +34,5 @@ export default class Payment extends Model<Payment> {
         defaultValue: 'done'
     })
     status: string;
-
-    @ForeignKey(() => PaymentMethod)
-    @Column({
-        allowNull: false
-    })
-    payment_method_id: number;
-
-    @BelongsTo(() => PaymentMethod)
-    paymentMethod: PaymentMethod;
 
 }

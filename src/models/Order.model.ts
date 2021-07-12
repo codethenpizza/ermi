@@ -5,6 +5,7 @@ import ShippingType from "@models/ShippingType.model";
 import Discount from "@models/Discount.model";
 import Shipping from "@models/Shipping.model";
 import Invoice from "@models/Invoice.model";
+import PaymentStrategy from "@models/PaymentStrategy.model";
 
 @Table({
     tableName: 'order',
@@ -14,8 +15,7 @@ import Invoice from "@models/Invoice.model";
 export default class Order extends Model<Order> {
 
     @Column({
-        allowNull: false,
-        unique: true
+        // unique: true
     })
     uid: string;
 
@@ -28,9 +28,19 @@ export default class Order extends Model<Order> {
     @BelongsTo(() => User)
     user: User;
 
+    @ForeignKey(() => PaymentStrategy)
+    @Column({
+        allowNull: false,
+    })
+    payment_strategy_id: number;
+
+    @BelongsTo(() => PaymentStrategy)
+    paymentStrategy: PaymentStrategy;
+
     // TODO set enum
     @Column({
         allowNull: false,
+        defaultValue: 'new'
     })
     status: string;
 
@@ -53,4 +63,13 @@ export default class Order extends Model<Order> {
     @HasMany(() => Invoice)
     invoices: Invoice[];
 
+}
+
+export interface IOrder {
+    id?: string;
+    uid?: string;
+    user_id: number;
+    payment_strategy_id: number;
+    status?: string;
+    total: number;
 }
