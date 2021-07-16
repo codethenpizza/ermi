@@ -2,8 +2,10 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {IUser} from "@models/User.model";
 import {isAuth} from "../../../middlewares/auth";
+import Order from "@models/Order.model";
+import {JWTPayload} from "@core/services/AuthService";
 
-export class User implements Action {
+export class OrderHistoryAction implements Action {
     get action() {
         return [isAuth, this.assert, this.handle];
     }
@@ -13,7 +15,11 @@ export class User implements Action {
     }
 
     async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response) {
-        res.send(user);
+        const orders = await Order.findAll({
+            where: {user_id: (user as JWTPayload).user.id},
+            include: Order.fullIncludes()
+        });
+        res.send(orders);
     }
 
 }

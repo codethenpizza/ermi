@@ -1,5 +1,5 @@
 import {fileStrategy} from 'config';
-import {LocalStrategy} from "@core/Files/LocalStrategy";
+import {LocalStrategy} from "@core/files/LocalStrategy";
 
 export interface FileStrategy {
     create(file: Buffer, name: string): Promise<string>;

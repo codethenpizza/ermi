@@ -8,6 +8,8 @@ import {ProductCatController} from "@controllers/admin/ProductCatController";
 import {ProductVariantController} from "@controllers/admin/ProductVariantController";
 import {SuppliersController} from "../../modules/suppliers/Controller";
 import {ImageController} from "@controllers/admin/ImageController";
+import {OrderAdminController} from "@controllers/admin/OrderAdminController";
+import {UserAdminController} from "@controllers/admin/UserController";
 
 export const AdminController = createController([
     {method: 'use', path: '/attrs', action: AttributeController},
@@ -18,5 +20,7 @@ export const AdminController = createController([
     {method: 'use', path: '/products', action: ProductController},
     {method: 'use', path: '/product_vars', action: ProductVariantController},
     {method: 'use', path: '/suppliers', action: SuppliersController},
-    {method: 'use', path: '/image', action: ImageController}
+    {method: 'use', path: '/image', action: ImageController},
+    {method: 'use', path: '/order', action: OrderAdminController},
+    {method: 'use', path: '/user', action: UserAdminController},
 ]);

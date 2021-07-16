@@ -9,9 +9,10 @@
     "start": "npm run set-max-space && node dist/server/index.js",
     "build": "tsc",
     "dev": "nodemon",
-    "migrate": "ts-node -r tsconfig-paths/register migrations/index.ts",
+    "cmd": "ts-node -r tsconfig-paths/register scripts/commands.ts",
+    "migrate": "npm run cmd migrate",
     "runner": "npm run set-max-space && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
-    "reindex": "npm run set-max-space && ts-node -r tsconfig-paths/register src/server/commands.ts es update-index",
+    "reindex": "npm run set-max-space && npm run cmd es update-index",
     "set-max-space": "export NODE_OPTIONS=--max_old_space_size=4096"
   },
   "dependencies": {
@@ -30,7 +31,6 @@
     "ftp": "^0.3.10",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "migrate": "^1.7.0",
     "module-alias": "^2.2.2",
     "mysql2": "^2.1.0",
     "node-cache": "^5.1.2",

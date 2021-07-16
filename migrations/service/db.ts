@@ -1,4 +1,4 @@
-import {Sequelize} from 'sequelize-typescript';
+import {Sequelize} from "sequelize-typescript";
 import {dbConfig} from 'config';
 
 export const sequelizeTs = new Sequelize({
@@ -9,10 +9,7 @@ export const sequelizeTs = new Sequelize({
     username: dbConfig.user,
     password: dbConfig.pass,
     models: [
-        __dirname + '/models/**/*.model.*',
-        __dirname + '/modules/**/*.model.*',
-        __dirname + '../migrations/service/**/*.model.*',
-
+        __dirname + '**/*.model.*',
     ],
     // logging: console.log
     logging: false
