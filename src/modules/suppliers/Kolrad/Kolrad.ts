@@ -2,7 +2,8 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {RimMap, RimStock, STOCK_MSK, Supplier, SupplierRim} from "../types";
+import {STOCK_MSK, Supplier} from "../types";
+import {RimMap, RimStock, SupplierRim} from "../helpers/rimProductType/rimTypes";
 import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
 import {rimType} from "../ProductMapping";

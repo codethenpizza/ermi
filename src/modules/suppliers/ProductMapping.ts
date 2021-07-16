@@ -12,9 +12,9 @@ import {
     RIM_WIDTH, RimMap,
     RimMapOptions,
     SupplierRim
-} from "./types";
+} from "./helpers/rimProductType/rimTypes";
 import OptionsModel from "@models/Options.model";
-import Attribute, {AttributeI, ATTR_TYPE} from "@models/Attribute.model";
+import Attribute, {IAttribute, ATTR_TYPE} from "@models/Attribute.model";
 import {Op, Transaction} from "sequelize";
 import AttrSet from "@models/AttrSet.model";
 import Product, {IProduct} from "@models/Product.model";
@@ -35,7 +35,7 @@ export enum rimType {
 export class ProductMapping {
     private rimMappingKey = 'product_mapping_rim';
 
-    private attrArr: AttributeI[] = [
+    private attrArr: IAttribute[] = [
         {name: RIM_MODEL, type_id: ATTR_TYPE.STRING},
         {name: RIM_BRAND, type_id: ATTR_TYPE.STRING, aggregatable: true},
         {name: RIM_COLOR, type_id: ATTR_TYPE.STRING, aggregatable: true},
@@ -162,7 +162,7 @@ export class ProductMapping {
         return attrs;
     }
 
-    private async diffAttrs(transaction: Transaction): Promise<[AttributeI[], Attribute[]]> { // attr-array
+    private async diffAttrs(transaction: Transaction): Promise<[IAttribute[], Attribute[]]> { // attr-array
         const attrs = await Attribute.findAll({where: {name: {[Op.in]: this.attrArr.map(x => x.name)}}, transaction});
 
         return [this.attrArr.filter(x => !attrs.find(a => a.name === x.name)), attrs];

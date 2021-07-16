@@ -2,7 +2,8 @@ import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
-import {RimMap, RimStock, STOCK_TOLYATTI, Supplier, SupplierRim} from "../types";
+import {Supplier, STOCK_TOLYATTI} from "../types";
+import {RimMap, RimStock, SupplierRim} from "../helpers/rimProductType/rimTypes";
 import Product from "@models/Product.model";
 import SlikModel, {ISilkRaw} from "./Slik.model";
 import {rimType} from "../ProductMapping";
@@ -55,8 +56,11 @@ export class Slik implements Supplier, SupplierRim {
         return undefined;
     }
 
-    async getRims(): Promise<RimMap[]> {
-        const rawData = await SlikModel.findAll();
+    async getRims(limit, offset): Promise<RimMap[]> {
+        const rawData = await SlikModel.findAll({
+            limit,
+            offset
+        });
 
         return rawData.map<RimMap>((item) => {
             const supplier = 'slik';

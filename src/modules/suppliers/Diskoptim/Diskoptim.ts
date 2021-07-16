@@ -3,7 +3,8 @@ import FTP from 'ftp';
 import XmlStream from 'xml-stream';
 import parseDouble from "../../../helpers/parseDouble";
 
-import {RimMap, RimStock, STOCK_MSK, STOCK_SPB, Supplier, SupplierRim} from "../types";
+import {STOCK_MSK, STOCK_SPB, Supplier} from "../types";
+import {RimMap, RimStock, SupplierRim} from "../helpers/rimProductType/rimTypes";
 import Product from "@models/Product.model";
 import {rimType} from "../ProductMapping";
 import DiskoptimModel, {DiskoptimRawRimMap} from "./Diskoptim.model"
