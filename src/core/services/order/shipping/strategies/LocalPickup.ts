@@ -4,7 +4,7 @@ import PickupPoint from "@models/PickupPoint.model";
 
 export class LocalPickup implements ShippingStrategy {
 
-    async calculate({orderProducts, address: {pickup_point_id}, shippingTypeId}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
+    async calculate({orderProducts, address: {pickup_point_id}, shippingType}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
 
         if (!pickup_point_id) {
             return [];
@@ -14,12 +14,15 @@ export class LocalPickup implements ShippingStrategy {
 
         const pickupPoint = await PickupPoint.findByPk(pickup_point_id);
 
+
+
         return [
             {
                 shipping: {
-                    shipping_address_id: pickupPoint.address_id,
+                    address_id: pickupPoint.address_id,
                     delivery_date_from: new Date(),
-                    shipping_type_id: shippingTypeId,
+                    shipping_type_id: shippingType.id,
+                    shippingType,
                     cost: 0,
                     status: 'done' // Set done after manager check
                 },

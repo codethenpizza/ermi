@@ -19,3 +19,7 @@ export default class Address extends Model<Address> {
     pickupPoints?: PickupPoint[];
 
 }
+
+export class IAddress {
+    fields: string;
+}

@@ -1,6 +1,7 @@
 import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import ProductVariant from "@models/ProductVariant.model";
 import Order from "@models/Order.model";
+import Shipping from "@models/Shipping.model";
 
 @Table({
     tableName: 'order_product',
@@ -37,6 +38,12 @@ export default class OrderProduct extends Model<OrderProduct> {
         allowNull: false
     })
     qty: number;
+
+    @ForeignKey(() => Shipping)
+    @Column({
+        allowNull: false
+    })
+    shipping_id: number;
 
 }
 

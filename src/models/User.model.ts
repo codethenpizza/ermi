@@ -1,5 +1,5 @@
 import {Column, HasMany, Model, Table} from "sequelize-typescript";
-import UserAddress from "@models/UserAddress.model";
+import UserAddress, {IUserAddress} from "@models/UserAddress.model";
 
 @Table({
     tableName: 'user',
@@ -12,6 +12,11 @@ export default class User extends Model<User> {
     })
     email: string;
 
+    @Column({
+        unique: true
+    })
+    phone: string;
+
     @Column
     password: string;
 
@@ -22,13 +27,15 @@ export default class User extends Model<User> {
     is_admin: boolean;
 
     @HasMany(() => UserAddress)
-    shippingAddresses: UserAddress[];
+    userAddresses: UserAddress[];
 }
 
-export type UserI = {
+export type IUser = {
     id?: number;
     email: string;
+    phone: string;
     password: string;
     name: string;
     is_admin?: boolean;
+    userAddresses?: IUserAddress;
 };

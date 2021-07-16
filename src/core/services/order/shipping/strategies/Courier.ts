@@ -3,7 +3,7 @@ import {CalculateShippingResult, ShippingStrategyData} from "@core/services/orde
 
 export class Courier implements ShippingStrategy {
 
-    async calculate({address, shippingTypeId, orderProducts}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
+    async calculate({address, shippingType, orderProducts}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
 
         // Check the availability of goods
 
@@ -17,7 +17,8 @@ export class Courier implements ShippingStrategy {
         return [
             {
                 shipping: {
-                    shipping_type_id: shippingTypeId,
+                    shipping_type_id: shippingType.id,
+                    shippingType,
                     cost,
                     status: 'new',
                     delivery_date_from: dateFrom,

@@ -1,6 +1,7 @@
 import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
 import ShippingPayment from "@models/ShippingPayment.model";
 import PaymentStrategy from "@models/PaymentStrategy.model";
+import {SHIPPING_STRATEGY} from "@core/services/order/shipping/constants";
 
 @Table({
     tableName: 'shipping_type',
@@ -24,7 +25,7 @@ export default class ShippingType extends Model<ShippingType> {
         unique: true,
         allowNull: false,
     })
-    strategy: string;
+    strategy: SHIPPING_STRATEGY;
 
     @Column({
         defaultValue: false

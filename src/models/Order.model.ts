@@ -6,6 +6,13 @@ import Discount from "@models/Discount.model";
 import Shipping from "@models/Shipping.model";
 import Invoice from "@models/Invoice.model";
 import PaymentStrategy from "@models/PaymentStrategy.model";
+import {Includeable} from "sequelize";
+import DiscountType from "@models/DiscountType.model";
+import Address from "@models/Address.model";
+import ProductVariant from "@models/ProductVariant.model";
+import AttrValue from "@models/AttrValue.model";
+import AttrType from "@models/AttrType.model";
+import Image from "@models/Image.model";
 
 @Table({
     tableName: 'order',
@@ -62,6 +69,15 @@ export default class Order extends Model<Order> {
 
     @HasMany(() => Invoice)
     invoices: Invoice[];
+
+    static fullIncludes(): Includeable[] {
+        return [
+            {model: Discount, include: [DiscountType]},
+            {model: Shipping, include: [ShippingType, Address, OrderProduct]},
+            PaymentStrategy,
+            Invoice
+        ];
+    }
 
 }
 

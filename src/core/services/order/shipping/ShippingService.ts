@@ -1,9 +1,13 @@
-import {CalculateShippingResult, ShippingStrategyData} from "@core/services/order/shipping/types";
+import {
+    CalculateShippingData,
+    CalculateShippingResult,
+    ShippingStrategyData
+} from "@core/services/order/shipping/types";
 import ShippingType from "@models/ShippingType.model";
 import {ShippingStrategy} from "@core/services/order/shipping/strategies/ShippingStrategy";
 import {LocalPickup} from "@core/services/order/shipping/strategies/LocalPickup";
 import slugify from "slugify";
-import {Courier} from "@core/services/order/shipping/strategies/Сourier";
+import {Courier} from "./strategies/Courier";
 
 const s = (className: string) => slugify(className, {lower: true});
 
@@ -14,7 +18,7 @@ export class ShippingService {
         [s(Courier.name)]: new Courier()
     };
 
-    async calculateShipping({shippingTypeId, address, orderProducts}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
+    async calculateShipping({shippingTypeId, address, orderProducts}: CalculateShippingData): Promise<CalculateShippingResult[]> {
         if (
             !shippingTypeId ||
             (!address.address && !address.address_id && !address.pickup_point_id)
@@ -27,7 +31,7 @@ export class ShippingService {
         return this.strategies[s(shippingType.strategy)].calculate({
             orderProducts,
             address,
-            shippingTypeId
+            shippingType
         });
     }
 

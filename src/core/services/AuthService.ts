@@ -1,39 +1,45 @@
 import jwt from 'jsonwebtoken';
-import User, {UserI} from "@models/User.model";
+import User, {IUser} from "@models/User.model";
 import config from 'config';
 import argon2 from 'argon2';
+import {Transaction} from "sequelize";
 
 export interface JWTPayload {
     user: {
         id: number;
         email: string;
         name: string;
-    }
+        phone: string;
+    },
+    iat?: number;
+    exp?: number;
 }
 
 export interface LoginObj {
-    user: Partial<UserI>,
+    user: Partial<IUser>,
     token: string;
 }
 
 export class AuthService {
 
-    static async register({password, email, name}: Partial<UserI>): Promise<LoginObj> {
+    static async register({password, email, name, phone}: Partial<IUser>, transaction?: Transaction): Promise<LoginObj> {
         const passwordHashed = await argon2.hash(password);
 
         const user = await User.create({
             password: passwordHashed,
             email,
             name,
-        });
+            phone,
+        }, {transaction});
 
         return {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phone: user.phone
             },
-            token: AuthService.generateToken(user)
+            token: AuthService.generateToken(user as unknown as IUser)
         }
     }
 
@@ -56,17 +62,18 @@ export class AuthService {
                 name: user.name,
                 email: user.email
             },
-            token: AuthService.generateToken(user)
+            token: AuthService.generateToken(user as unknown as IUser)
         }
     }
 
-    private static generateToken(user: UserI): string {
+    private static generateToken(user: IUser): string {
 
         const payload: JWTPayload = {
             user: {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                phone: user.phone
             }
         };
 

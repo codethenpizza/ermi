@@ -1,8 +1,8 @@
-import {BelongsTo, Column, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import Address from "@models/Address.model";
 
 @Table({
-    tableName: 'shipping_address',
+    tableName: 'pickup_point',
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
@@ -14,7 +14,7 @@ export default class PickupPoint extends Model<PickupPoint> {
     name: string;
 
     @Column({
-        allowNull: false
+        type: DataType.TEXT
     })
     desc: string;
 
@@ -26,4 +26,11 @@ export default class PickupPoint extends Model<PickupPoint> {
 
     @BelongsTo(() => Address)
     address: Address;
+}
+
+export interface IPickupPoint {
+    id?: number;
+    name: string;
+    desc: string;
+    address_id: number;
 }

@@ -1,8 +1,6 @@
-import {Router} from "express";
-import UserCreateAction from "@actions/admin/User/UserCreateAction";
+import {createController} from "@core/Controller";
+import {UserGetAction} from "@actions/admin/User/UserGetAction";
 
-const UserController = Router();
-
-UserController.get('/create', ...UserCreateAction.action);
-
-export {UserController}
+export const UserAdminController = createController([
+    {method: 'get', path: '/get', action: UserGetAction}
+]);

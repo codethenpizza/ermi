@@ -32,4 +32,5 @@ export interface IUserAddress {
     id?: number;
     user_id: number;
     address_id: number;
+    address?: Address;
 }

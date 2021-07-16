@@ -1,7 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {AuthService} from "@core/services/AuthService";
-import {UserI} from "@models/User.model";
+import {IUser} from "@models/User.model";
 
 export class Login implements Action {
     get action() {
@@ -12,7 +12,7 @@ export class Login implements Action {
         next();
     }
 
-    async handle({body: {email, password}}: Request<any, any, Partial<UserI>, any>, res: Response) {
+    async handle({body: {email, password}}: Request<any, any, Partial<IUser>, any>, res: Response) {
         try {
             const resp = await AuthService.login(email, password);
             res.send(resp);

@@ -1,8 +1,9 @@
-import {BelongsTo, Column, DataType, ForeignKey, HasOne, Model, Table} from "sequelize-typescript";
-import ShippingType from "@models/ShippingType.model";
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table} from "sequelize-typescript";
+import ShippingType, {IShippingType} from "@models/ShippingType.model";
 import Order from "@models/Order.model";
 import UserAddress from "@models/UserAddress.model";
 import Address from "@models/Address.model";
+import OrderProduct from "@models/OrderProduct.model";
 
 @Table({
     tableName: 'shipping',
@@ -40,10 +41,10 @@ export default class Shipping extends Model<Shipping> {
     @Column({
         allowNull: false,
     })
-    shipping_address_id: number;
+    address_id: number;
 
     @BelongsTo(() => Address)
-    shippingAddress: Address;
+    address: Address;
 
     @Column({
         type: DataType.DATE,
@@ -60,6 +61,9 @@ export default class Shipping extends Model<Shipping> {
         allowNull: false
     })
     status: string;
+
+    @HasMany(() => OrderProduct)
+    orderProducts: OrderProduct[];
 }
 
 export interface IShipping {
@@ -67,8 +71,9 @@ export interface IShipping {
     shipping_type_id: number;
     order_id?: number;
     cost: number;
-    shipping_address_id: number;
+    address_id: number;
     delivery_date_from: Date;
     delivery_date_to?: Date;
     status: string;
+    shippingType?: IShippingType;
 }
