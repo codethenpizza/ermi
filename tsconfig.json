@@ -11,6 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": "src",
+    "rootDir": "src",
     "outDir": "dist",
     "paths": {
       "@actions/*": [
@@ -33,6 +34,9 @@
       ],
       "@core/*": [
         "core/*"
+      ],
+      "@services/*": [
+        "services/*"
       ]
     }
   },
@@ -40,6 +44,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "migrations/**/*"
   ]
 }

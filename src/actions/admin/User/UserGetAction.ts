@@ -3,16 +3,14 @@ import User, {IUser} from "@models/User.model";
 import {Action} from "@projTypes/action";
 
 
-class UserCreateAction extends Action {
+export class UserGetAction extends Action {
 
     assert(req: Request<any, any, any, any>, res, next: NextFunction) {
         next();
     }
 
-    async handle(req: Request<any, any, any, any>, res) {
-        const userData: IUser = {email: 'dsa', phone: '1234567890', password: 'wqe', name: 'trefsda', is_admin: false};
-        const user = new User(userData);
-        await user.save();
+    async handle(req: Request<any, any, any, {id: string}>, res) {
+        const user = await User.findByPk(parseInt(req.query.id));
         res.send(user);
     }
 
@@ -21,4 +19,3 @@ class UserCreateAction extends Action {
     }
 
 }
-export default new UserCreateAction();

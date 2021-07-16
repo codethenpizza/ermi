@@ -9,12 +9,14 @@
     "start": "npm run set-max-space && node dist/server/index.js",
     "build": "tsc",
     "dev": "nodemon",
-    "migrate": "ts-node -r tsconfig-paths/register migrations/index.ts",
+    "cmd": "ts-node -r tsconfig-paths/register scripts/commands.ts",
+    "migrate": "npm run cmd migrate",
     "runner": "npm run set-max-space && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
-    "reindex": "npm run set-max-space && ts-node -r tsconfig-paths/register src/server/commands.ts es update-index",
+    "reindex": "npm run set-max-space && npm run cmd es update-index",
     "set-max-space": "export NODE_OPTIONS=--max_old_space_size=4096"
   },
   "dependencies": {
+    "argon2": "^0.28.2",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "bodybuilder": "^2.2.21",
@@ -25,9 +27,10 @@
     "es7": "npm:@elastic/elasticsearch@^7.9.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
+    "express-jwt": "^6.0.0",
     "ftp": "^0.3.10",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "migrate": "^1.7.0",
     "module-alias": "^2.2.2",
     "mysql2": "^2.1.0",
     "node-cache": "^5.1.2",
@@ -43,10 +46,13 @@
     "xml-stream": "^0.4.5"
   },
   "devDependencies": {
+    "@types/argon2": "^0.15.0",
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.32",
     "@types/express": "^4.17.7",
     "@types/express-fileupload": "^1.1.6",
+    "@types/express-jwt": "^6.0.1",
+    "@types/jsonwebtoken": "^8.5.2",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.6.0",
     "@types/node-cache": "^4.2.5",
@@ -56,7 +62,8 @@
     "@types/validator": "^13.1.0",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
-    "tsconfig-paths": "^3.9.0"
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.3.5"
   },
   "_moduleAliases": {
     "@actions": "dist/actions",
@@ -65,6 +72,7 @@
     "@projTypes": "dist/types",
     "@db": "dist/database.js",
     "@server": "dist/server",
-    "@core": "dist/core"
+    "@core": "dist/core",
+    "@services": "dist/services"
   }
 }

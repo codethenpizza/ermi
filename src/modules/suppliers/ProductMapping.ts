@@ -20,7 +20,7 @@ import AttrSet from "@models/AttrSet.model";
 import Product, {IProduct} from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
-import {sequelize} from '@db'
+import {sequelizeTs} from '@db'
 import Image from "@models/Image.model";
 import ProductVariantImg from "@models/ProductVariantImg.model";
 import progressBar from "../../helpers/progressBar";
@@ -57,7 +57,7 @@ export class ProductMapping {
     ];
 
     async storeRim(suppliers: SupplierRim[]): Promise<void> {
-        const transaction = await sequelize.transaction();
+        const transaction = await sequelizeTs.transaction();
         let mapping: RimMapOptions;
         try {
             mapping = await this.getMapping(transaction);
