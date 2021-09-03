@@ -15,7 +15,7 @@ export const setCronTasks = (): void => {
     });
 };
 
-const parseSuppliers = async () => {
+export const parseSuppliers = async () => {
     console.log('Suppliers parse start at ', new Date());
     await fetchAll();
     await storeAll();

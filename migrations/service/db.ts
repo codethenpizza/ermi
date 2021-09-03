@@ -1,7 +1,7 @@
 import {Sequelize} from "sequelize-typescript";
 import {dbConfig} from 'config';
 
-export const sequelizeTs = new Sequelize({
+export const migrationSequelizeTs = new Sequelize({
     dialect: 'mysql',
     host: dbConfig.host,
     port: dbConfig.port,

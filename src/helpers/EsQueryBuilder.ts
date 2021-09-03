@@ -1,7 +1,6 @@
 import {EsProductVariant, EsReqFilter, EsReqFilterValue, EsRespProduct, RangeFilter} from "@actions/front/types";
 import bodybuilder, {Bodybuilder} from "bodybuilder";
 import Attribute from "@models/Attribute.model";
-import {groupBy} from "lodash";
 
 export interface QueryParams {
     filters?: EsReqFilter[];
@@ -12,12 +11,11 @@ export interface QueryParams {
 export const JAVA_MAX_INT = 2147483647;
 
 export class EsQueryBuilder {
-
     static makeQuery(params: QueryParams, aggAttrs?: Attribute[]): Bodybuilder {
         const query = bodybuilder();
         const filtersArr = EsQueryBuilder.makeAllFilters(params);
         query.query('bool', 'filter', filtersArr);
-        if(aggAttrs) {
+        if (aggAttrs) {
             EsQueryBuilder.addAggs(query, aggAttrs);
         }
         return query;

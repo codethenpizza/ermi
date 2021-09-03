@@ -9,10 +9,7 @@ import PaymentStrategy from "@models/PaymentStrategy.model";
 import {Includeable} from "sequelize";
 import DiscountType from "@models/DiscountType.model";
 import Address from "@models/Address.model";
-import ProductVariant from "@models/ProductVariant.model";
-import AttrValue from "@models/AttrValue.model";
-import AttrType from "@models/AttrType.model";
-import Image from "@models/Image.model";
+import B2BDiscount from "@models/B2BDiscount.model";
 
 @Table({
     tableName: 'order',
@@ -58,6 +55,13 @@ export default class Order extends Model<Order> {
     })
     total: number;
 
+    @ForeignKey(() => B2BDiscount)
+    @Column
+    b2b_discount_id: number;
+
+    @BelongsTo(() => B2BDiscount)
+    B2BDiscount: B2BDiscount;
+
     @HasMany(() => OrderProduct)
     products: OrderProduct[];
 
@@ -75,7 +79,9 @@ export default class Order extends Model<Order> {
             {model: Discount, include: [DiscountType]},
             {model: Shipping, include: [ShippingType, Address, OrderProduct]},
             PaymentStrategy,
-            Invoice
+            Invoice,
+            B2BDiscount,
+            OrderProduct
         ];
     }
 
@@ -88,4 +94,5 @@ export interface IOrder {
     payment_strategy_id: number;
     status?: string;
     total: number;
+    b2b_discount_id?: number;
 }

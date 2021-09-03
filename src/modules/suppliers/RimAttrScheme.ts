@@ -101,10 +101,10 @@ export const RimAttrScheme = {
             },
             "slug": {
                 "type": "keyword",
-                "normalizer": LOWERCASE_NORMALIZER
             },
             "value": {
                 "type": "keyword",
+                "normalizer": LOWERCASE_NORMALIZER
             }
         }
     },
@@ -184,14 +184,14 @@ export const RimAttrScheme = {
                 "type": "nested",
                 "properties": {
                     "name": {
-                        "type" : "text",
+                        "type": "text",
                         "index": false
                     },
                     "shippingTime": {
-                        "type" : "keyword",
+                        "type": "keyword",
                     },
                     "count": {
-                        "type" : "integer",
+                        "type": "integer",
                         "index": false
                     }
                 }

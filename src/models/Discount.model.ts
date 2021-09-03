@@ -1,4 +1,4 @@
-import {BelongsTo, Column, ForeignKey, HasOne, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, ForeignKey, Model, Table} from "sequelize-typescript";
 import Order from "@models/Order.model";
 import DiscountType from "@models/DiscountType.model";
 

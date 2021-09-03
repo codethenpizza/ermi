@@ -3,14 +3,10 @@ import User, {IUser} from "@models/User.model";
 import config from 'config';
 import argon2 from 'argon2';
 import {Transaction} from "sequelize";
+import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
 
 export interface JWTPayload {
-    user: {
-        id: number;
-        email: string;
-        name: string;
-        phone: string;
-    },
+    user: IUser,
     iat?: number;
     exp?: number;
 }
@@ -22,7 +18,13 @@ export interface LoginObj {
 
 export class AuthService {
 
-    static async register({password, email, name, phone}: Partial<IUser>, transaction?: Transaction): Promise<LoginObj> {
+    static async register({
+                              password,
+                              email,
+                              name,
+                              phone,
+                              b2b_discount_group_id
+                          }: Partial<IUser>, transaction?: Transaction): Promise<LoginObj> {
         const passwordHashed = await argon2.hash(password);
 
         const user = await User.create({
@@ -30,21 +32,23 @@ export class AuthService {
             email,
             name,
             phone,
-        }, {transaction});
+            b2b_discount_group_id
+        }, {transaction, include: [B2BDiscountGroup]});
 
         return {
             user: {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone,
+                b2b_discount_group_id: user.b2b_discount_group_id
             },
             token: AuthService.generateToken(user as unknown as IUser)
         }
     }
 
     static async login(email: string, password: string): Promise<LoginObj> {
-        const user = await User.findOne({where: {email}});
+        const user = await User.findOne({where: {email}, include: [B2BDiscountGroup]});
 
         if (!user) {
             throw new Error('User not found');
@@ -60,7 +64,9 @@ export class AuthService {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phone: user.phone,
+                b2b_discount_group_id: user.b2b_discount_group_id
             },
             token: AuthService.generateToken(user as unknown as IUser)
         }
@@ -73,14 +79,15 @@ export class AuthService {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone,
+                b2b_discount_group_id: user.b2b_discount_group_id
             }
         };
 
         const signature = config.auth.secret;
         const expiration = '6h';
 
-        return jwt.sign(payload, signature, { expiresIn: expiration });
+        return jwt.sign(payload, signature, {expiresIn: expiration});
     }
 
 }
