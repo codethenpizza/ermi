@@ -15,6 +15,7 @@ export class Slik implements Supplier, SupplierRim {
         return new Promise((resolve, reject) => {
             console.log('Start fetch Slik');
             let counter = 0;
+            let errCounter = 0;
             try {
                 const ftp = new FTP();
 
@@ -23,12 +24,17 @@ export class Slik implements Supplier, SupplierRim {
                         const xml = new XmlStream(stream);
                         xml.on('endElement: gd', async (item: ISilkRaw) => {
                             counter++;
-                            await SlikModel.upsert(item);
+                            try {
+                                await SlikModel.upsert(item);
+                            } catch (e) {
+                                console.error(e.message);
+                                errCounter++;
+                            }
                         });
 
                         xml.on('end', () => {
                             ftp.end();
-                            console.log(`End fetch Slik [${counter}]`);
+                            console.log(`End fetch Slik. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
                     });

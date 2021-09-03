@@ -11,7 +11,6 @@ export const sequelizeTs = new Sequelize({
     models: [
         __dirname + '/models/**/*.model.*',
         __dirname + '/modules/**/*.model.*',
-        __dirname + '../migrations/service/**/*.model.*',
 
     ],
     // logging: console.log

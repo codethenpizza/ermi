@@ -2,7 +2,6 @@ import {Client} from 'es7';
 import {elastic} from 'config';
 import * as RequestParams from "es7/api/requestParams";
 import {ApiResponse, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
-import {throws} from "assert";
 
 const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
 export const esClient = new Client({node});
@@ -11,7 +10,7 @@ export class Elastic {
 
     constructor(
         private index: string,
-        private type = null
+        private type = '_doc'
     ) {
     }
 
@@ -148,7 +147,7 @@ export class Elastic {
             index: this.index,
             id
         }).catch((e) => {
-            if(e.meta.statusCode === 404) {
+            if (e.meta.statusCode === 404) {
                 return null;
             }
 

@@ -1,7 +1,7 @@
 import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 @Table({
-    tableName: 'supplier_Diskoptim',
+    tableName: 'supplier_diskoptim',
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })

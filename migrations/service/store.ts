@@ -1,10 +1,11 @@
-import {MigrationEntity, MigrationSet, MigrationStore} from "./types";
-import {sequelizeTs} from "./db";
+import {MigrationSet, MigrationStore} from "./types";
+import {migrationSequelizeTs} from "./db";
+// @ts-ignore
 import Migration from "./Migration.model";
 
 export class MStore implements MigrationStore {
 
-    db = sequelizeTs;
+    db = migrationSequelizeTs;
 
     async init(): Promise<void> {
         await Migration.sync();

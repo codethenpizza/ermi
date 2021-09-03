@@ -1,9 +1,10 @@
 import {MigrationEntity, MigrationStore} from "./types";
-import path from "path";
+import * as path from "path";
 import slugify from "slugify";
-import fs from "fs";
+import * as fs from "fs";
 import {Transaction} from "sequelize";
-import {sequelizeTs} from "./db";
+// @ts-ignore
+import {migrationSequelizeTs} from "./db";
 
 export class Migrate {
 
@@ -17,6 +18,32 @@ export class Migrate {
     async init(): Promise<void> {
         await this.store.init();
         console.log('Migrations store successfully init');
+    }
+
+    async syncFiles(): Promise<void> {
+        const {lastRun, migrations} = await this.store.load();
+
+        const migrationNames = migrations.map(x => x.name);
+
+        const tsFilePattern = /\.ts$/;
+        const files = fs
+            .readdirSync(this.dir, {withFileTypes: true})
+            .filter(x =>
+                x.isFile() &&
+                tsFilePattern.test(x.name) &&
+                !migrationNames.includes(x.name)
+            );
+
+        const parseFile = (name: string): MigrationEntity => {
+            const [timestamp] = name.split('-');
+            return {timestamp: parseInt(timestamp, 10), name, lastRun: false};
+        }
+
+        const newMigrations = files.map(x => parseFile(x.name));
+
+        migrations.push(...newMigrations);
+
+        await this.store.save({lastRun, migrations});
     }
 
     async create(name?: string): Promise<string> {
@@ -81,7 +108,7 @@ export class Migrate {
             return;
         }
 
-        const transaction = await sequelizeTs.transaction();
+        const transaction = await migrationSequelizeTs.transaction();
         try {
             for (const migration of targetMigrations) {
                 await this.runMigration(migration, 'up', transaction);
@@ -130,7 +157,7 @@ export class Migrate {
             return;
         }
 
-        const transaction = await sequelizeTs.transaction();
+        const transaction = await migrationSequelizeTs.transaction();
         try {
             for (const migration of targetMigrations) {
                 await this.runMigration(migration, 'down', transaction);

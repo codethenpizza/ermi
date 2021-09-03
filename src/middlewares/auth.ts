@@ -13,3 +13,19 @@ export const isAuth = (req: Request<any, any, any, any>, res: Response, next: Ne
         res.status(401).send((e as Error).message);
     }
 };
+
+export const setUser = (req: Request<any, any, any, any>, res: Response, next: NextFunction) => {
+    try {
+        jwt({
+            algorithms: ['HS256'],
+            secret: config.auth.secret,
+            credentialsRequired: false,
+        })(req, res, (err) => {
+            if (err?.code === 'invalid_token') return next();
+            return next(err);
+        });
+    } catch (e) {
+        console.log('ERR', (e as Error).message);
+        res.status(401).send((e as Error).message);
+    }
+};
