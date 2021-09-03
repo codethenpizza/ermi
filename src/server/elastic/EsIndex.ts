@@ -18,18 +18,16 @@ export class EsIndex {
         await this.updateIndexData();
     }
 
-    private async updateIndexData() {
-        try {
-            await Elastic.checkConnection();
-
-            await this.resetIndex();
-
-            await this.createData(this.es.bulkCreate.bind(this));
-            console.log('[Index data updated successfully]');
-        } catch (e) {
-            console.error('Updating index error:');
-            console.error(e);
-        }
+    public async findByIds(ids: number[]) {
+        return this.es.search({
+            body: {
+                query: {
+                    terms: {
+                        "_id": ids
+                    }
+                }
+            }
+        });
     }
 
     protected async createData(storeFn: Function): Promise<void> {
@@ -44,13 +42,27 @@ export class EsIndex {
         return null;
     }
 
+    private async updateIndexData() {
+        try {
+            await Elastic.checkConnection();
+
+            await this.resetIndex();
+
+            await this.createData(this.es.bulkCreate.bind(this));
+            console.log('[Index data updated successfully]');
+        } catch (e) {
+            console.error('Updating index error:');
+            console.error(e);
+        }
+    }
+
     private async resetIndex() {
         await this.es.createIndex();
 
         await this.es.clearIndex();
 
         const settings = this.createSettings();
-        if(settings) {
+        if (settings) {
             await this.es.setSettings(settings);
         }
 

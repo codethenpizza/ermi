@@ -16,6 +16,7 @@ export class Diskoptim implements Supplier, SupplierRim {
         return new Promise((resolve, reject) => {
             console.log('Start fetch Diskoptim');
             let counter = 0;
+            let errCounter = 0;
             try {
                 const ftp = new FTP();
 
@@ -25,19 +26,24 @@ export class Diskoptim implements Supplier, SupplierRim {
                         xml.on('endElement: Диск', async (item) => {
                             counter++;
                             const formattedItem = {};
-                            for (const [key, value] of Object.entries(item)) {
-                                if (DiskoptimRawRimMap[key]) {
-                                    formattedItem[DiskoptimRawRimMap[key]] = value
-                                } else {
-                                    throw new Error(`undefined item key: ${key}`)
+                            try {
+                                for (const [key, value] of Object.entries(item)) {
+                                    if (DiskoptimRawRimMap[key]) {
+                                        formattedItem[DiskoptimRawRimMap[key]] = value
+                                    } else {
+                                        throw new Error(`undefined item key: ${key}`)
+                                    }
                                 }
+                                await DiskoptimModel.upsert(formattedItem);
+                            } catch (e) {
+                                console.error(e.message);
+                                errCounter++;
                             }
-                            await DiskoptimModel.upsert(formattedItem);
                         });
 
                         xml.on('end', () => {
                             ftp.end();
-                            console.log(`End fetch Diskoptim [${counter}]`);
+                            console.log(`End fetch Diskoptim. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
                     });

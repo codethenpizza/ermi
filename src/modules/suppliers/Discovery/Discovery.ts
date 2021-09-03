@@ -19,13 +19,14 @@ export class Discovery implements SupplierRim {
             const url = `${host}?token=${token}`;
 
             let counter = 0;
+            let errCounter = 0;
             try {
                 request.get(url)
-                    .on('response', resp => {
+                    .on('response', async resp => {
                         const xml = new XmlStream(resp);
 
                         xml.collect('param');
-                        xml.on('endElement: rim', async (item: IDiscoveryRaw) => {
+                        xml.on('endElement: disk', async (item: IDiscoveryRaw) => {
                             counter++;
 
                             item.param = JSON.stringify(item.param);
@@ -33,13 +34,14 @@ export class Discovery implements SupplierRim {
                                 await DiscoveryModel.upsert(item);
                             } catch (e) {
                                 console.error(e, item);
+                                errCounter++;
                             }
                         });
 
                         xml.on("error", (err) => console.log('Error', err));
 
                         xml.on("end", () => {
-                            console.log(`End fetch Discovery [${counter}]`);
+                            console.log(`End fetch Discovery. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
                     });

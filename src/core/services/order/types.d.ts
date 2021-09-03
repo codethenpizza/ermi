@@ -2,6 +2,9 @@ import {IDiscount} from "@models/Discount.model";
 import Address from "@models/Address.model";
 import {CalculateShippingResult} from "@core/services/order/shipping/types";
 import {IUser} from "@models/User.model";
+import Order from "@models/Order.model";
+import {EsProductVariant} from "@actions/front/types";
+
 
 export interface CreateOrderData {
     productItems: CreateOrderDataProduct[];
@@ -36,4 +39,10 @@ export interface CalculateOrderTotal {
 
 export interface CalculateOrderResult extends CalculateOrderTotal {
     total: number;
+    b2b_discount_id?: number;
+}
+
+export interface OrderResp {
+    order: Order;
+    esOrderProducts: EsProductVariant[];
 }

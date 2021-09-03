@@ -10,6 +10,7 @@ import {SuppliersController} from "../../modules/suppliers/Controller";
 import {ImageController} from "@controllers/admin/ImageController";
 import {OrderAdminController} from "@controllers/admin/OrderAdminController";
 import {UserAdminController} from "@controllers/admin/UserController";
+import {B2BController} from "@controllers/admin/B2BController";
 
 export const AdminController = createController([
     {method: 'use', path: '/attrs', action: AttributeController},
@@ -23,4 +24,5 @@ export const AdminController = createController([
     {method: 'use', path: '/image', action: ImageController},
     {method: 'use', path: '/order', action: OrderAdminController},
     {method: 'use', path: '/user', action: UserAdminController},
+    {method: 'use', path: '/b2b', action: B2BController},
 ]);

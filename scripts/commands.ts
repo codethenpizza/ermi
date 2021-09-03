@@ -1,9 +1,13 @@
 // @ts-ignore
 import program, {Command} from 'commander';
 import {updateProductIndexes} from "../src/server/elastic";
+// @ts-ignore
 import {Migrate} from "../migrations/service";
+// @ts-ignore
 import {MStore} from "../migrations/service/store";
+import {parseSuppliers} from "../src/server/crone";
 import {sequelizeTs} from "../src/database";
+import {migrationSequelizeTs} from "../migrations/service/db";
 
 program
     .command('es <action>')
@@ -18,6 +22,15 @@ program
             default:
                 console.log('Command not found');
         }
+    });
+
+program
+    .command('update-suppliers-data')
+    .description('Sync sequelize models')
+    .action(async () => {
+        await parseSuppliers();
+        await updateProductIndexes();
+        process.exit(0);
     });
 
 program
@@ -45,6 +58,10 @@ program
                     case 'down':
                         await migrate.down(attr);
                         break;
+
+                    case 'sync':
+                        await migrate.syncFiles();
+                        break;
                 }
             } else {
                 await migrate.allUp();
@@ -57,14 +74,18 @@ program
     });
 
 program
-    .command('sync-models')
-    .option('-f, --force', 'force')
+    .command('sync-models [force]')
     .description('Sync sequelize models')
-    .action(async (command) => {
+    .action(async (force?: string) => {
         await sequelizeTs.sync({
-            force: !!command.force,
-            alter: !command.force
+            force: !!force,
+            alter: !force
         });
+        await migrationSequelizeTs.sync({
+            force: !!force,
+            alter: !force
+        })
+        process.exit(0);
     });
 
 program.parse(process.argv);

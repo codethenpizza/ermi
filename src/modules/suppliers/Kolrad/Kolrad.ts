@@ -6,8 +6,8 @@ import {RimMap, RimStock, STOCK_MSK, Supplier, SupplierRim} from "../types";
 import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
 import {rimType} from "../ProductMapping";
-import ParsedStocks = IKolrad.ParsedStocks;
 import progressBar from "../../../helpers/progressBar";
+import ParsedStocks = IKolrad.ParsedStocks;
 
 export class Kolrad implements Supplier, SupplierRim {
     readonly name = 'kolrad';
@@ -50,6 +50,43 @@ export class Kolrad implements Supplier, SupplierRim {
 
     async getDataCount(): Promise<number> {
         return KolradModel.count();
+    }
+
+    async getProductData(): Promise<Product[]> {
+        return undefined;
+    }
+
+    async getRims(limit, offset): Promise<RimMap[]> {
+        const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
+        const toCreate: RimMap[] = [];
+        for (const item of rawData) {
+            try {
+                const {
+                    vendor: brand,
+                    picture: image,
+                    vendorCode,
+                } = item;
+
+                const stock = this.getRimStocks(item);
+                const price = this.getRimPrice(item);
+                const params: IKolrad.ParsedParams = this.getRimParsedParams(item)
+
+                toCreate.push({
+                    uid: `${this.name}_${vendorCode}`,
+                    supplier: this.name,
+                    price,
+                    brand,
+                    image,
+                    type: rimType.alloy,
+                    stock: JSON.stringify(stock),
+                    inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
+                    ...params
+                })
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        return toCreate
     }
 
     private async getTotalPages(url: string): Promise<number> {
@@ -109,43 +146,6 @@ export class Kolrad implements Supplier, SupplierRim {
                     });
                 });
         })
-    }
-
-    async getProductData(): Promise<Product[]> {
-        return undefined;
-    }
-
-    async getRims(limit, offset): Promise<RimMap[]> {
-        const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
-        const toCreate: RimMap[] = [];
-        for (const item of rawData) {
-            try {
-                const {
-                    vendor: brand,
-                    picture: image,
-                    vendorCode,
-                } = item;
-
-                const stock = this.getRimStocks(item);
-                const price = this.getRimPrice(item);
-                const params: IKolrad.ParsedParams = this.getRimParsedParams(item)
-
-                toCreate.push({
-                    uid: `${this.name}_${vendorCode}`,
-                    supplier: this.name,
-                    price,
-                    brand,
-                    image,
-                    type: rimType.alloy,
-                    stock: JSON.stringify(stock),
-                    inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
-                    ...params
-                })
-            } catch (e) {
-                console.log(e)
-            }
-        }
-        return toCreate
     }
 
     private getRimStocks({stocks}: IKolrad.Raw): RimStock[] {
@@ -218,7 +218,7 @@ export class Kolrad implements Supplier, SupplierRim {
                 const [bolts_count, bolts_spacing] = paramValue.split('/');
                 formattedParams['bolts_count'] = bolts_count;
                 formattedParams['bolts_spacing'] = bolts_spacing;
-                formattedParams['pcd'] = paramValue;
+                formattedParams['pcd'] = `${bolts_count}x${bolts_spacing}`;
                 continue;
             }
 

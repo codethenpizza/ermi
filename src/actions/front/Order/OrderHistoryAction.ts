@@ -2,8 +2,9 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {IUser} from "@models/User.model";
 import {isAuth} from "../../../middlewares/auth";
-import Order from "@models/Order.model";
 import {JWTPayload} from "@core/services/AuthService";
+import {OrderService} from "@core/services/order/OrderService";
+import {OrderResp} from "@core/services/order/types";
 
 export class OrderHistoryAction implements Action {
     get action() {
@@ -14,12 +15,16 @@ export class OrderHistoryAction implements Action {
         next();
     }
 
-    async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response) {
-        const orders = await Order.findAll({
-            where: {user_id: (user as JWTPayload).user.id},
-            include: Order.fullIncludes()
-        });
-        res.send(orders);
+    async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response<OrderResp[]>) {
+        try {
+            const orderService = new OrderService();
+            const JWTPayload: JWTPayload = user as JWTPayload;
+            const orders = await orderService.getUserOrders(JWTPayload.user);
+            res.send(orders);
+        } catch (e) {
+            console.error(e.message);
+            res.status(401).send(e.message);
+        }
     }
 
 }
