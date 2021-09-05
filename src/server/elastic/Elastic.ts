@@ -1,7 +1,7 @@
-import {Client} from 'es7';
+import {ApiResponse, Client, RequestParams} from '@elastic/elasticsearch';
 import {elastic} from 'config';
-import * as RequestParams from "es7/api/requestParams";
-import {ApiResponse, TransportRequestOptions, TransportRequestPromise} from "es7/lib/Transport";
+import {TransportRequestOptions, TransportRequestPromise} from "@elastic/elasticsearch/lib/Transport";
+
 
 const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
 export const esClient = new Client({node});
