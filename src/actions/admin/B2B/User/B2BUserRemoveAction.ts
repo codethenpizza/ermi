@@ -26,7 +26,7 @@ export class B2BUserRemoveAction implements Action {
             res.send();
         } catch (e) {
             console.error(e.message);
-            res.status(401).send(e.message);
+            res.status(400).send(e.message);
         }
     }
 

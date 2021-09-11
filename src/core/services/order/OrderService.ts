@@ -59,7 +59,7 @@ export class OrderService {
             include: [B2BDiscountGroup]
         });
 
-        const isB2BUser = !!user.b2b_discount_group_id;
+        const isB2BUser = !!user?.b2b_discount_group_id;
 
         const orderProducts = await this.makeOrderProducts(data.productItems, isB2BUser ? user : null);
 

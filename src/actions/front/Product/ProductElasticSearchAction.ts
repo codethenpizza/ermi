@@ -40,7 +40,7 @@ export class ProductElasticSearchAction implements Action {
                 searchString,
             }, aggAttrs).build();
 
-            console.log('query', JSON.stringify(query));
+            // console.log('query', JSON.stringify(query));
 
             const esProduct = new EsProduct();
             const resp = await esProduct.es.search({
@@ -58,7 +58,7 @@ export class ProductElasticSearchAction implements Action {
                 .map<EsProductVariant>((item) => item._source);
 
             const JWTPayload: JWTPayload = user as JWTPayload;
-            if (JWTPayload?.user) {
+            if (JWTPayload?.user?.b2b_discount_group_id) {
                 products = await B2BDiscountService.enrichESProductByB2BUserDiscount(JWTPayload.user, products) as EsProductVariant[];
             }
 
