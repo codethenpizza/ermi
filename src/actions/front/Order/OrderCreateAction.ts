@@ -26,7 +26,7 @@ export class OrderCreateAction implements Action {
         } catch (e) {
             await transaction.rollback();
             console.error(e.message);
-            res.status(401).send(e.message);
+            res.status(400).send(e.message);
         }
     }
 

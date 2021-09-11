@@ -134,7 +134,7 @@ export class Elastic {
     async search(params?: RequestParams.Search, options?: TransportRequestOptions): Promise<TransportRequestPromise<ApiResponse>> {
         return esClient.search({
             index: this.index,
-            type: this.type,
+            // type: this.type,
             ...params
         }, options).catch(e => {
             console.log('ES SEARCH ERROR', JSON.stringify(e));

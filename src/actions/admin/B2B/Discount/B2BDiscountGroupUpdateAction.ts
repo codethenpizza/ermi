@@ -32,7 +32,7 @@ export class B2BDiscountGroupUpdateAction implements Action {
         } catch (e) {
             transaction.rollback();
             console.error(e.message);
-            res.status(401).send(e.message);
+            res.status(400).send(e.message);
         }
     }
 

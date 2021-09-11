@@ -1,12 +1,12 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
-import {SearchByAxlesReqBody, SearchByAxlesProducts, SearchByAxlesParams, SearchByAxlesRespData} from "../types";
+import {SearchByAxlesParams, SearchByAxlesProducts, SearchByAxlesReqBody, SearchByAxlesRespData} from "../types";
 import Attribute from "@models/Attribute.model";
 import {EsQueryBuilder, JAVA_MAX_INT} from "../../../helpers/EsQueryBuilder"
 import bodybuilder from "bodybuilder";
 import {EsProduct} from "@server/elastic/EsProducts";
 import AttrType from "@models/AttrType.model";
-import {groupBy} from "lodash";
+import {get, groupBy} from "lodash";
 import {AttrsAggregations} from "@actions/front/types";
 
 export class SearchByAxlesAction implements Action {
@@ -117,7 +117,7 @@ export class SearchByAxlesAction implements Action {
         }).build();
         const frontResp = await this.esProduct.es.search({body: frontQuery, size: 10000});
         const frontProducts = EsQueryBuilder.mapBody(frontResp);
-        const groupedFrontProducts = groupBy(frontProducts, modelAttrPath);
+        const groupedFrontProducts = this.groupByLowercase(frontProducts, modelAttrPath);
 
 
         const rearFilters = body.extFilters.axles.rear || [];
@@ -127,11 +127,12 @@ export class SearchByAxlesAction implements Action {
         }).build();
         const rearResp = await this.esProduct.es.search({body: rearQuery, size: 10000});
         const rearProducts = EsQueryBuilder.mapBody(rearResp);
-        const groupedRearProducts = groupBy(rearProducts, modelAttrPath);
-
+        const groupedRearProducts = this.groupByLowercase(rearProducts, modelAttrPath);
 
         const modelsMap: SearchByAxlesProducts = availableModels.reduce((map, modelName) => {
-            map[modelName] = {
+            const modelItem = groupedFrontProducts[modelName];
+            const originalModelName = modelItem ? get(modelItem[0], modelAttrPath) : modelName;
+            map[originalModelName] = {
                 front: groupedFrontProducts[modelName],
                 rear: groupedRearProducts[modelName]
             };
@@ -171,5 +172,19 @@ export class SearchByAxlesAction implements Action {
 
 
         return resp.body.aggregations;
+    }
+
+    private groupByLowercase(arr: any[], path: string): Object {
+        const data = groupBy(arr, path);
+        if (!Object.keys(data).length) {
+            return data;
+        }
+
+        return Object.entries(data).reduce((acc, [key, data]) => {
+
+            acc[key.toLowerCase()] = data;
+
+            return acc;
+        }, {});
     }
 }
