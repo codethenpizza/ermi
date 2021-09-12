@@ -7,6 +7,7 @@ import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
 import {rimType} from "../ProductMapping";
 import progressBar from "../../../helpers/progressBar";
+import parseDouble from "../../../helpers/parseDouble";
 import ParsedStocks = IKolrad.ParsedStocks;
 
 export class Kolrad implements Supplier, SupplierRim {
@@ -217,23 +218,28 @@ export class Kolrad implements Supplier, SupplierRim {
             if (paramName === IKolrad.RawParamNames.PCD) {
                 const [bolts_count, bolts_spacing] = paramValue.split('/');
                 formattedParams['bolts_count'] = bolts_count;
-                formattedParams['bolts_spacing'] = bolts_spacing;
-                formattedParams['pcd'] = `${bolts_count}x${bolts_spacing}`;
+                formattedParams['bolts_spacing'] = parseDouble(bolts_spacing);
+                formattedParams['pcd'] = `${bolts_count}x${parseDouble(bolts_spacing)}`;
                 continue;
             }
 
             if (paramName === IKolrad.RawParamNames["D (размер обода)"]) {
-                formattedParams[paramName] = parseFloat(paramValue.split('x')[1]);
+                formattedParams[paramName] = parseDouble(paramValue.split('x')[1]);
                 continue;
             }
 
             if (paramName === IKolrad.RawParamNames.DIA) {
-                formattedParams[paramName] = parseFloat(paramValue.split('d-')[1]);
+                formattedParams[paramName] = parseDouble(paramValue.split('d-')[1]);
                 continue;
             }
 
             if (paramName === IKolrad.RawParamNames.ET) {
-                formattedParams[paramName] = Number(paramValue.split('ET')[1]);
+                formattedParams[paramName] = parseDouble(paramValue.split('ET')[1]);
+                continue;
+            }
+
+            if (paramName === IKolrad.RawParamNames['LZ (ширина обода)']) {
+                formattedParams[paramName] = parseDouble(paramValue);
                 continue;
             }
 

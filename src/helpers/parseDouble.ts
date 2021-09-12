@@ -1,4 +1,4 @@
-export default function parseDouble (val: string): number {
+export default function parseDouble(val: string): number {
     if (!val) {
         return null;
     }

@@ -8,8 +8,8 @@ import {EsIndex} from "./EsIndex";
 import {EsAttrValue, EsProductVariant} from "./types";
 import {Normalizers} from "@server/elastic/schemas/Analysis";
 import {ProductScheme} from "@server/elastic/schemas/ProductScheme";
-import AttrSet from "@models/AttrSet.model";
 import ProductCategory from "@models/ProductCategory.model";
+import parseDouble from "../../helpers/parseDouble";
 
 export const productIndex = 'product';
 
@@ -19,12 +19,12 @@ export class EsProduct extends EsIndex {
 
     private maxDataItemsInIter = 100;
 
-    static addSchemes(schemes: Object[]): void {
-        this.schemas.push(...schemes);
-    }
-
     constructor() {
         super(productIndex);
+    }
+
+    static addSchemes(schemes: Object[]): void {
+        this.schemas.push(...schemes);
     }
 
     protected async createMapping() {
@@ -33,22 +33,30 @@ export class EsProduct extends EsIndex {
 
     protected async createData(storeFn: Function): Promise<void> {
         const total = await ProductVariant.count({where: {is_available: true}});
-        if(!total) {
+        if (!total) {
             console.log('No data');
             return;
         }
 
-        if(total < this.maxDataItemsInIter) {
+        if (total < this.maxDataItemsInIter) {
             await storeFn(await this.makeData());
         } else {
-            const chunksCount = Math.ceil(total/this.maxDataItemsInIter);
+            const chunksCount = Math.ceil(total / this.maxDataItemsInIter);
             console.log('Chunks count - ', chunksCount);
-            for(let page = 0; page < chunksCount; page++) {
+            for (let page = 0; page < chunksCount; page++) {
                 const data = await this.makeData(page);
                 await storeFn(data);
                 console.log(`Chunk ${page + 1} done`);
             }
         }
+    }
+
+    protected createSettings(): any {
+        return {
+            analysis: {
+                normalizer: Normalizers
+            }
+        };
     }
 
     private async makeData(page = 0): Promise<any> {
@@ -66,7 +74,8 @@ export class EsProduct extends EsIndex {
                     include: [{model: Attribute, include: [AttrType]}],
                 },
                 Image,
-            ]});
+            ]
+        });
 
         // @ts-ignore
         return variants.map<ProductVariant>(x => x.dataValues).map<EsProductVariant>((variant) => {
@@ -81,7 +90,6 @@ export class EsProduct extends EsIndex {
         })
     }
 
-
     private makeAttrs(variant: ProductVariant): EsAttrValue[] {
         // @ts-ignore
         return variant.attrs.map(x => x.dataValues)
@@ -90,7 +98,7 @@ export class EsProduct extends EsIndex {
 
                 switch (attr.attribute.type.type) {
                     case 'decimal':
-                        value = parseFloat(value);
+                        value = parseDouble(value);
                         break;
 
                     case 'number':
@@ -110,14 +118,6 @@ export class EsProduct extends EsIndex {
                 };
                 return obj;
             }, {});
-    }
-
-    protected createSettings(): any {
-        return {
-            analysis: {
-                normalizer: Normalizers
-            }
-        };
     }
 }
 
