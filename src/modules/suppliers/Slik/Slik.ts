@@ -76,7 +76,7 @@ export class Slik implements Supplier, SupplierRim {
                 brand: item.brand,
                 image: encodeURI(item.image),
                 price: parseDouble(item.price),
-                pcd: `${item.bolts_count}X${item.bolts_spacing}`,
+                pcd: `${item.bolts_count}X${parseDouble(item.bolts_spacing)}`,
                 width: parseDouble(item.width),
                 color: item.color || null,
                 diameter: parseDouble(item.diameter),
