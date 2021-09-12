@@ -102,10 +102,29 @@ export class EsQueryBuilder {
     }
 
     static makeSearchQuery(searchString: string): Object {
+        const article = parseInt(searchString);
+        const searchByArticle = !isNaN(article);
+
+        const should: any[] = [
+            {
+                // @ts-ignore
+                query_string: {
+                    query: `*${searchString}*`
+                }
+            }
+        ];
+
+        if (searchByArticle) {
+            should.push({
+                term: {
+                    id: article
+                }
+            });
+        }
+
         return {
-            // @ts-ignore
-            query_string: {
-                query: `*${searchString}*`
+            bool: {
+                should
             }
         }
     }

@@ -252,13 +252,17 @@ export class OrderService {
         return shippingAndProductsTotal - discountsTotal;
     }
 
-    private async generateUser({email}: Partial<IUser>, transaction: Transaction): Promise<{ loginObj: LoginObj, password: string }> {
-        const name = email.split('@')[0];
+    private async generateUser(
+        {
+            email,
+            name
+        }: Partial<IUser>, transaction: Transaction): Promise<{ loginObj: LoginObj, password: string }> {
+        const userName = name || email.split('@')[0];
         const password = randomString(8);
 
         const loginObj = await AuthService.register({
             email,
-            name,
+            name: userName,
             password
         }, transaction);
 
