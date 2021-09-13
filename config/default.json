@@ -7,9 +7,9 @@
   "dbConfig": {
     "host": "localhost",
     "port": 3306,
-    "name": "ermi",
-    "user": "ermi",
-    "pass": "ermi123456"
+    "name": "",
+    "user": "",
+    "pass": ""
   },
   "elastic": {
     "host": "localhost",
@@ -21,43 +21,11 @@
     "port": "6379"
   },
   "auth": {
-    "secret": "qwerty"
+    "secret": ""
   },
-  "suppliers": {
-    "Slik": {
-      "ftp": {
-        "host": "ftp.slik.com.ru",
-        "port": 2121,
-        "user": "slikpartner",
-        "password": "Dg23aw7CvL"
-      },
-      "ftp_file": "/home/replay.xml"
-    },
-    "Diskoptim": {
-      "ftp": {
-        "host": "ftp.diskoptim.ru",
-        "port": 21,
-        "user": "00-00000515",
-        "password": "onaMI32h"
-      },
-      "ftp_file": "/Diskoptim Ostatki Sklad.xml"
-    },
-    "Discovery": {
-      "api": {
-        "host": "https://discovery.moscow/xmlprice/contract/422/",
-        "token": "$1$ONBHZjsp$xV6prHPQBp8RY7KDnBXtq0"
-      }
-    },
-    "Kolrad": {
-      "api": {
-        "host": "https://b2b.kolrad.ru/xml/hannover",
-        "contractNum": "contract253",
-        "token": "$1$H3dxVSzo$mDqwwSdkS9vsiCnuK/uef1"
-      }
-    }
-  },
+  "suppliers": {},
   "wheelSize": {
-    "apiKey": "0a257eab46dd96b3d93eb0baf44db9d4"
+    "apiKey": ""
   },
   "fileStrategy": "local",
   "cacheStrategy": "local",
@@ -78,6 +46,22 @@
       "thumbnail": {
         "width": 320,
         "height": null
+      }
+    }
+  },
+  "mail": {
+    "from": "",
+    "smtp": {
+      "host": "",
+      "port": 465,
+      "auth": {
+        "user": "",
+        "pass": ""
+      },
+      "dkim": {
+        "domainName": "",
+        "keySelector": "",
+        "privateKey": ""
       }
     }
   }

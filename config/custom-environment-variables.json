@@ -16,5 +16,21 @@
   },
   "wheelSize": {
     "apiKey": "WHEEL_SIZE_API_KEY"
+  },
+  "mail": {
+    "from": "MAIL_FROM",
+    "smtp": {
+      "host": "MAIL_SMTP_HOST",
+      "port": "MAIL_SMTP_PORT",
+      "auth": {
+        "user": "MAIL_SMTP_AUTH_USER",
+        "pass": "MAIL_SMTP_AUTH_PASS"
+      },
+      "dkim": {
+        "domainName": "MAIL_SMTP_DKIM_DOMAIN",
+        "keySelector": "MAIL_SMTP_DKIM_KEY_SELECTOR",
+        "privateKey": "MAIL_SMTP_DKIM_PRIVATE_KEY"
+      }
+    }
   }
 }

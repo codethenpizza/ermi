@@ -8,6 +8,7 @@ import {MStore} from "../migrations/service/store";
 import {parseSuppliers} from "../src/server/crone";
 import {sequelizeTs} from "../src/database";
 import {migrationSequelizeTs} from "../migrations/service/db";
+import {NotificationService} from "../src/core/services/notification/NotificationService";
 
 program
     .command('es <action>')
@@ -85,6 +86,14 @@ program
             force: !!force,
             alter: !force
         })
+        process.exit(0);
+    });
+
+program
+    .command('test')
+    .action(async () => {
+        const notiffer = new NotificationService();
+        await notiffer.sendMail(0, {subject: 'DKMI TEST2', body: 'secure string'});
         process.exit(0);
     });
 
