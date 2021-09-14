@@ -14,6 +14,31 @@
   "auth": {
     "secret": "AUTH_SECRET"
   },
+  "suppliers": {
+    "Slik": {
+      "ftp": {
+        "user": "SUP_SLIK_USER",
+        "password": "SUP_SLIK_PASS"
+      }
+    },
+    "Diskoptim": {
+      "ftp": {
+        "user": "SUP_DISKOPTIM_USER",
+        "password": "SUP_DISKOPTIM_PASS"
+      }
+    },
+    "Discovery": {
+      "api": {
+        "token": "SUP_DISCOVERY_TOKEN"
+      }
+    },
+    "Kolrad": {
+      "api": {
+        "contractNum": "SUP_KOLRAD_CONTRACT_NUM",
+        "token": "SUP_KOLRAD_TOKEN"
+      }
+    }
+  },
   "wheelSize": {
     "apiKey": "WHEEL_SIZE_API_KEY"
   },
@@ -31,6 +56,17 @@
         "keySelector": "MAIL_SMTP_DKIM_KEY_SELECTOR",
         "privateKey": "MAIL_SMTP_DKIM_PRIVATE_KEY"
       }
+    }
+  },
+  "AWS": {
+    "credentials": {
+      "accessKeyId": "AWS_ACCESS_KEY_ID",
+      "secretAccessKey": "AWS_SECRET_ACCESS_KEY"
+    },
+    "DKIM": {
+      "region": "AWS_DKIM_REGION",
+      "Bucket": "AWS_DKIM_BUCKET",
+      "Key": "AWS_DKIM_KEY"
     }
   }
 }

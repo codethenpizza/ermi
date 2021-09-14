@@ -23,7 +23,39 @@
   "auth": {
     "secret": ""
   },
-  "suppliers": {},
+  "suppliers": {
+    "Slik": {
+      "ftp": {
+        "host": "ftp.slik.com.ru",
+        "port": 2121,
+        "user": "",
+        "password": ""
+      },
+      "ftp_file": "/home/replay.xml"
+    },
+    "Diskoptim": {
+      "ftp": {
+        "host": "ftp.diskoptim.ru",
+        "port": 21,
+        "user": "",
+        "password": ""
+      },
+      "ftp_file": "/Diskoptim Ostatki Sklad.xml"
+    },
+    "Discovery": {
+      "api": {
+        "host": "https://discovery.moscow/xmlprice/contract/422/",
+        "token": ""
+      }
+    },
+    "Kolrad": {
+      "api": {
+        "host": "https://b2b.kolrad.ru/xml/hannover",
+        "contractNum": "",
+        "token": ""
+      }
+    }
+  },
   "wheelSize": {
     "apiKey": ""
   },
@@ -63,6 +95,17 @@
         "keySelector": "",
         "privateKey": ""
       }
+    }
+  },
+  "AWS": {
+    "credentials": {
+      "accessKeyId": "",
+      "secretAccessKey": ""
+    },
+    "DKIM": {
+      "region": "",
+      "Bucket": "",
+      "Key": ""
     }
   }
 }

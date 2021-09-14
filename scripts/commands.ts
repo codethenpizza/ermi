@@ -8,7 +8,7 @@ import {MStore} from "../migrations/service/store";
 import {parseSuppliers} from "../src/server/crone";
 import {sequelizeTs} from "../src/database";
 import {migrationSequelizeTs} from "../migrations/service/db";
-import {NotificationService} from "../src/core/services/notification/NotificationService";
+import {MailService} from "../src/core/services/notification/MailService";
 
 program
     .command('es <action>')
@@ -92,8 +92,9 @@ program
 program
     .command('test')
     .action(async () => {
-        const notiffer = new NotificationService();
-        await notiffer.sendMail(0, {subject: 'DKMI TEST2', body: 'secure string'});
+        const mail = new MailService();
+        const resp = await mail.getDKIMPrivateKey();
+        console.log(resp);
         process.exit(0);
     });
 
