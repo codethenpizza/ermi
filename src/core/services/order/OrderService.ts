@@ -28,6 +28,8 @@ import AttrValue from "@models/AttrValue.model";
 import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
 import {EsProduct} from "@server/elastic/EsProducts";
 import {EsProductVariant, EsRespProduct} from "@actions/front/types";
+import {NotificationService} from "@core/services/notification/NotificationService";
+import {MailData} from "@core/services/notification/types";
 
 export class OrderService {
 
@@ -35,6 +37,7 @@ export class OrderService {
         private shippingService = new ShippingService(),
         private discountService = new DiscountService(),
         private paymentService = new PaymentService(),
+        private notificationService = new NotificationService()
     ) {
     }
 
@@ -162,11 +165,13 @@ export class OrderService {
     private async createForNewUser(data: CreateOrderData, transaction?: Transaction): Promise<OrderResp> {
         const {password, loginObj} = await this.generateUser(data.userData, transaction);
 
-        // TODO Send email with password
-
         const user = await User.findByPk(loginObj.user.id, {transaction});
 
-        return this.createForUser(data, user, transaction);
+        const order = await this.createForUser(data, user, transaction);
+
+        await this.sendPassForNewUser(user, password, transaction);
+
+        return order;
     }
 
     private async createForB2BUser(data: CreateOrderData, user: User, transaction?: Transaction): Promise<OrderResp> {
@@ -255,7 +260,8 @@ export class OrderService {
     private async generateUser(
         {
             email,
-            name
+            name,
+            phone
         }: Partial<IUser>, transaction: Transaction): Promise<{ loginObj: LoginObj, password: string }> {
         const userName = name || email.split('@')[0];
         const password = randomString(8);
@@ -263,7 +269,8 @@ export class OrderService {
         const loginObj = await AuthService.register({
             email,
             name: userName,
-            password
+            password,
+            phone
         }, transaction);
 
         return {
@@ -322,5 +329,14 @@ export class OrderService {
         }
 
         return products;
+    }
+
+    private async sendPassForNewUser(user: User, password: string, transaction?: Transaction): Promise<boolean> {
+        const data: MailData = {
+            subject: 'Регистрация заказа - пароль',
+            body: `Пароль от пользователя ${user.name} "${password}". Сменить пароль можно в личном кабинете`
+        };
+
+        return this.notificationService.sendMail(user.id, data, transaction);
     }
 }

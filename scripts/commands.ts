@@ -8,6 +8,7 @@ import {MStore} from "../migrations/service/store";
 import {parseSuppliers} from "../src/server/crone";
 import {sequelizeTs} from "../src/database";
 import {migrationSequelizeTs} from "../migrations/service/db";
+import {MailService} from "../src/core/services/notification/MailService";
 
 program
     .command('es <action>')
@@ -85,6 +86,15 @@ program
             force: !!force,
             alter: !force
         })
+        process.exit(0);
+    });
+
+program
+    .command('test')
+    .action(async () => {
+        const mail = new MailService();
+        const resp = await mail.getDKIMPrivateKey();
+        console.log(resp);
         process.exit(0);
     });
 

@@ -3,6 +3,8 @@ dist
 node_modules
 public
 
+config/local.json
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
