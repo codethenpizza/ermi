@@ -7,6 +7,7 @@ import {Migrate} from "../migrations/service";
 import {MStore} from "../migrations/service/store";
 import {parseSuppliers} from "../src/server/crone";
 import {sequelizeTs} from "../src/database";
+// @ts-ignore
 import {migrationSequelizeTs} from "../migrations/service/db";
 import {MailService} from "../src/core/services/notification/MailService";
 

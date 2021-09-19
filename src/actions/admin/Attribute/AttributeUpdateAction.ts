@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
-import Attribute, {AttributeI} from "@models/Attribute.model";
+import Attribute, {IAttribute} from "@models/Attribute.model";
 import {catchError} from "@actions/admin/Attribute/helper";
 
 type ReqParams = {
@@ -20,7 +20,7 @@ export class AttributeUpdateAction implements Action {
         }
     }
 
-    async handle(req: Request<ReqParams, any, AttributeI, any>, res: Response) {
+    async handle(req: Request<ReqParams, any, IAttribute, any>, res: Response) {
         try {
             const attrData = req.body;
             const id = parseInt(req.params.id);

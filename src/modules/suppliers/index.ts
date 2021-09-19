@@ -3,7 +3,7 @@ import "@db";
 
 const parseSuppliers = async () => {
     console.log(new Date());
-    await fetchAll();
+    // await fetchAll();
     await storeAll();
     console.log(new Date());
 };
