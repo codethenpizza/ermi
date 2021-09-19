@@ -23,6 +23,9 @@ export default class AttrValue extends Model<AttrValue> {
     @Column
     product_variant_id: number;
 
+    @BelongsTo(() => ProductVariant)
+    productVariant: ProductVariant;
+
     @BelongsTo(() => Attribute, 'attr_id')
     attribute: Attribute;
 }

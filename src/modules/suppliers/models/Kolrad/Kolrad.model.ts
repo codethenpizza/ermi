@@ -1,5 +1,5 @@
 import {Column, Model, Table} from "sequelize-typescript";
-import {RimMap} from "../helpers/rimProductType/rimTypes";
+import {RimMap} from "../../helpers/rimProductType/rimTypes";
 
 @Table({
     tableName: 'supplier_kolrad',

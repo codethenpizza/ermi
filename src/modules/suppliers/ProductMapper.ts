@@ -1,23 +1,20 @@
 import {Supplier} from "./types";
 import {RimMapOptions} from "./helpers/rimProductType/rimTypes";
-import {IProduct} from "@models/Product.model";
+import Product, {IProduct} from "@models/Product.model";
 import {Op, Transaction} from "sequelize";
 import ProductCategory, {IProductCategory} from "@models/ProductCategory.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import Image from "@models/Image.model";
-import Product from "@models/Product.model";
 import ProductVariant from "@models/ProductVariant.model";
-import ProductVariantImg from "@models/ProductVariantImg.model";
+import {IProductVariantImg} from "@models/ProductVariantImg.model";
 import Attribute, {IAttribute} from "@models/Attribute.model";
 import AttrSet from "@models/AttrSet.model";
-import {RimAttrScheme} from "./RimAttrScheme";
+import {RimAttrScheme} from "./schemas/RimAttrScheme";
 import OptionsModel from "@models/Options.model";
 import progressBar from "../../helpers/progressBar";
 import {sequelizeTs} from "@db";
 import {IProductMapper} from './interfaces/ProductMapper'
-import {
-    rimMapperRequiredOptions,
-} from "./helpers/rimProductType/rimProductTypeRequredOptions";
+import {rimMapperRequiredOptions,} from "./helpers/rimProductType/rimProductTypeRequredOptions";
 
 
 const mapArr: IProductMapper.MapItem[] = [
@@ -35,7 +32,7 @@ export class ProductMapper {
 
         for (const supp of suppliers) {
             for (let i = 0; i < mapArr.length; i++) {
-                const { method, mappingKey } = mapArr[i];
+                const {method, mappingKey} = mapArr[i];
 
                 const transaction = await sequelizeTs.transaction();
                 let loadedMap;
@@ -60,10 +57,10 @@ export class ProductMapper {
                     }
 
                     while (data.length) {
-                       await this.storeProducts(data, loadedMap);
+                        await this.storeProducts(data, loadedMap);
 
-                       offset = offset + limit;
-                       data = await supp[method](limit, offset);
+                        offset = offset + limit;
+                        data = await supp[method](limit, offset);
                     }
                 }
             }
@@ -93,7 +90,6 @@ export class ProductMapper {
     }
 
 
-
     /**
      * Return product mapping if it exist or create new one
      * @param mappingKey -  key which uses for find mapping in data base for specific product type
@@ -117,13 +113,12 @@ export class ProductMapper {
      * @return mapping - object which represent relation of raw data and attrs of product
      */
     private async createMapping(mapItem: IProductMapper.MapItem, transaction: Transaction): Promise<any> {
-        const { mappingKey, mapping, attributes } = mapItem;
-        const { attrSetName, attrSetDesc, requiredAttrs } = attributes;
+        const {mappingKey, mapping, attributes} = mapItem;
+        const {attrSetName, attrSetDesc, requiredAttrs} = attributes;
 
         const attrs = await this.createAttributes(requiredAttrs, transaction);
         const attrSet = await this.createAttrSet(attrs, attrSetName, attrSetDesc, transaction);
         const cat = await this.createCat(mapItem.productCategory, transaction);
-        console.log('cat', cat);
 
         const attrMap: { [key: string]: number } = attrs.reduce((map, item) => {
             map[item.name] = item.id;
@@ -260,29 +255,27 @@ export class ProductMapper {
             try {
 
 
-                const productVariant = await ProductVariant.create({
+                const productVariantImgs: Partial<IProductVariantImg>[] = [];
+
+                if (item.image) {
+                    try {
+                        const img = await Image.create({original_uri: item.image});
+                        productVariantImgs.push({image_id: img.id});
+                    } catch (e) {
+                        console.log('Error with, ', item.image, ' id', item.uid, e);
+                    }
+                }
+
+                await ProductVariant.create({
                     ...item,
                     product_id,
                     vendor_code: item.uid,
                     attrs,
                     price: item.price,
                     in_stock_qty: item.inStock,
-                    is_available: !!item.inStock
+                    is_available: !!item.inStock,
+                    productVariantImgs
                 }, {include: [AttrValue]});
-
-
-                if (item.image) {
-                    try {
-                        const img = await Image.create({original_uri: item.image});
-
-                        await ProductVariantImg.create({
-                            image_id: img.id,
-                            product_variant_id: productVariant.id
-                        });
-                    } catch (e) {
-                        console.log('Error with, ', item.image, ' id', item.uid, e);
-                    }
-                }
             } catch (e) {
                 console.log('ERROR', e);
                 const product = await Product.findByPk(product_id);
@@ -308,20 +301,20 @@ export class ProductMapper {
         });
 
         if (variantByCode) {
-            variantByCode.price = item.price;
-            variantByCode.in_stock_qty = item.inStock;
-
-            await variantByCode.save();
-
             const stockAttr = await AttrValue.findOne({
                 where: {
                     product_variant_id: variantByCode.id,
                     attr_id: mapping.stock
                 }
             });
-            stockAttr.value = item.stock;
+            await stockAttr.update({
+                value: item.stock
+            });
 
-            await stockAttr.save();
+            await variantByCode.update({
+                price: item.price,
+                in_stock_qty: item.inStock
+            });
             return true;
         }
 
@@ -354,14 +347,14 @@ export class ProductMapper {
                 }, []),
                 price: item.price,
                 in_stock_qty: item.inStock,
-                is_available: !!item.inStock
+                is_available: !!item.inStock,
             }]
         };
 
         if (item.image) {
             try {
                 const img = await Image.create({original_uri: item.image});
-                product.variants[0].images = [{id: img.id}];
+                product.variants[0].productVariantImgs = [{image_id: img.id}];
             } catch (e) {
                 console.log('Error with, ', item.image, ' id', item.uid);
                 console.log(e)
@@ -377,7 +370,10 @@ export class ProductMapper {
      * @param productCategory - object of product category which includes name and parent_id (0 by def - create top level category)
      * @param transaction - sequelize transaction
      */
-    private async createCat({name, parent_id = 0}: IProductCategory, transaction: Transaction): Promise<ProductCategory> {
+    private async createCat({
+                                name,
+                                parent_id = 0
+                            }: IProductCategory, transaction: Transaction): Promise<ProductCategory> {
         return ProductCategory.create({
             name,
             parent_id

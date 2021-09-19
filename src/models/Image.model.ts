@@ -1,12 +1,11 @@
 import {BelongsToMany, Column, Model, Table} from "sequelize-typescript";
 import {UploadedFile} from "express-fileupload";
 import sharp from 'sharp';
-import ProductVariantImgModel from "@models/ProductVariantImg.model";
+import ProductVariantImg from "@models/ProductVariantImg.model";
 import ProductVariant from "@models/ProductVariant.model";
 import {getFileStrategy} from "@core/files/FileStrategy";
 import {images} from 'config';
 import {Transaction} from "sequelize";
-import {stringify} from "querystring";
 import slugify from "slugify";
 
 
@@ -43,10 +42,16 @@ export default class Image extends Model<Image> {
     @Column
     size: number;
 
-    @BelongsToMany(() => ProductVariant, () => ProductVariantImgModel)
+    @BelongsToMany(() => ProductVariant, () => ProductVariantImg)
     productVariants: ProductVariant[];
 
-    static async uploadFile({name, md5, data, size, mimetype}: UploadedFile, transaction?: Transaction): Promise<Image> {
+    static async uploadFile({
+                                name,
+                                md5,
+                                data,
+                                size,
+                                mimetype
+                            }: UploadedFile, transaction?: Transaction): Promise<Image> {
         const strategy = getFileStrategy();
 
         const normalName = slugify(name, {lower: true});

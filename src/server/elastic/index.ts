@@ -1,14 +1,13 @@
 import '@db';
 import {EsProduct} from "./EsProducts";
-import {RimAttrScheme} from "../../modules/suppliers/RimAttrScheme";
+import {RimAttrScheme} from "../../modules/suppliers/schemas/RimAttrScheme";
 
-export const updateProductIndexes = async () => {
+EsProduct.addSchemes([
+    RimAttrScheme
+]);
 
-    EsProduct.addSchemes([
-        RimAttrScheme
-    ]);
+export const esProduct = new EsProduct();
 
-    const es = new EsProduct();
-    await es.updateData()
-
+export const resetIndex = async () => {
+    await esProduct.resetIndex();
 }

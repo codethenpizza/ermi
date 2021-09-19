@@ -6,7 +6,7 @@ import ProductVariant from "@models/ProductVariant.model";
     tableName: 'product_variant_image',
     timestamps: false
 })
-export default class ProductVariantImgModel extends Model<ProductVariantImgModel> {
+export default class ProductVariantImg extends Model<ProductVariantImg> {
 
     @ForeignKey(() => Image)
     @Column
@@ -21,4 +21,10 @@ export default class ProductVariantImgModel extends Model<ProductVariantImgModel
     })
     position: number;
 
+}
+
+export interface IProductVariantImg {
+    image_id: number;
+    product_variant_id: number;
+    position?: number;
 }

@@ -1,6 +1,5 @@
 import cron from 'node-cron';
-import {fetchAll, storeAll} from "../modules/suppliers/runner";
-import {updateProductIndexes} from "@server/elastic";
+import {parseSuppliers} from "../modules/suppliers";
 
 export const setCronTasks = (): void => {
     // [minute] [hour] [day of month] [month] [day of week]
@@ -8,16 +7,9 @@ export const setCronTasks = (): void => {
     cron.schedule(EVERY_DAY, async () => {
         console.log('CronTasks start');
         await parseSuppliers();
-        await updateProductIndexes();
         console.log('CronTasks complete');
     }, {
         timezone: 'Europe/Moscow'
     });
 };
 
-export const parseSuppliers = async () => {
-    console.log('Suppliers parse start at ', new Date());
-    await fetchAll();
-    await storeAll();
-    console.log('Suppliers parse end at ', new Date());
-};

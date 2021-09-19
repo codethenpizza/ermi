@@ -2,13 +2,13 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {STOCK_MSK, Supplier} from "../types";
-import {RimMap, RimStock, SupplierRim} from "../helpers/rimProductType/rimTypes";
+import {STOCK_MSK, Supplier} from "../../types";
+import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
 import Product from "@models/Product.model";
 import KolradModel, {IKolrad} from "./Kolrad.model";
-import {rimType} from "../ProductMapping";
-import progressBar from "../../../helpers/progressBar";
-import parseDouble from "../../../helpers/parseDouble";
+import progressBar from "../../../../helpers/progressBar";
+import parseDouble from "../../../../helpers/parseDouble";
+import {rimType} from "../../helpers/constants";
 import ParsedStocks = IKolrad.ParsedStocks;
 
 export class Kolrad implements Supplier, SupplierRim {
@@ -59,6 +59,7 @@ export class Kolrad implements Supplier, SupplierRim {
     }
 
     async getRims(limit, offset): Promise<RimMap[]> {
+        console.log('Start store Kolrad');
         const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
         const toCreate: RimMap[] = [];
         for (const item of rawData) {

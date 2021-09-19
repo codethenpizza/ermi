@@ -1,26 +1,30 @@
 // @ts-ignore
 import program, {Command} from 'commander';
-import {updateProductIndexes} from "../src/server/elastic";
+import {resetIndex} from "../src/server/elastic";
 // @ts-ignore
 import {Migrate} from "../migrations/service";
 // @ts-ignore
 import {MStore} from "../migrations/service/store";
-import {parseSuppliers} from "../src/server/crone";
+
 import {sequelizeTs} from "../src/database";
 // @ts-ignore
 import {migrationSequelizeTs} from "../migrations/service/db";
-import {MailService} from "../src/core/services/notification/MailService";
+import {parseSuppliers} from "../src/modules/suppliers";
 
 program
     .command('es <action>')
     .description('Available actions: update-index')
     .action(async (action) => {
         switch (action) {
-            case 'update-index':
-                await updateProductIndexes();
+            case 'refresh-index':
+                // await updateProductIndexes();
                 process.exit(0);
                 break;
 
+            case 'reset-indexes':
+                await resetIndex();
+                process.exit(0);
+                break;
             default:
                 console.log('Command not found');
         }
@@ -31,7 +35,6 @@ program
     .description('Sync sequelize models')
     .action(async () => {
         await parseSuppliers();
-        await updateProductIndexes();
         process.exit(0);
     });
 
@@ -87,15 +90,6 @@ program
             force: !!force,
             alter: !force
         })
-        process.exit(0);
-    });
-
-program
-    .command('test')
-    .action(async () => {
-        const mail = new MailService();
-        const resp = await mail.getDKIMPrivateKey();
-        console.log(resp);
         process.exit(0);
     });
 

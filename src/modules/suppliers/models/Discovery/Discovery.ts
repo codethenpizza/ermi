@@ -1,10 +1,10 @@
 import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
-import parseDouble from "../../../helpers/parseDouble";
+import parseDouble from "../../../../helpers/parseDouble";
 
-import {STOCK_MSK, Supplier} from "../types";
-import {RimMap, RimStock, SupplierRim} from "../helpers/rimProductType/rimTypes";
+import {STOCK_MSK} from "../../types";
+import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 
