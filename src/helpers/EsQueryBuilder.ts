@@ -109,7 +109,7 @@ export class EsQueryBuilder {
             {
                 // @ts-ignore
                 query_string: {
-                    query: `*${searchString}*`
+                    query: searchString.split(' ').map(x => (`*${x}*`)).join(' AND ')
                 }
             }
         ];

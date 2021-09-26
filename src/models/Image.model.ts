@@ -7,6 +7,7 @@ import {getFileStrategy} from "@core/files/FileStrategy";
 import {images} from 'config';
 import {Transaction} from "sequelize";
 import slugify from "slugify";
+import {splitImageNameByExt} from "../helpers/utils";
 
 
 @Table({
@@ -45,22 +46,23 @@ export default class Image extends Model<Image> {
     @BelongsToMany(() => ProductVariant, () => ProductVariantImg)
     productVariants: ProductVariant[];
 
-    static async uploadFile({
-                                name,
-                                md5,
-                                data,
-                                size,
-                                mimetype
-                            }: UploadedFile, transaction?: Transaction): Promise<Image> {
+    static async uploadFile(
+        {
+            name,
+            data,
+            size,
+            mimetype
+        }: Partial<UploadedFile>, transaction?: Transaction): Promise<Image> {
         const strategy = getFileStrategy();
 
-        const normalName = slugify(name, {lower: true});
+        const {name: normalName, ext} = splitImageNameByExt(slugify(name, {lower: true}));
 
-        const original_uri = await strategy.create(data, `${md5}.${normalName}`);
-        const large_uri = await strategy.create(await Image.resizeImage(data, "large"), `${md5}.large.${normalName}`);
-        const medium_uri = await strategy.create(await Image.resizeImage(data, "medium"), `${md5}.medium.${normalName}`);
-        const small_uri = await strategy.create(await Image.resizeImage(data, "small"), `${md5}.small.${normalName}`);
-        const thumbnail_uri = await strategy.create(await Image.resizeImage(data, "thumbnail"), `${md5}.thumbnail.${normalName}`);
+
+        const original_uri = await strategy.create(data, `${normalName}.${ext}`);
+        const large_uri = await strategy.create(await Image.resizeImage(data, "large"), `${normalName}.large.${ext}`);
+        const medium_uri = await strategy.create(await Image.resizeImage(data, "medium"), `${normalName}.medium.${ext}`);
+        const small_uri = await strategy.create(await Image.resizeImage(data, "small"), `${normalName}.small.${ext}`);
+        const thumbnail_uri = await strategy.create(await Image.resizeImage(data, "thumbnail"), `${normalName}.thumbnail.${ext}`);
 
         return Image.create({
             original_uri,

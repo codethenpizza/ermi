@@ -15,6 +15,7 @@ import progressBar from "../../helpers/progressBar";
 import {sequelizeTs} from "@db";
 import {IProductMapper} from './interfaces/ProductMapper'
 import {rimMapperRequiredOptions,} from "./helpers/rimProductType/rimProductTypeRequredOptions";
+import {getFileNameFromUrl, getImageFromUrl, isDev} from "../../helpers/utils";
 
 
 const mapArr: IProductMapper.MapItem[] = [
@@ -259,8 +260,16 @@ export class ProductMapper {
 
                 if (item.image) {
                     try {
-                        const img = await Image.create({original_uri: item.image});
-                        productVariantImgs.push({image_id: img.id});
+                        if (isDev) {
+                            const img = await Image.create({original_uri: item.image});
+                            productVariantImgs.push({image_id: img.id});
+                        } else {
+                            const data = await getImageFromUrl(item.image);
+                            const name = getFileNameFromUrl(item.image)
+
+                            const img = await Image.uploadFile({name, data});
+                            productVariantImgs.push({image_id: img.id});
+                        }
                     } catch (e) {
                         console.log('Error with, ', item.image, ' id', item.uid, e);
                     }
@@ -353,7 +362,10 @@ export class ProductMapper {
 
         if (item.image) {
             try {
-                const img = await Image.create({original_uri: item.image});
+                const data = await getImageFromUrl(item.image);
+                const name = getFileNameFromUrl(item.image)
+
+                const img = await Image.uploadFile({name, data});
                 product.variants[0].productVariantImgs = [{image_id: img.id}];
             } catch (e) {
                 console.log('Error with, ', item.image, ' id', item.uid);

@@ -93,4 +93,41 @@ program
         process.exit(0);
     });
 
+program
+    .command('test')
+    .action(async () => {
+        // try {
+        //
+        //     const fileName = '52519.JPG';
+        //     try {
+        //         const file = await new Promise<Buffer>((resolve, reject) => {
+        //             https.get(`https://discovery.moscow/dbpics/${fileName}`, res => {
+        //                 if (res.statusCode === 200) {
+        //                     bufferFromStream(res).then(x => resolve(x));
+        //                 } else {
+        //                     reject('Wrong url');
+        //                 }
+        //             });
+        //         });
+        //         console.log('file', file);
+        //     } catch (e) {
+        //         console.error('error: ', e);
+        //     }
+        //
+        //
+        //     const s3Strategy = new S3Strategy();
+        //
+        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519.jpeg');
+        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519_1.jpeg');
+        //     const resp = await s3Strategy.create(file, fileName);
+        //
+        //     console.log('isFileExist', resp);
+        // } catch (e) {
+        //     console.error(e);
+        // }
+        //
+        // process.exit(0);
+    })
+
+
 program.parse(process.argv);
