@@ -1,9 +1,10 @@
 import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
-import parseDouble from "../../../helpers/parseDouble";
+import parseDouble from "../../../../helpers/parseDouble";
 
-import {RimMap, RimStock, STOCK_MSK, SupplierRim} from "../types";
+import {STOCK_MSK} from "../../types";
+import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
 import Product from "@models/Product.model";
 
@@ -27,11 +28,11 @@ export class Discovery implements SupplierRim {
 
                         xml.collect('param');
                         xml.on('endElement: disk', async (item: IDiscoveryRaw) => {
-                            counter++;
 
                             item.param = JSON.stringify(item.param);
                             try {
                                 await DiscoveryModel.upsert(item);
+                                counter++;
                             } catch (e) {
                                 console.error(e, item);
                                 errCounter++;

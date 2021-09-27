@@ -1,6 +1,10 @@
 {
-  "watch": ["src"],
+  "watch": [
+    "src"
+  ],
   "ext": "ts",
-  "ignore": ["src/**/*.spec.ts"],
-  "exec": "tsc && node dist/server/index.js"
+  "ignore": [
+    "src/**/*.spec.ts"
+  ],
+  "exec": "tsc && NODE_ENV=development node dist/server/index.js"
 }

@@ -1,5 +1,5 @@
 export interface EsProductVariant {
-    id: number;
+    id?: number;
     name: string;
     product_id: number;
     vendor_code: string;
@@ -11,7 +11,11 @@ export interface EsProductVariant {
     is_available: boolean;
     is_discount: boolean;
     cat: number[];
-    attrs: EsAttrValue[];
+    attrs: EsProductVariantAttrs;
+}
+
+export interface EsProductVariantAttrs {
+    [x: string]: EsAttrValue
 }
 
 export interface EsAttrValue {

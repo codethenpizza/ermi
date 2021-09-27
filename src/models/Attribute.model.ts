@@ -55,7 +55,7 @@ export default class Attribute extends Model<Attribute> {
     }
 }
 
-export type AttributeI = {
+export type IAttribute = {
     name: string;
     type_id: number;
     aggregatable?: boolean;

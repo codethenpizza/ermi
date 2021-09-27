@@ -1,9 +1,6 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {WheelSizeApi} from "../index";
-import {ParamsPair} from "../types";
-import {RIM_BOLTS_COUNT, RIM_BOLTS_SPACING, RIM_DIAMETER, RIM_ET, RIM_WIDTH} from "../../suppliers/types";
-import slugify from "slugify";
 
 type ReqBody = {
     make: string;

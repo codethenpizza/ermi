@@ -67,6 +67,11 @@
       "region": "AWS_DKIM_REGION",
       "Bucket": "AWS_DKIM_BUCKET",
       "Key": "AWS_DKIM_KEY"
+    },
+    "images": {
+      "region": "AWS_IMAGES_REGION",
+      "Bucket": "AWS_IMAGES_BUCKET",
+      "productDir": "AWS_IMAGES_PRODUCT_DIR"
     }
   }
 }
