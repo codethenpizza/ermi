@@ -1,26 +1,30 @@
 // @ts-ignore
 import program, {Command} from 'commander';
-import {updateProductIndexes} from "../src/server/elastic";
+import {resetIndex} from "../src/server/elastic";
 // @ts-ignore
 import {Migrate} from "../migrations/service";
 // @ts-ignore
 import {MStore} from "../migrations/service/store";
-import {parseSuppliers} from "../src/server/crone";
+
 import {sequelizeTs} from "../src/database";
 // @ts-ignore
 import {migrationSequelizeTs} from "../migrations/service/db";
-import {MailService} from "../src/core/services/notification/MailService";
+import {parseSuppliers} from "../src/modules/suppliers";
 
 program
     .command('es <action>')
     .description('Available actions: update-index')
     .action(async (action) => {
         switch (action) {
-            case 'update-index':
-                await updateProductIndexes();
+            case 'refresh-index':
+                // await updateProductIndexes();
                 process.exit(0);
                 break;
 
+            case 'reset-indexes':
+                await resetIndex();
+                process.exit(0);
+                break;
             default:
                 console.log('Command not found');
         }
@@ -31,7 +35,6 @@ program
     .description('Sync sequelize models')
     .action(async () => {
         await parseSuppliers();
-        await updateProductIndexes();
         process.exit(0);
     });
 
@@ -93,10 +96,38 @@ program
 program
     .command('test')
     .action(async () => {
-        const mail = new MailService();
-        const resp = await mail.getDKIMPrivateKey();
-        console.log(resp);
-        process.exit(0);
-    });
+        // try {
+        //
+        //     const fileName = '52519.JPG';
+        //     try {
+        //         const file = await new Promise<Buffer>((resolve, reject) => {
+        //             https.get(`https://discovery.moscow/dbpics/${fileName}`, res => {
+        //                 if (res.statusCode === 200) {
+        //                     bufferFromStream(res).then(x => resolve(x));
+        //                 } else {
+        //                     reject('Wrong url');
+        //                 }
+        //             });
+        //         });
+        //         console.log('file', file);
+        //     } catch (e) {
+        //         console.error('error: ', e);
+        //     }
+        //
+        //
+        //     const s3Strategy = new S3Strategy();
+        //
+        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519.jpeg');
+        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519_1.jpeg');
+        //     const resp = await s3Strategy.create(file, fileName);
+        //
+        //     console.log('isFileExist', resp);
+        // } catch (e) {
+        //     console.error(e);
+        // }
+        //
+        // process.exit(0);
+    })
+
 
 program.parse(process.argv);

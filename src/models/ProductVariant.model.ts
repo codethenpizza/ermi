@@ -1,9 +1,25 @@
-import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {
+    AfterCreate,
+    AfterDestroy,
+    AfterUpdate,
+    BelongsTo,
+    BelongsToMany,
+    Column,
+    DataType,
+    ForeignKey,
+    HasMany,
+    Model,
+    Table
+} from "sequelize-typescript";
 import Product from "@models/Product.model";
 import AttrValue, {IAttrValue, IAttrValueUpdateData} from "@models/AttrValue.model";
 import Image, {IImage} from "@models/Image.model";
-import ProductVariantImgModel from "@models/ProductVariantImg.model";
-import {Op, Transaction} from "sequelize";
+import ProductVariantImg, {IProductVariantImg} from "@models/ProductVariantImg.model";
+import {CreateOptions, Includeable, InstanceDestroyOptions, InstanceUpdateOptions, Op, Transaction} from "sequelize";
+import {EsProduct} from "@server/elastic/EsProducts";
+import Attribute from "@models/Attribute.model";
+import AttrType from "@models/AttrType.model";
+import ProductCategory from "@models/ProductCategory.model";
 
 @Table({
     tableName: 'product_variant',
@@ -66,17 +82,44 @@ export default class ProductVariant extends Model<ProductVariant> {
     @BelongsTo(() => Product)
     product: Product;
 
-    @BelongsToMany(() => Image, () => ProductVariantImgModel)
+    @BelongsToMany(() => Image, () => ProductVariantImg)
     images: Image[];
 
-    static async CreateOrUpdate(variant: IProductVariantUpdateData, transaction: Transaction): Promise<number> {
+    @HasMany(() => ProductVariantImg)
+    productVariantImgs: Partial<IProductVariantImg>[];
+
+
+    @AfterUpdate
+    static async hookAfterUpdate(instance: ProductVariant, {transaction}: InstanceUpdateOptions): Promise<void> {
+        instance = await instance.reload({
+            include: this.fullIncludes(),
+            transaction
+        });
+        const esProduct = new EsProduct();
+        await esProduct.updateDocument(instance);
+    }
+
+    @AfterDestroy
+    static async hookAfterDestroy(instance: ProductVariant, options: InstanceDestroyOptions): Promise<void> {
+        const esProduct = new EsProduct();
+        await esProduct.es.update({id: instance.id, is_available: false});
+    }
+
+    @AfterCreate
+    static async hookAfterCreate(attributes: ProductVariant, {transaction}: CreateOptions): Promise<void> {
+        const instance = await ProductVariant.findByPk(attributes.id, {include: this.fullIncludes(), transaction});
+        const esProduct = new EsProduct();
+        await esProduct.updateDocument(instance);
+    }
+
+    static async createOrUpdate(variant: IProductVariantUpdateData, transaction: Transaction): Promise<number> {
         if (variant.id) {
             await this.updateAttrs(variant, transaction);
 
             await this.updateImages(variant, transaction);
 
             delete variant.attrs;
-            await ProductVariant.update(variant, {where: {id: variant.id}, transaction});
+            await ProductVariant.update(variant, {where: {id: variant.id}, transaction, individualHooks: true});
 
             return variant.id
         } else {
@@ -84,6 +127,18 @@ export default class ProductVariant extends Model<ProductVariant> {
             return id
         }
     }
+
+    static fullIncludes(): Includeable[] {
+        return [
+            {
+                model: AttrValue,
+                include: [{model: Attribute, include: [AttrType]}]
+            },
+            {model: Product, include: [ProductCategory]},
+            Image
+        ];
+    }
+
 
     private static async updateAttrs(variant: IProductVariantUpdateData, transaction: Transaction) {
         const attrs = [...variant.attrs].map(x => ({
@@ -101,14 +156,14 @@ export default class ProductVariant extends Model<ProductVariant> {
     }
 
     private static async updateImages(variant: IProductVariantUpdateData, transaction: Transaction) {
-        const productVariantImgToDelete = await ProductVariantImgModel.findAll({
+        const productVariantImgToDelete = await ProductVariantImg.findAll({
             where: {
                 product_variant_id: variant.id,
                 image_id: {[Op.notIn]: variant.images.map(x => x.id)}
             }
         })
 
-        await ProductVariantImgModel.destroy({
+        await ProductVariantImg.destroy({
             where: {
                 product_variant_id: variant.id,
                 image_id: {
@@ -123,9 +178,9 @@ export default class ProductVariant extends Model<ProductVariant> {
             position
         }));
 
-        await ProductVariantImgModel.bulkCreate(images, {transaction, updateOnDuplicate: ["position"]});
+        await ProductVariantImg.bulkCreate(images, {transaction, updateOnDuplicate: ["position"]});
     }
-}
+};
 
 export type IProductVariant = {
     id?: number;
@@ -140,6 +195,7 @@ export type IProductVariant = {
     is_discount?: boolean;
     attrs: IAttrValue[]
     images?: IImage[];
+    productVariantImgs?: Partial<IProductVariantImg>[];
 }
 
 export type IProductVariantUpdateData = {

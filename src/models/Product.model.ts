@@ -1,18 +1,8 @@
-import {
-    BelongsTo,
-    BelongsToMany,
-    Column,
-    DataType,
-    ForeignKey,
-    HasMany,
-    HasOne,
-    Model,
-    Table
-} from "sequelize-typescript"
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript"
 import ProductVariant, {IProductVariant, IProductVariantUpdateData} from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import ProductCategory from "@models/ProductCategory.model";
-import ProductCatsProduct from "@models/ProductCatsProduct.model";
+import ProductCatsProduct, {IProductCatsProduct} from "@models/ProductCatsProduct.model";
 import Attribute from "@models/Attribute.model";
 import AttrSet from "@models/AttrSet.model";
 import {Op} from "sequelize";
@@ -47,6 +37,9 @@ export default class Product extends Model<Product> {
     @BelongsToMany(() => ProductCategory, () => ProductCatsProduct)
     cats: ProductCategory[];
 
+    @HasMany(() => ProductCatsProduct)
+    productCatsProduct: ProductCatsProduct[];
+
     @HasMany(() => ProductVariant)
     variants: ProductVariant[];
 
@@ -54,32 +47,22 @@ export default class Product extends Model<Product> {
     static async createWR(data: IProduct): Promise<Product> {
         const transaction = await this.sequelize.transaction();
         try {
-            let product = await Product.create(data, {
-                transaction, include: [
-                    {model: ProductVariant, include: [AttrValue]},
-                    ProductCategory
-                ]
+            const productCatsProduct: Partial<IProductCatsProduct>[] = data.cats_ids.map(product_cat_id => ({product_cat_id}));
+
+            let product = await Product.create({...data, productCatsProduct}, {
+                include: [
+                    {model: ProductVariant, include: [AttrValue, ProductVariantImg]},
+                    ProductCatsProduct
+                ],
+                transaction
             });
 
-            for (let i = 0; i < product.variants.length; i++) {
-                const variant = data.variants[i];
-                if (variant.images) {
-                    for (const image of variant.images) {
-                        await ProductVariantImg.create({
-                            image_id: image.id,
-                            product_variant_id: product.variants[i].id
-                        }, {transaction});
-                    }
-                }
-            }
-
-            await ProductCatsProduct.bulkCreate(data.cats_ids.map(id => ({product_cat_id: id, product_id: product.id})), {transaction});
-
             product = await product.reload({
-                transaction, include: [
+                include: [
                     {model: ProductVariant, include: [{model: AttrValue, include: [Attribute]}, Image]},
                     ProductCategory
-                ]
+                ],
+                transaction
             });
             await transaction.commit();
             return product;
@@ -92,10 +75,11 @@ export default class Product extends Model<Product> {
     static async updateWR(id: number, product: IProductUpdateData): Promise<void> {
         const transaction = await this.sequelize.transaction();
         try {
-            const productUpdateResult = await Product.update(product, {where: {id}});
-            if (productUpdateResult[0] === 0) {
+            const prod = await Product.findByPk(id);
+            if (!prod) {
                 throw new Error(`Can't update product with id ${id}`)
             }
+            await prod.update(product);
 
             const variantToDestroy = product.variants.filter(variant => variant.id).map(variant => variant.id);
             ProductVariant.destroy({
@@ -107,7 +91,7 @@ export default class Product extends Model<Product> {
 
             for (const variant of product.variants) {
                 variant.product_id = id;
-                await ProductVariant.CreateOrUpdate(variant, transaction);
+                await ProductVariant.createOrUpdate(variant, transaction);
             }
             await transaction.commit();
         } catch (e) {
@@ -125,6 +109,7 @@ export type IProduct = {
     desc?: string;
     cats_ids: number[];
     variants: IProductVariant[];
+    productCatsProduct?: ProductCatsProduct[];
     attr_set_id?: number;
 }
 

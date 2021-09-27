@@ -2,7 +2,7 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import Attribute from "@models/Attribute.model";
 import {EsProduct} from "@server/elastic/EsProducts";
-import {EsProductVariant, EsRespProduct, EsSearchReqBody, RespData} from "@actions/front/types";
+import {EsProductVariant, EsReqFilter, EsRespProduct, EsSearchReqBody, RespData} from "@actions/front/types";
 import {EsQueryBuilder} from "../../../helpers/EsQueryBuilder";
 import {setUser} from "../../../middlewares/auth";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
@@ -34,19 +34,24 @@ export class ProductElasticSearchAction implements Action {
 
             const aggAttrs = await Attribute.findAggregatable();
 
+            const availableFilter: EsReqFilter = {key: 'is_available', value: true};
+
+            filters = filters?.length ? [...filters, availableFilter] : [availableFilter];
+
             const query = EsQueryBuilder.makeQuery({
                 filters,
                 groupedFilters: extFilters?.data,
                 searchString,
             }, aggAttrs).build();
 
-            // console.log('query', JSON.stringify(query));
+            console.log('query', JSON.stringify(query));
 
             const esProduct = new EsProduct();
             const resp = await esProduct.es.search({
                 body: query,
                 size,
                 from,
+                sort: 'id:desc'
             });
 
 

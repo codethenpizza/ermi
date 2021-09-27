@@ -98,7 +98,7 @@ export interface EsReqFilter {
     value: EsReqFilterValue;
 }
 
-export type EsReqFilterValue = string | string[] | number | number[] | RangeFilter;
+export type EsReqFilterValue = string | string[] | number | number[] | boolean | RangeFilter;
 
 export interface RangeFilter {
     gt?: number;

@@ -120,6 +120,15 @@ export class Elastic {
         });
     }
 
+    update(data: { [x: string]: any } & { id: number }) {
+        return esClient.index({
+            index: this.index,
+            // type: this.type,
+            id: data.id.toString(),
+            body: data,
+        });
+    }
+
     async bulkUpdate(data: Object & { id: number }[]) {
         for (const item of data) {
             await esClient.index({
@@ -129,6 +138,13 @@ export class Elastic {
                 body: item,
             }).catch(e => JSON.stringify(e));
         }
+    }
+
+    destroy(id: number) {
+        return esClient.delete({
+            index: this.index,
+            id: id.toString()
+        });
     }
 
     async search(params?: RequestParams.Search, options?: TransportRequestOptions): Promise<TransportRequestPromise<ApiResponse>> {

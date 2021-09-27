@@ -1,9 +1,9 @@
 import {Action} from "@projTypes/action";
-import {NextFunction, Response, Request} from "express";
+import {NextFunction, Request, Response} from "express";
 import {WheelSizeApi} from "../index";
-import {RIM_PCD, RIM_DIAMETER, RIM_ET, RIM_WIDTH} from "../../suppliers/types";
 import slugify from "slugify";
 import {SearchRespBodyItem} from "../types";
+import {RIM_DIAMETER, RIM_ET, RIM_PCD, RIM_WIDTH} from "../../suppliers/helpers/rimProductType/rimTypes";
 
 interface ReqBody {
     make: string;
@@ -17,6 +17,10 @@ interface ReqBody {
 export class WheelsSearchAction implements Action {
     get action() {
         return [this.assert, this.handle];
+    }
+
+    private static generateAttrKey(name: string): string {
+        return `attrs.${slugify(name, {lower: true})}.value`
     }
 
     assert({
@@ -136,10 +140,6 @@ export class WheelsSearchAction implements Action {
             });
 
         res.send(data);
-    }
-
-    private static generateAttrKey(name: string): string {
-        return `attrs.${slugify(name, {lower: true})}.value`
     }
 }
 

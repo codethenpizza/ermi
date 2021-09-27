@@ -5,7 +5,7 @@ import Attribute from "@models/Attribute.model";
 import AttrType from "@models/AttrType.model";
 import Image from "@models/Image.model";
 import {EsIndex} from "./EsIndex";
-import {EsAttrValue, EsProductVariant} from "./types";
+import {EsProductVariant, EsProductVariantAttrs} from "./types";
 import {Normalizers} from "@server/elastic/schemas/Analysis";
 import {ProductScheme} from "@server/elastic/schemas/ProductScheme";
 import ProductCategory from "@models/ProductCategory.model";
@@ -25,6 +25,56 @@ export class EsProduct extends EsIndex {
 
     static addSchemes(schemes: Object[]): void {
         this.schemas.push(...schemes);
+    }
+
+    static mapToEsProductVariant(variant: ProductVariant): EsProductVariant {
+        variant = variant.get({plain: true}) as ProductVariant;
+        const variantData = {...variant};
+        delete variantData.product;
+        return {
+            ...variantData,
+            attrs: EsProduct.makeAttrs(variant),
+            name: variant.product.name,
+            cat: variant.product.cats.map(c => c.id)
+        };
+    }
+
+    static makeAttrs(variant: ProductVariant): EsProductVariantAttrs {
+        return variant.attrs.reduce((obj, attr) => {
+            let value: string | boolean | number = attr.value;
+
+            switch (attr.attribute.type.type) {
+                case 'decimal':
+                    value = parseDouble(value);
+                    break;
+
+                case 'number':
+                    value = parseInt(value);
+                    break;
+
+                case 'array':
+                case 'json':
+                    value = JSON.parse(value);
+                    break;
+            }
+
+            obj[attr.attribute.slug] = {
+                value,
+                name: attr.attribute.name,
+                slug: attr.attribute.slug
+            };
+            return obj;
+        }, {});
+    }
+
+    async updateDocument(variant: ProductVariant): Promise<any> {
+        const data = EsProduct.mapToEsProductVariant(variant);
+        // @ts-ignore
+        return this.es.update(data);
+    }
+
+    async destroyDocument(id: number): Promise<any> {
+        return this.es.destroy(id);
     }
 
     protected async createMapping() {
@@ -77,47 +127,7 @@ export class EsProduct extends EsIndex {
             ]
         });
 
-        // @ts-ignore
-        return variants.map<ProductVariant>(x => x.dataValues).map<EsProductVariant>((variant) => {
-            const variantData = {...variant};
-            delete variantData.product;
-            return {
-                ...variantData,
-                attrs: this.makeAttrs(variant),
-                name: variant.product.name,
-                cat: variant.product.cats.map(c => c.id)
-            };
-        })
-    }
-
-    private makeAttrs(variant: ProductVariant): EsAttrValue[] {
-        // @ts-ignore
-        return variant.attrs.map(x => x.dataValues)
-            .reduce((obj, attr) => {
-                let value = attr.value;
-
-                switch (attr.attribute.type.type) {
-                    case 'decimal':
-                        value = parseDouble(value);
-                        break;
-
-                    case 'number':
-                        value = parseInt(value);
-                        break;
-
-                    case 'array':
-                    case 'json':
-                        value = JSON.parse(value);
-                        break;
-                }
-
-                obj[attr.attribute.slug] = {
-                    value,
-                    name: attr.attribute.name,
-                    slug: attr.attribute.slug
-                };
-                return obj;
-            }, {});
+        return variants.map<EsProductVariant>(EsProduct.mapToEsProductVariant);
     }
 }
 

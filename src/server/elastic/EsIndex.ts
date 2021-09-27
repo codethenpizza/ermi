@@ -30,6 +30,22 @@ export class EsIndex {
         });
     }
 
+    async resetIndex() {
+        await this.es.createIndex();
+
+        await this.es.clearIndex();
+
+        const settings = this.createSettings();
+        if (settings) {
+            await this.es.setSettings(settings);
+        }
+
+        const schema = await this.createMapping();
+        if (schema) {
+            await this.es.setQuotesMapping(schema);
+        }
+    }
+
     protected async createData(storeFn: Function): Promise<void> {
         throw new Error('Override createData method');
     }
@@ -53,22 +69,6 @@ export class EsIndex {
         } catch (e) {
             console.error('Updating index error:');
             console.error(e);
-        }
-    }
-
-    private async resetIndex() {
-        await this.es.createIndex();
-
-        await this.es.clearIndex();
-
-        const settings = this.createSettings();
-        if (settings) {
-            await this.es.setSettings(settings);
-        }
-
-        const schema = await this.createMapping();
-        if (schema) {
-            await this.es.setQuotesMapping(schema);
         }
     }
 }
