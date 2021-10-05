@@ -331,6 +331,7 @@ export class ProductMapper {
                     if (isDev) {
                         const img = await Image.create({original_uri: item.image});
                         await ProductVariantImg.create({image_id: img.id, product_variant_id: variantByCode.id});
+                        await variantByCode.update({})
                     } else {
                         const data = await getImageFromUrl(item.image);
                         const name = getFileNameFromUrl(item.image)

@@ -1,6 +1,6 @@
 // @ts-ignore
 import program, {Command} from 'commander';
-import {resetIndex} from "../src/server/elastic";
+import {resetIndex, syncEsData} from "../src/server/elastic";
 // @ts-ignore
 import {Migrate} from "../migrations/service";
 // @ts-ignore
@@ -16,8 +16,8 @@ program
     .description('Available actions: update-index')
     .action(async (action) => {
         switch (action) {
-            case 'refresh-index':
-                // await updateProductIndexes();
+            case 'sync-data':
+                await syncEsData();
                 process.exit(0);
                 break;
 
