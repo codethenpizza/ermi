@@ -96,34 +96,40 @@ program
 program
     .command('test')
     .action(async () => {
-        // try {
+        // const {credentials, images: {region, Bucket, productDir}} = config.AWS;
         //
-        //     const fileName = '52519.JPG';
-        //     try {
-        //         const file = await new Promise<Buffer>((resolve, reject) => {
-        //             https.get(`https://discovery.moscow/dbpics/${fileName}`, res => {
-        //                 if (res.statusCode === 200) {
-        //                     bufferFromStream(res).then(x => resolve(x));
-        //                 } else {
-        //                     reject('Wrong url');
-        //                 }
-        //             });
-        //         });
-        //         console.log('file', file);
-        //     } catch (e) {
-        //         console.error('error: ', e);
+        // const s3Client = new S3Client({
+        //     region,
+        //     credentials
+        // });
+        //
+        // let Marker = undefined;
+        //
+        // const reg = /.+_1.+/;
+        // let i = 0;
+        //
+        // while (true) {
+        //     const resp = await s3Client.send(new ListObjectsCommand({
+        //         Bucket,
+        //         Marker
+        //     }));
+        //
+        //     if (!resp.Contents) {
+        //         break;
         //     }
         //
+        //     for (const {Key} of resp.Contents) {
+        //         Marker = Key;
+        //         if (reg.test(Key)) {
+        //             await s3Client.send(new DeleteObjectCommand({
+        //                 Bucket,
+        //                 Key
+        //             }))
+        //         }
+        //     }
         //
-        //     const s3Strategy = new S3Strategy();
+        //     console.log('i = ' + i++);
         //
-        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519.jpeg');
-        //     await s3Strategy.delete('https://img.four-wheels.ru/product/52519_1.jpeg');
-        //     const resp = await s3Strategy.create(file, fileName);
-        //
-        //     console.log('isFileExist', resp);
-        // } catch (e) {
-        //     console.error(e);
         // }
         //
         // process.exit(0);

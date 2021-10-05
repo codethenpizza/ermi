@@ -6,7 +6,7 @@ import ProductCategory, {IProductCategory} from "@models/ProductCategory.model";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
 import Image from "@models/Image.model";
 import ProductVariant from "@models/ProductVariant.model";
-import {IProductVariantImg} from "@models/ProductVariantImg.model";
+import ProductVariantImg, {IProductVariantImg} from "@models/ProductVariantImg.model";
 import Attribute, {IAttribute} from "@models/Attribute.model";
 import AttrSet from "@models/AttrSet.model";
 import {RimAttrScheme} from "./schemas/RimAttrScheme";
@@ -284,7 +284,7 @@ export class ProductMapper {
                     in_stock_qty: item.inStock,
                     is_available: !!item.inStock,
                     productVariantImgs
-                }, {include: [AttrValue]});
+                }, {include: [AttrValue, ProductVariantImg]});
             } catch (e) {
                 console.log('ERROR', e);
                 const product = await Product.findByPk(product_id);
@@ -306,7 +306,8 @@ export class ProductMapper {
         const variantByCode = await ProductVariant.findOne({
             where: {
                 vendor_code: item.uid
-            }
+            },
+            include: [Image]
         });
 
         if (variantByCode) {
@@ -324,6 +325,24 @@ export class ProductMapper {
                 price: item.price,
                 in_stock_qty: item.inStock
             });
+
+            if (item.image && !variantByCode.images?.length && item) {
+                try {
+                    if (isDev) {
+                        const img = await Image.create({original_uri: item.image});
+                        await ProductVariantImg.create({image_id: img.id, product_variant_id: variantByCode.id});
+                    } else {
+                        const data = await getImageFromUrl(item.image);
+                        const name = getFileNameFromUrl(item.image)
+
+                        const img = await Image.uploadFile({name, data});
+                        await ProductVariantImg.create({image_id: img.id, product_variant_id: variantByCode.id});
+                    }
+                } catch (e) {
+                    console.log('Error with, ', item.image, ' id', item.uid, e);
+                }
+            }
+
             return true;
         }
 
@@ -362,11 +381,16 @@ export class ProductMapper {
 
         if (item.image) {
             try {
-                const data = await getImageFromUrl(item.image);
-                const name = getFileNameFromUrl(item.image)
+                if (isDev) {
+                    const img = await Image.create({original_uri: item.image});
+                    product.variants[0].productVariantImgs = [{image_id: img.id}];
+                } else {
+                    const data = await getImageFromUrl(item.image);
+                    const name = getFileNameFromUrl(item.image)
 
-                const img = await Image.uploadFile({name, data});
-                product.variants[0].productVariantImgs = [{image_id: img.id}];
+                    const img = await Image.uploadFile({name, data});
+                    product.variants[0].productVariantImgs = [{image_id: img.id}];
+                }
             } catch (e) {
                 console.log('Error with, ', item.image, ' id', item.uid);
                 console.log(e)
