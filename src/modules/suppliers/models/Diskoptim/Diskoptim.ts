@@ -91,7 +91,7 @@ export class Diskoptim implements Supplier, SupplierRim {
                 supplier: this.name,
                 model: item.model,
                 brand: item.brand,
-                image: encodeURI(item.image),
+                image: item.image && encodeURI(item.image),
                 price: parseDouble(item.price),
                 pcd: `${raw_bolts_count}X${parseDouble(raw_bolts_spacing)}`,
                 width: parseDouble(item.width),

@@ -87,7 +87,7 @@ export class Discovery implements SupplierRim {
                 supplier: this.name,
                 model: item.model,
                 brand: item.brand,
-                image: encodeURI(item.picture),
+                image: item.picture && encodeURI(item.picture),
                 price: parseDouble(item.price),
                 pcd: `${bolts_count}X${bolts_spacing}`,
                 width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text),

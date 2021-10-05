@@ -11,3 +11,7 @@ export const esProduct = new EsProduct();
 export const resetIndex = async () => {
     await esProduct.resetIndex();
 }
+
+export const syncEsData = async () => {
+    await esProduct.updateData();
+}
