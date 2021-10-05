@@ -1,4 +1,4 @@
-import {FileStrategy} from "@core/files/FileStrategy";
+import {CreateOptions, FileStrategy} from "@core/files/FileStrategy";
 import {DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import config from 'config';
 import {splitImageNameByExt} from "../../helpers/utils";
@@ -32,12 +32,12 @@ export class S3Strategy implements FileStrategy {
         return `image/${type}`;
     }
 
-    async create(Body: Buffer, name: string, mimeType?: string): Promise<string> {
+    async create(Body: Buffer, name: string, {mimeType, rewrite}: CreateOptions = {}): Promise<string> {
         name = S3Strategy.formatName(name);
 
         const ContentType = mimeType || S3Strategy.getContentType(name);
         const dir = this.productDir ? `${this.productDir}/` : '';
-        const Key = await this.getUniName(`${dir}${name}`);
+        const Key = rewrite ? `${dir}${name}` : await this.getUniName(`${dir}${name}`);
 
         await this.s3Client.send(new PutObjectCommand({
             Bucket: this.Bucket,
@@ -75,13 +75,14 @@ export class S3Strategy implements FileStrategy {
     }
 
     private async getUniName(Key: string): Promise<string> {
+        const {name, ext} = splitImageNameByExt(Key);
+        let tmpKey = Key;
         let i = 0;
-        while (await this.isFileExist(Key)) {
+        while (await this.isFileExist(tmpKey)) {
             i++;
-            const {name, ext} = splitImageNameByExt(Key);
-            Key = `${name}_${i}.${ext}`;
+            tmpKey = `${name}_${i}.${ext}`;
         }
 
-        return Key;
+        return tmpKey;
     }
 }
