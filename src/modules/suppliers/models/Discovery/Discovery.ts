@@ -21,27 +21,30 @@ export class Discovery implements SupplierRim {
 
             let counter = 0;
             let errCounter = 0;
+            const functions = [];
             try {
                 request.get(url)
                     .on('response', async resp => {
                         const xml = new XmlStream(resp);
 
                         xml.collect('param');
-                        xml.on('endElement: disk', async (item: IDiscoveryRaw) => {
-
-                            item.param = JSON.stringify(item.param);
-                            try {
-                                await DiscoveryModel.upsert(item);
-                                counter++;
-                            } catch (e) {
-                                console.error(e, item);
-                                errCounter++;
-                            }
+                        xml.on('endElement: disk', (item: IDiscoveryRaw) => {
+                            functions.push((async () => {
+                                try {
+                                    item.param = JSON.stringify(item.param);
+                                    await DiscoveryModel.upsert(item);
+                                    counter++;
+                                } catch (e) {
+                                    console.error(e, item);
+                                    errCounter++;
+                                }
+                            })());
                         });
 
                         xml.on("error", (err) => console.log('Error', err));
 
-                        xml.on("end", () => {
+                        xml.on("end", async () => {
+                            await Promise.all(functions);
                             console.log(`End fetch Discovery. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
@@ -68,6 +71,10 @@ export class Discovery implements SupplierRim {
 
         return rawData.map<RimMap>((item) => {
             const param = JSON.parse(item.param);
+
+            if (!param) {
+                return null;
+            }
 
             const bolts_count = parseDouble(param.find((e) => e.$.name === 'Количество отверстий')?.$text) || null;
             const bolts_spacing = parseDouble(param.find((e) => e.$.name === 'Диаметр расположения отверстий')?.$text) || null;
@@ -102,6 +109,6 @@ export class Discovery implements SupplierRim {
                 stock: JSON.stringify(stock),
                 inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
             };
-        });
+        }).filter(x => Boolean(x));
     }
 }

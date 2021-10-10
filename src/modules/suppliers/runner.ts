@@ -1,10 +1,10 @@
 import {ProductMapper} from "./ProductMapper";
 //suppliers
-import {Diskoptim} from "./models/Diskoptim/Diskoptim"
-import {Slik} from "./models/Slik/Slik";
-import {Discovery} from "./models/Discovery/Discovery";
-import {Kolrad} from "./models/Kolrad/Kolrad";
 import {SupplierRim} from "./helpers/rimProductType/rimTypes";
+import {Slik} from "./models/Slik/Slik";
+import {Kolrad} from "./models/Kolrad/Kolrad";
+import {Diskoptim} from "./models/Diskoptim/Diskoptim";
+import {Discovery} from "./models/Discovery/Discovery";
 
 const suppliers: Array<SupplierRim> = [
     new Discovery(),

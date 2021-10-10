@@ -15,35 +15,41 @@ export class Diskoptim implements Supplier, SupplierRim {
 
     async fetchData(): Promise<void> {
         return new Promise((resolve, reject) => {
+
             console.log('Start fetch Diskoptim');
+
             let counter = 0;
             let errCounter = 0;
+            const functions = [];
             try {
                 const ftp = new FTP();
 
                 ftp.on('ready', () => {
                     ftp.get(config.get('suppliers.Diskoptim.ftp_file'), (err, stream) => {
                         const xml = new XmlStream(stream);
-                        xml.on('endElement: Диск', async (item) => {
-                            counter++;
-                            const formattedItem = {};
-                            try {
-                                for (const [key, value] of Object.entries(item)) {
-                                    if (DiskoptimRawRimMap[key]) {
-                                        formattedItem[DiskoptimRawRimMap[key]] = value
-                                    } else {
-                                        throw new Error(`undefined item key: ${key}`)
+                        xml.on('endElement: Диск', (item) => {
+                            functions.push((async () => {
+                                const formattedItem = {};
+                                try {
+                                    for (const [key, value] of Object.entries(item)) {
+                                        if (DiskoptimRawRimMap[key]) {
+                                            formattedItem[DiskoptimRawRimMap[key]] = value
+                                        } else {
+                                            throw new Error(`undefined item key: ${key}`)
+                                        }
                                     }
+                                    await DiskoptimModel.upsert(formattedItem);
+                                    counter++;
+                                } catch (e) {
+                                    console.error(e.message);
+                                    errCounter++;
                                 }
-                                await DiskoptimModel.upsert(formattedItem);
-                            } catch (e) {
-                                console.error(e.message);
-                                errCounter++;
-                            }
+                            })());
                         });
 
-                        xml.on('end', () => {
+                        xml.on('end', async () => {
                             ftp.end();
+                            await Promise.all(functions);
                             console.log(`End fetch Diskoptim. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
@@ -66,6 +72,7 @@ export class Diskoptim implements Supplier, SupplierRim {
 
     async getRims(limit, offset): Promise<RimMap[]> {
         console.log('Start store Diskoptim');
+
         const rawData = await DiskoptimModel.findAll({limit, offset});
 
         const toCreate = [];
