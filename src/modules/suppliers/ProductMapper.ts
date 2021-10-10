@@ -275,7 +275,7 @@ export class ProductMapper {
                     }
                 }
 
-                await ProductVariant.create({
+                const p = await ProductVariant.create({
                     ...item,
                     product_id,
                     vendor_code: item.uid,
@@ -321,28 +321,30 @@ export class ProductMapper {
                 value: item.stock
             });
 
-            await variantByCode.update({
-                price: item.price,
-                in_stock_qty: item.inStock
-            });
-
-            if (item.image && !variantByCode.images?.length && item) {
+            if (item.image && !variantByCode.images?.length) {
                 try {
                     if (isDev) {
                         const img = await Image.create({original_uri: item.image});
                         await ProductVariantImg.create({image_id: img.id, product_variant_id: variantByCode.id});
-                        await variantByCode.update({})
                     } else {
                         const data = await getImageFromUrl(item.image);
                         const name = getFileNameFromUrl(item.image)
 
                         const img = await Image.uploadFile({name, data});
-                        await ProductVariantImg.create({image_id: img.id, product_variant_id: variantByCode.id});
+                        await ProductVariantImg.create({
+                            image_id: img.id,
+                            product_variant_id: variantByCode.id
+                        });
                     }
                 } catch (e) {
                     console.log('Error with, ', item.image, ' id', item.uid, e);
                 }
             }
+
+            await variantByCode.update({
+                price: item.price,
+                in_stock_qty: item.inStock
+            });
 
             return true;
         }

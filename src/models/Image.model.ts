@@ -58,11 +58,31 @@ export default class Image extends Model<Image> {
         const {name: normalName, ext} = splitImageNameByExt(slugify(name, {lower: true}));
 
 
-        const original_uri = await strategy.create(data, `${normalName}.${ext}`);
-        const large_uri = await strategy.create(await Image.resizeImage(data, "large"), `${normalName}.large.${ext}`);
-        const medium_uri = await strategy.create(await Image.resizeImage(data, "medium"), `${normalName}.medium.${ext}`);
-        const small_uri = await strategy.create(await Image.resizeImage(data, "small"), `${normalName}.small.${ext}`);
-        const thumbnail_uri = await strategy.create(await Image.resizeImage(data, "thumbnail"), `${normalName}.thumbnail.${ext}`);
+        const [
+            largeData,
+            mediumData,
+            smallData,
+            thumbnailData
+        ] = await Promise.all([
+            Image.resizeImage(data, "large"),
+            Image.resizeImage(data, "medium"),
+            Image.resizeImage(data, "small"),
+            Image.resizeImage(data, "thumbnail")
+        ]);
+
+        const [
+            original_uri,
+            large_uri,
+            medium_uri,
+            small_uri,
+            thumbnail_uri
+        ] = await Promise.all([
+            strategy.create(data, `${normalName}.${ext}`),
+            strategy.create(largeData, `${normalName}.large.${ext}`),
+            strategy.create(mediumData, `${normalName}.medium.${ext}`),
+            strategy.create(smallData, `${normalName}.small.${ext}`),
+            strategy.create(thumbnailData, `${normalName}.thumbnail.${ext}`)
+        ]);
 
         return Image.create({
             original_uri,

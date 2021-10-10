@@ -19,22 +19,26 @@ export class Slik implements Supplier, SupplierRim {
             let errCounter = 0;
             try {
                 const ftp = new FTP();
+                const functions = [];
 
                 ftp.on('ready', () => {
                     ftp.get(config.get('suppliers.Slik.ftp_file'), (err, stream) => {
                         const xml = new XmlStream(stream);
-                        xml.on('endElement: gd', async (item: ISilkRaw) => {
-                            counter++;
-                            try {
-                                await SlikModel.upsert(item);
-                            } catch (e) {
-                                console.error(e.message);
-                                errCounter++;
-                            }
+                        xml.on('endElement: gd', (item: ISilkRaw) => {
+                            functions.push((async () => {
+                                counter++;
+                                try {
+                                    await SlikModel.upsert(item);
+                                } catch (e) {
+                                    console.error(e.message);
+                                    errCounter++;
+                                }
+                            })())
                         });
 
-                        xml.on('end', () => {
+                        xml.on('end', async () => {
                             ftp.end();
+                            await Promise.all(functions);
                             console.log(`End fetch Slik. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });

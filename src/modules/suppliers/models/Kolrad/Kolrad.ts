@@ -60,6 +60,7 @@ export class Kolrad implements Supplier, SupplierRim {
 
     async getRims(limit, offset): Promise<RimMap[]> {
         console.log('Start store Kolrad');
+
         const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
         const toCreate: RimMap[] = [];
         for (const item of rawData) {
@@ -111,40 +112,44 @@ export class Kolrad implements Supplier, SupplierRim {
     }
 
     private async parsePage(url: string): Promise<number> {
-        // console.log(`start parse url: ${url}`);
         let pageCounter = 0;
         return new Promise((resolve) => {
+            const functions = [];
             request.get(url)
                 .on('response', resp => {
                     const xml = new XmlStream(resp);
 
                     xml.collect('param');
-                    xml.on('endElement: offer', async (item: any) => {
-                        if (item.categoryId !== '5') {
-                            return;
-                        }
+                    xml.on('endElement: offer', (item: any) => {
+                        functions.push((async () => {
+                            if (item.categoryId !== '5') {
+                                return;
+                            }
 
-                        const stock = item.stocks?.stock
-                        if (!stock || (stock['$']?.id !== '3' || stock.quantity === '0')) {
-                            return;
-                        }
+                            const stock = item.stocks?.stock
+                            if (!stock || (stock['$']?.id !== '3' || stock.quantity === '0')) {
+                                return;
+                            }
 
-                        try {
-                            item.param = JSON.stringify(item.param);
-                            item.prices = JSON.stringify(item.prices);
-                            item.stocks = JSON.stringify(item.stocks);
-                            await KolradModel.upsert(item)
-                            pageCounter++;
-                        } catch (e) {
-                            console.error(e, item);
-                        }
+                            try {
+                                item.param = JSON.stringify(item.param);
+                                item.prices = JSON.stringify(item.prices);
+                                item.stocks = JSON.stringify(item.stocks);
+                                await KolradModel.upsert(item)
+                                pageCounter++;
+                            } catch (e) {
+                                console.error(e, item);
+                            }
+                        })())
+
                     });
 
                     xml.on("error", (err) => {
                         console.log('Error', err);
                     });
 
-                    xml.on("end", () => {
+                    xml.on("end", async () => {
+                        await Promise.all(functions);
                         resolve(pageCounter);
                     });
                 });
