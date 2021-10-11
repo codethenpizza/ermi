@@ -23,6 +23,9 @@
   "auth": {
     "secret": ""
   },
+  "suppliersConfig": {
+    "ProductMapperStoreLimit": 1000
+  },
   "suppliers": {
     "Slik": {
       "ftp": {

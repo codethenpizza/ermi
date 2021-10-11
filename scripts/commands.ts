@@ -10,6 +10,7 @@ import {sequelizeTs} from "../src/database";
 // @ts-ignore
 import {migrationSequelizeTs} from "../migrations/service/db";
 import {parseSuppliers} from "../src/modules/suppliers";
+import {fetchAll, storeAll} from "../src/modules/suppliers/runner";
 
 program
     .command('es <action>')
@@ -35,6 +36,22 @@ program
     .description('Sync sequelize models')
     .action(async () => {
         await parseSuppliers();
+        process.exit(0);
+    });
+
+program
+    .command('fetch-suppliers-data')
+    .description('Sync sequelize models')
+    .action(async () => {
+        await fetchAll();
+        process.exit(0);
+    });
+
+program
+    .command('store-suppliers-data')
+    .description('Sync sequelize models')
+    .action(async () => {
+        await storeAll();
         process.exit(0);
     });
 
