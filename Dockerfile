@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM public.ecr.aws/bitnami/node:latest
 
 COPY package*.json ./
 RUN apk add --no-cache --virtual .gyp \
