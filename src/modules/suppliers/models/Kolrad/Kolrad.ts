@@ -30,8 +30,7 @@ export class Kolrad implements Supplier, SupplierRim {
                 totalPages = await this.getTotalPages(url)
 
                 if (!totalPages) {
-                    console.log('total pages is empty')
-                    return;
+                    throw new Error('total pages is empty ' + totalPages);
                 }
 
                 for (let i = 10; i <= totalPages; i++) {

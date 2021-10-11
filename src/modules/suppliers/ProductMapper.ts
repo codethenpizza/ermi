@@ -16,6 +16,7 @@ import {sequelizeTs} from "@db";
 import {IProductMapper} from './interfaces/ProductMapper'
 import {rimMapperRequiredOptions,} from "./helpers/rimProductType/rimProductTypeRequredOptions";
 import {getFileNameFromUrl, getImageFromUrl, isDev} from "../../helpers/utils";
+import config from 'config';
 
 
 const mapArr: IProductMapper.MapItem[] = [
@@ -30,6 +31,8 @@ export class ProductMapper {
      * @param suppliers -  array of Suppliers
      */
     public async mapProductData(suppliers: Supplier[]): Promise<void> {
+
+        const {ProductMapperStoreLimit} = config.suppliersConfig;
 
         for (const supp of suppliers) {
             for (let i = 0; i < mapArr.length; i++) {
@@ -46,8 +49,10 @@ export class ProductMapper {
                     throw e;
                 }
 
+                console.log(`Start store ${supp.name} ${(method as string)}`);
+
                 if (supp[method]) {
-                    let limit = 1000;
+                    let limit = ProductMapperStoreLimit;
                     let offset = 0;
 
                     let data = await supp[method](limit, offset);
