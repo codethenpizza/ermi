@@ -1,12 +1,7 @@
-FROM node:12-alpine
+FROM public.ecr.aws/bitnami/node:latest
 
 COPY package*.json ./
-RUN apk add --no-cache --virtual .gyp \
-        python \
-        make \
-        g++ \
-    && npm install \
-    && apk del .gyp
+RUN npm install --unsafe-perm
 
 COPY . .
 RUN npm run build
