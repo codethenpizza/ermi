@@ -39,7 +39,7 @@
     "mysql2": "^2.1.0",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.0",
-    "node-fetch": "^3.0.0",
+    "node-fetch-commonjs": "^3.0.3",
     "nodemailer": "^6.6.3",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",

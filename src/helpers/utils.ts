@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch from 'node-fetch-commonjs';
 
 export const bufferFromStream = (stream: NodeJS.ReadableStream | NodeJS.WritableStream): Promise<Buffer> =>
     new Promise(resolve => {
