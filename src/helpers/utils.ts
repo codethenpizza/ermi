@@ -1,4 +1,4 @@
-import https from "https";
+import fetch from 'node-fetch';
 
 export const bufferFromStream = (stream: NodeJS.ReadableStream | NodeJS.WritableStream): Promise<Buffer> =>
     new Promise(resolve => {
@@ -18,15 +18,6 @@ export const splitImageNameByExt = (str: string): { ext: string, name: string } 
 
 export const getFileNameFromUrl = (url: string): string => url.split('/').pop();
 
-export const getImageFromUrl = async (url: string): Promise<Buffer> =>
-    new Promise<Buffer>((resolve, reject) => {
-        https.get(url, res => {
-            if (res.statusCode === 200) {
-                bufferFromStream(res).then(x => resolve(x));
-            } else {
-                reject('Wrong url');
-            }
-        });
-    });
+export const getImageFromUrl = (url: string): Promise<Buffer> => fetch(url).then(x => x.buffer());
 
 export const isDev = process.env.NODE_ENV === 'development';

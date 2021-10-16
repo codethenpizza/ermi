@@ -52,7 +52,7 @@ export class ProductMapper {
                 console.log(`Start store ${supp.name} ${(method as string)}`);
 
                 if (supp[method]) {
-                    let limit = ProductMapperStoreLimit;
+                    let limit = parseInt(ProductMapperStoreLimit);
                     let offset = 0;
 
                     let data = await supp[method](limit, offset);
