@@ -11,6 +11,24 @@ import DiscountType from "@models/DiscountType.model";
 import Address from "@models/Address.model";
 import B2BDiscount from "@models/B2BDiscount.model";
 
+export interface IOrder {
+    id?: string;
+    uid?: string;
+    user_id: number;
+    payment_strategy_id: number;
+    status: OrderStatus;
+    total: number;
+    b2b_discount_id?: number;
+}
+
+export enum OrderStatus {
+    New = 'new',
+    InProgress = 'inProgress',
+    Completed = 'completed',
+    Cancelled = 'cancelled',
+}
+
+
 @Table({
     tableName: 'order',
     updatedAt: 'updated_at',
@@ -41,10 +59,9 @@ export default class Order extends Model<Order> {
     @BelongsTo(() => PaymentStrategy)
     paymentStrategy: PaymentStrategy;
 
-    // TODO set enum
     @Column({
         allowNull: false,
-        defaultValue: 'new'
+        defaultValue: OrderStatus.New
     })
     status: string;
 
@@ -85,14 +102,4 @@ export default class Order extends Model<Order> {
         ];
     }
 
-}
-
-export interface IOrder {
-    id?: string;
-    uid?: string;
-    user_id: number;
-    payment_strategy_id: number;
-    status?: string;
-    total: number;
-    b2b_discount_id?: number;
 }
