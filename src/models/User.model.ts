@@ -50,3 +50,7 @@ export type IUser = {
     b2b_discount_group_id?: number;
     b2bDiscountGroup?: B2BDiscountGroup;
 };
+
+export type IUserJWTPayload = Omit<IUser, 'b2bDiscountGroup' | 'userAddresses' | 'is_admin'>
+
+export type IAdminUserJWTPayload = Pick<IUserJWTPayload, 'email' | 'name' | 'id'>

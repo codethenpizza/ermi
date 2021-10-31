@@ -3,10 +3,11 @@ import {NextFunction, Request, Response} from "express";
 import B2BDiscount from "@models/B2BDiscount.model";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
 import B2BDiscountGroup, {IB2BDiscountGroup} from "@models/B2BDiscountGroup.model";
+import {isAuth} from "../../../../middlewares/auth";
 
 export class B2BDiscountGroupCreateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, B2BDiscountGroup, any>, res: Response, next: NextFunction) {

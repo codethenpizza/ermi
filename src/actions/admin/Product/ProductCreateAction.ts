@@ -1,11 +1,12 @@
 import {NextFunction, Request, Response} from "express";
 import Product, {IProduct} from "@models/Product.model";
 import {Action} from "@projTypes/action";
+import {isAuth} from "../../../middlewares/auth";
 
 
 export class ProductCreateAction implements Action{
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, IProduct, any>, res: Response, next: NextFunction) {

@@ -1,6 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import AttrType from "@models/AttrType.model";
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqBody = {
     type: string;
@@ -8,7 +9,7 @@ type ReqBody = {
 
 export class AttrTypeCreateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, ReqBody, any>, res: Response, next: NextFunction) {

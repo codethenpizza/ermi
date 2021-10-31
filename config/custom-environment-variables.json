@@ -12,7 +12,7 @@
     "protocol": "ELASTIC_PROTOCOL"
   },
   "auth": {
-    "secret": "AUTH_SECRET"
+    "secret": "1b7551649ee6426d0c0f1a596682a3f7264ecc98c3000f6a2f0842573dcd4c680af1493a281878fb1a6d1c04ab48c2bcef7571658675f480103104d725fc589c"
   },
   "suppliersConfig": {
     "ProductMapperStoreLimit": "SUP_CONF_MAPPER_STORE_LIMIT"

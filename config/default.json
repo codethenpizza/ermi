@@ -21,7 +21,7 @@
     "port": "6379"
   },
   "auth": {
-    "secret": ""
+    "secretAccessToken": ""
   },
   "suppliersConfig": {
     "ProductMapperStoreLimit": 1000

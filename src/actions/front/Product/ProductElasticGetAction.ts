@@ -5,6 +5,7 @@ import {setUser} from "../../../middlewares/auth";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
 import {EsProductVariant} from "@actions/front/types";
 import {JWTPayload} from "@core/services/AuthService";
+import {IUserJWTPayload} from "@models/User.model";
 
 export class ProductElasticGetAction implements Action {
     get action() {
@@ -21,7 +22,7 @@ export class ProductElasticGetAction implements Action {
             const resp = await esProduct.es.get(req.params.id);
             if (resp) {
                 let product = resp.body._source;
-                const JWTPayload: JWTPayload = req.user as JWTPayload;
+                const JWTPayload = req.user as JWTPayload<IUserJWTPayload>;
                 if (JWTPayload?.user) {
                     product = await B2BDiscountService.enrichESProductByB2BUserDiscount(JWTPayload.user, product) as EsProductVariant;
                 }

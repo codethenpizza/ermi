@@ -11,6 +11,7 @@ import {ImageController} from "@controllers/admin/ImageController";
 import {OrderAdminController} from "@controllers/admin/OrderAdminController";
 import {UserAdminController} from "@controllers/admin/UserController";
 import {B2BController} from "@controllers/admin/B2BController";
+import {AuthController} from "@controllers/admin/AuthController";
 
 export const AdminController = createController([
     {method: 'use', path: '/attrs', action: AttributeController},
@@ -25,4 +26,5 @@ export const AdminController = createController([
     {method: 'use', path: '/order', action: OrderAdminController},
     {method: 'use', path: '/user', action: UserAdminController},
     {method: 'use', path: '/b2b', action: B2BController},
+    {method: 'use', path: '/auth', action: AuthController},
 ]);

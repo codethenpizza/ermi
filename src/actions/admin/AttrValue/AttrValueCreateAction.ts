@@ -1,11 +1,12 @@
 import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import AttrValue, {IAttrValue} from "@models/AttrValue.model";
+import {isAuth} from "../../../middlewares/auth";
 
 
 export class AttrValueCreateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, IAttrValue, any>, res: Response, next: NextFunction) {
