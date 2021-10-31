@@ -14,3 +14,8 @@
 
 ## migrate
 `npm run migrate`
+
+
+## generate token secret
+`node`
+`require('crypto').randomBytes(64).toString('hex')`

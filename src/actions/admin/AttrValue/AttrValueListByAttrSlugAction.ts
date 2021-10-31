@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import Attribute from "@models/Attribute.model";
 import AttrValue from "@models/AttrValue.model";
-
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     slug: string;
@@ -10,7 +10,7 @@ type ReqParams = {
 
 export class AttrValueListByAttrSlugAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {

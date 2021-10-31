@@ -1,12 +1,13 @@
 import {Action} from "@projTypes/action";
-import {NextFunction, Response, Request} from "express";
+import {NextFunction, Request, Response} from "express";
 import Image from "@models/Image.model";
 import {UploadedFile} from "express-fileupload";
+import {isAuth} from "../../../middlewares/auth";
 
 
 export class ImageUploadAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {

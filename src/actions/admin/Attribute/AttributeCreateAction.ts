@@ -2,10 +2,11 @@ import {NextFunction, Request, Response} from "express";
 import Attribute, {IAttribute} from "@models/Attribute.model";
 import {Action} from "@projTypes/action";
 import {catchError} from "@actions/admin/Attribute/helper";
+import {isAuth} from "../../../middlewares/auth";
 
 export class AttributeCreateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, IAttribute, any>, res: Response, next: NextFunction) {

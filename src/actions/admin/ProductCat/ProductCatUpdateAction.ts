@@ -3,6 +3,7 @@ import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import Attribute from "@models/Attribute.model";
 import {IProductCategory} from "@models/ProductCategory.model";
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -10,7 +11,7 @@ type ReqParams = {
 
 export class ProductCatUpdateAction extends Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {

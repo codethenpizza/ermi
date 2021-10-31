@@ -2,6 +2,7 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
+import {isAuth} from "../../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -9,7 +10,7 @@ type ReqParams = {
 
 export class B2BDiscountGroupRemoveAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {

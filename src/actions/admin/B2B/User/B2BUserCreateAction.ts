@@ -2,10 +2,11 @@ import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {IUser} from "@models/User.model";
 import {AuthService} from "@core/services/AuthService";
+import {isAuth} from "../../../../middlewares/auth";
 
 export class B2BUserCreateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {

@@ -7,6 +7,7 @@ import {EsQueryBuilder} from "../../../helpers/EsQueryBuilder";
 import {setUser} from "../../../middlewares/auth";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
 import {JWTPayload} from "@core/services/AuthService";
+import {IUserJWTPayload} from "@models/User.model";
 
 const MAX_INT = 2147483647;
 
@@ -62,7 +63,7 @@ export class ProductElasticSearchAction implements Action {
             let products: EsProductVariant[] = body.hits.hits
                 .map<EsProductVariant>((item) => item._source);
 
-            const JWTPayload: JWTPayload = user as JWTPayload;
+            const JWTPayload = user as JWTPayload<IUserJWTPayload>;
             if (JWTPayload?.user?.b2b_discount_group_id) {
                 products = await B2BDiscountService.enrichESProductByB2BUserDiscount(JWTPayload.user, products) as EsProductVariant[];
             }

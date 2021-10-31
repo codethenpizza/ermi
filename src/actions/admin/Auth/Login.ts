@@ -14,7 +14,8 @@ export class Login implements Action {
 
     async handle({body: {email, password}}: Request<any, any, Partial<IUser>, any>, res: Response) {
         try {
-            const resp = await AuthService.login(email, password);
+            const resp = await AuthService.loginAdmin(email, password);
+            res.setHeader('authorization', resp.token)
             res.status(200).json(resp);
         } catch (e) {
             console.log(e);

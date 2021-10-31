@@ -5,6 +5,7 @@ import ProductVariant from "@models/ProductVariant.model";
 import AttrValue from "@models/AttrValue.model";
 import Attribute from "@models/Attribute.model";
 import Image from "@models/Image.model";
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -12,7 +13,7 @@ type ReqParams = {
 
 export class ProductGetAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {

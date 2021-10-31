@@ -3,6 +3,7 @@ import {NextFunction, Request, Response} from "express";
 import {IB2BDiscountGroup} from "@models/B2BDiscountGroup.model";
 import B2BDiscount from "@models/B2BDiscount.model";
 import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
+import {isAuth} from "../../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -10,7 +11,7 @@ type ReqParams = {
 
 export class B2BDiscountGroupUpdateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, IB2BDiscountGroup, any>, res: Response, next: NextFunction) {
