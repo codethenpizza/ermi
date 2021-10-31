@@ -1,12 +1,14 @@
 import {BelongsToMany, Column, Model, Table} from "sequelize-typescript";
 import {UploadedFile} from "express-fileupload";
 import sharp from 'sharp';
-import ProductVariantImg from "@models/ProductVariantImg.model";
-import ProductVariant from "@models/ProductVariant.model";
-import {getFileStrategy} from "@core/files/FileStrategy";
 import {images} from 'config';
 import {Transaction} from "sequelize";
 import slugify from "slugify";
+
+import ProductVariantImg from "@models/ProductVariantImg.model";
+import ProductVariant from "@models/ProductVariant.model";
+import {FileStrategyHelper} from "@core/files/FileStrategy";
+
 import {splitImageNameByExt} from "../helpers/utils";
 
 
@@ -53,7 +55,7 @@ export default class Image extends Model<Image> {
             size,
             mimetype
         }: Partial<UploadedFile>, transaction?: Transaction): Promise<Image> {
-        const strategy = getFileStrategy();
+        const strategy = FileStrategyHelper.getInstance();
 
         const {name: normalName, ext} = splitImageNameByExt(slugify(name, {lower: true}));
 
@@ -108,7 +110,7 @@ export default class Image extends Model<Image> {
         const image = await Image.findByPk(id);
 
         if (image) {
-            const strategy = getFileStrategy();
+            const strategy = FileStrategyHelper.getInstance();
 
             await strategy.delete(image.original_uri);
             await strategy.delete(image.large_uri);

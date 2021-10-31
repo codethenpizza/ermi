@@ -10,6 +10,7 @@
     "build": "tsc",
     "dev": "nodemon",
     "cmd": "ts-node -r tsconfig-paths/register scripts/commands.ts",
+    "cmd debug": "node -r ts-node/register -r tsconfig-paths/register --inspect scripts/commands.ts",
     "migrate": "npm run cmd migrate",
     "runner": "npm run set-max-space && ts-node -r tsconfig-paths/register src/modules/suppliers/index.ts",
     "reindex": "npm run set-max-space && npm run cmd es update-index",
