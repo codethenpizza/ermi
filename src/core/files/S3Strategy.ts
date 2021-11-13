@@ -39,13 +39,16 @@ export class S3Strategy implements FileStrategy {
         const dir = this.productDir ? `${this.productDir}/` : '';
         const Key = rewrite ? `${dir}${name}` : await this.getUniName(`${dir}${name}`);
 
-        await this.s3Client.send(new PutObjectCommand({
+        const r = await this.s3Client.send(new PutObjectCommand({
             Bucket: this.Bucket,
             Key,
             Body,
             ContentType
         }));
 
+        if (r.$metadata.httpStatusCode !== 200) {
+            throw new Error(`Image create error: ${JSON.stringify(r, null, 2)}`);
+        }
         return `https://${this.Bucket}/${Key}`;
     }
 

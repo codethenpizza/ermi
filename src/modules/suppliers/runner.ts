@@ -2,7 +2,6 @@ import {ProductMapper} from "./ProductMapper";
 //suppliers
 import {SupplierRim} from "./helpers/rimProductType/rimTypes";
 import {Slik} from "./models/Slik/Slik";
-import {Kolrad} from "./models/Kolrad/Kolrad";
 import {Diskoptim} from "./models/Diskoptim/Diskoptim";
 import {Discovery} from "./models/Discovery/Discovery";
 
@@ -10,7 +9,7 @@ const suppliers: Array<SupplierRim> = [
     new Discovery(),
     new Slik(),
     new Diskoptim(),
-    new Kolrad(),
+    // new Kolrad(),
 ];
 
 export const fetchAll = async () => {

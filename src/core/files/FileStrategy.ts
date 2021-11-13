@@ -13,12 +13,21 @@ export interface FileStrategy {
     delete(filePath: string): Promise<void>;
 }
 
-export const getFileStrategy = (): FileStrategy => {
-    switch (fileStrategy) {
-        case 's3':
-            return new S3Strategy();
-        case 'local':
-        default:
-            return new LocalStrategy();
+export class FileStrategyHelper {
+    private static fs: FileStrategy;
+
+    static getInstance(): FileStrategy {
+        if (!this.fs) {
+            switch (fileStrategy) {
+                case 's3':
+                    this.fs = new S3Strategy();
+                    break;
+                case 'local':
+                default:
+                    this.fs = new LocalStrategy();
+            }
+        }
+
+        return this.fs;
     }
-};
+}
