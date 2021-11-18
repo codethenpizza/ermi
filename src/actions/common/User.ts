@@ -1,7 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import {IUser} from "@models/User.model";
-import {isAuth} from "../../../middlewares/auth";
+import {isAuth} from "../../middlewares/auth";
 
 export class User implements Action {
     get action() {

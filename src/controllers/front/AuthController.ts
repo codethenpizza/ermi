@@ -1,7 +1,7 @@
 import {createController} from "@core/Controller";
 import {Register} from "@actions/front/Auth/Register";
 import {Login} from "@actions/front/Auth/Login";
-import {User} from "@actions/front/Auth/User";
+import {User} from "@actions/common/User";
 import {RefreshTokenAction} from "@actions/common/RefreshTokenAction"
 
 export const AuthController = createController([
