@@ -157,10 +157,9 @@ export class AuthService {
         })
 
         const newAccessToken = AuthService.generateToken(token.user);
-        const newRefreshToken = await AuthService.generateRefreshToken(token.user.id);
         return {
             token: newAccessToken,
-            refreshToken: newRefreshToken
+            refreshToken: refreshToken
         }
     }
 }
