@@ -1,7 +1,7 @@
 import {NextFunction, Request} from "express";
 import User, {IUser} from "@models/User.model";
 import {Action} from "@projTypes/action";
-
+import {isAuth} from "../../../middlewares/auth";
 
 class UserCreateAction extends Action {
 
@@ -17,7 +17,7 @@ class UserCreateAction extends Action {
     }
 
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
 }

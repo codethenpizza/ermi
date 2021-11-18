@@ -3,6 +3,7 @@ import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import AttrSet from "@models/AttrSet.model";
 import {ForeignKeyConstraintError, UniqueConstraintError} from "sequelize";
+import {isAuth} from "../../../middlewares/auth";
 
 const catchError = (e, res: Response) => {
     if (e instanceof UniqueConstraintError) {
@@ -26,7 +27,7 @@ type reqType = {
 
 export class AttrSetUpdateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, reqType, any>, res: Response, next: NextFunction) {

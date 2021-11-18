@@ -1,6 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import Image from "@models/Image.model";
+import {isAuth} from "../../../middlewares/auth";
 
 type QueryParams = {
     limit: string;
@@ -9,7 +10,7 @@ type QueryParams = {
 
 export class ImageListAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {

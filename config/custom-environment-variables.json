@@ -12,7 +12,9 @@
     "protocol": "ELASTIC_PROTOCOL"
   },
   "auth": {
-    "secret": "AUTH_SECRET"
+    "secret": "AUTH_SECRET",
+    "refreshTokenLifetime": "REFRESH_TOKEN_LIFETIME",
+    "accessTokenLifetime": "ACCESS_TOKEN_LIFETIME"
   },
   "suppliersConfig": {
     "ProductMapperStoreLimit": "SUP_CONF_MAPPER_STORE_LIMIT"

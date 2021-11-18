@@ -21,7 +21,9 @@
     "port": "6379"
   },
   "auth": {
-    "secret": ""
+    "secret": "",
+    "refreshTokenLifetime": "2000",
+    "accessTokenLifetime": "1m"
   },
   "suppliersConfig": {
     "ProductMapperStoreLimit": 1000

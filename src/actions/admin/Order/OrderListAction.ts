@@ -1,11 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import Product from "@models/Product.model";
 import {Action} from "@projTypes/action";
-import ProductVariant from "@models/ProductVariant.model";
-import AttrValue from "@models/AttrValue.model";
-import Attribute from "@models/Attribute.model";
-import Image from "@models/Image.model";
 import Order from "@models/Order.model";
+import {isAuth} from "../../../middlewares/auth";
 
 export class OrderListAction implements Action {
 
@@ -13,7 +9,7 @@ export class OrderListAction implements Action {
     }
 
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {

@@ -3,10 +3,11 @@ import {NextFunction, Request, Response} from "express";
 import User from "@models/User.model";
 import {Op} from "sequelize";
 import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
+import {isAuth} from "../../../../middlewares/auth";
 
 export class B2BUserListAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {

@@ -1,6 +1,6 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
-import {IUser} from "@models/User.model";
+import {IUser, IUserJWTPayload} from "@models/User.model";
 import {isAuth} from "../../../middlewares/auth";
 import {JWTPayload} from "@core/services/AuthService";
 import {OrderService} from "@core/services/order/OrderService";
@@ -18,7 +18,7 @@ export class OrderHistoryAction implements Action {
     async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response<OrderResp[]>) {
         try {
             const orderService = new OrderService();
-            const JWTPayload: JWTPayload = user as JWTPayload;
+            const JWTPayload = user as JWTPayload<IUserJWTPayload>;
             const orders = await orderService.getUserOrders(JWTPayload.user);
             res.send(orders);
         } catch (e) {
