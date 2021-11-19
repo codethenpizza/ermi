@@ -1,6 +1,7 @@
-import {BelongsTo, Column, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, ForeignKey, HasMany, HasOne, Model, Table} from "sequelize-typescript";
 import UserAddress, {IUserAddress} from "@models/UserAddress.model";
 import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
+import RefreshToken from "@models/RefreshToken.model";
 
 @Table({
     tableName: 'user',
@@ -37,6 +38,9 @@ export default class User extends Model<User> {
 
     @HasMany(() => UserAddress)
     userAddresses: UserAddress[];
+
+    @HasOne(() => RefreshToken)
+    refreshToken: RefreshToken;
 }
 
 export type IUser = {
@@ -50,3 +54,7 @@ export type IUser = {
     b2b_discount_group_id?: number;
     b2bDiscountGroup?: B2BDiscountGroup;
 };
+
+export type IUserJWTPayload = Omit<IUser, 'b2bDiscountGroup' | 'userAddresses' | 'is_admin'>
+
+export type IAdminUserJWTPayload = Pick<IUserJWTPayload, 'email' | 'name' | 'id'>

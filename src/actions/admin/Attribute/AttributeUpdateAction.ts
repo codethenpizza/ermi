@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {Action} from "@projTypes/action";
 import Attribute, {IAttribute} from "@models/Attribute.model";
 import {catchError} from "@actions/admin/Attribute/helper";
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -9,7 +10,7 @@ type ReqParams = {
 
 export class AttributeUpdateAction implements Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {

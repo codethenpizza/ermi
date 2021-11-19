@@ -1,6 +1,7 @@
 import {Action} from "@projTypes/action";
 import {NextFunction, Request, Response} from "express";
 import AttrType from "@models/AttrType.model";
+import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
@@ -8,7 +9,7 @@ type ReqParams = {
 
 export class AttrTypeDeleteAction extends Action {
     get action() {
-        return [this.assert, this.handle];
+        return [isAuth, this.assert, this.handle];
     }
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
