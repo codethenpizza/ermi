@@ -22,8 +22,8 @@
   },
   "auth": {
     "secret": "",
-    "refreshTokenLifetime": "2000",
-    "accessTokenLifetime": "1m"
+    "accessTokenLifetime": "6h",
+    "refreshTokenLifetime": "604800"
   },
   "suppliersConfig": {
     "ProductMapperStoreLimit": 1000
