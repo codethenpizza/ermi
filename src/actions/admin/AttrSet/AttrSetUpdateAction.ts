@@ -1,9 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import AttrSet from "@models/AttrSet.model";
+import {Action} from "@actions/Action";
 import {ForeignKeyConstraintError, UniqueConstraintError} from "sequelize";
-import {isAuth} from "../../../middlewares/auth";
 
 const catchError = (e, res: Response) => {
     if (e instanceof UniqueConstraintError) {
@@ -25,10 +23,7 @@ type reqType = {
     attributes?: number[];
 };
 
-export class AttrSetUpdateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrSetUpdateAction extends Action {
 
     assert(req: Request<ReqParams, any, reqType, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
@@ -40,9 +35,9 @@ export class AttrSetUpdateAction implements Action {
 
     async handle(req: Request<ReqParams, any, reqType, any>, res: Response) {
         try {
-            const id = parseInt(req.params.id);
-            const set = await AttrSet.updateWR({id, ...req.body});
-            res.send(set);
+            // const id = parseInt(req.params.id);
+            // const set = await AttrSet.updateWR({id, ...req.body});
+            // res.send(set);
         } catch (error) {
             catchError(error, res);
         }

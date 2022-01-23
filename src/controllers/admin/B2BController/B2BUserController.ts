@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {B2BUserListAction} from "@actions/admin/B2B/User/B2BUserListAction";
 import {B2BUserCreateAction} from "@actions/admin/B2B/User/B2BUserCreateAction";
 import {B2BUserUpdateAction} from "@actions/admin/B2B/User/B2BUserUpdateAction";

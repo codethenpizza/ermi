@@ -1,11 +1,14 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {AuthService} from "@core/services/AuthService";
-import {IUser} from "@models/User.model";
+import {authService} from "@core/services";
+import {IUser} from "@core/models/User.model";
 
-export class Login implements Action {
-    get action() {
-        return [this.assert, this.handle];
+export class Login extends Action {
+
+    constructor(
+        private _authService = authService
+    ) {
+        super();
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
@@ -14,7 +17,7 @@ export class Login implements Action {
 
     async handle({body: {email, password}}: Request<any, any, Partial<IUser>, any>, res: Response) {
         try {
-            const resp = await AuthService.login(email, password);
+            const resp = await this._authService.login(email, password);
             res.status(200).json(resp);
         } catch (e) {
             console.log(e);

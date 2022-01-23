@@ -1,13 +1,9 @@
 import {NextFunction, Request, Response} from "express";
-import Product, {IProduct} from "@models/Product.model";
-import {Action} from "@projTypes/action";
-import {isAuth} from "../../../middlewares/auth";
+import {IProduct} from "@core/models/Product.model";
+import {Action} from "@actions/Action";
 
 
-export class ProductCreateAction implements Action{
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ProductCreateAction extends Action {
 
     assert(req: Request<any, any, IProduct, any>, res: Response, next: NextFunction) {
         const {name, variants} = req.body;
@@ -19,11 +15,11 @@ export class ProductCreateAction implements Action{
     }
 
     async handle(req: Request<any, any, IProduct, any>, res: Response) {
-        try {
-            const product = await Product.createWR(req.body);
-            res.send(product);
-        } catch (error) {
-            res.status(500).send({error});
-        }
+        // try {
+        //     const product = await Product.createWR(req.body);
+        //     res.send(product);
+        // } catch (error) {
+        //     res.status(500).send({error});
+        // }
     }
 }

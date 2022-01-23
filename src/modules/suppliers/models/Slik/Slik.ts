@@ -1,20 +1,24 @@
 import config from 'config';
 import FTP from 'ftp';
 import XmlStream from 'xml-stream';
-import parseDouble from "../../../../helpers/parseDouble";
-import {STOCK_TOLYATTI, Supplier} from "../../types";
-import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
-import Product from "@models/Product.model";
+import {RimMap, Stock, SupplierRim} from "../../productTypes/rim/rimTypes";
 import SlikModel, {ISilkRaw} from "./Slik.model";
-import {rimType} from "../../helpers/constants";
+import {ParsedData} from "../../types";
+import {Supplier} from "../../interfaces/Supplier";
+import {STOCK_TOLYATTI} from "../../constants";
+import parseDouble from "@core/helpers/parseDouble";
+import {rimType} from "../../productTypes/rim/constants";
 
 
-export class Slik implements Supplier, SupplierRim {
-    readonly name = 'slik'
+export class Slik extends Supplier implements SupplierRim {
 
-    async fetchData(): Promise<void> {
+    readonly name = 'Slik'
+
+    async loadData(): Promise<void> {
         return new Promise((resolve, reject) => {
-            console.log('Start fetch Slik');
+
+            console.log(`Start fetch ${this.name}`);
+
             let counter = 0;
             let errCounter = 0;
             try {
@@ -39,7 +43,7 @@ export class Slik implements Supplier, SupplierRim {
                         xml.on('end', async () => {
                             ftp.end();
                             await Promise.all(functions);
-                            console.log(`End fetch Slik. Total: [${counter}] Errors: [${errCounter}]`);
+                            console.log(`End fetch ${this.name}. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
                     });
@@ -56,35 +60,34 @@ export class Slik implements Supplier, SupplierRim {
         return SlikModel.count();
     }
 
-    async getProductData(): Promise<Product[]> {
-        return undefined;
-    }
-
-    async getRims(limit, offset): Promise<RimMap[]> {
-        console.log('Start store Slik');
+    async getRims(limit, offset): Promise<ParsedData<RimMap>[]> {
         const rawData = await SlikModel.findAll({
             limit,
             offset
         });
 
-        return rawData.map<RimMap>((item) => {
-            const supplier = 'slik';
+        const parsedData: ParsedData<RimMap>[] = [];
 
-            const stock: RimStock[] = [
+        const vendorID = await this.getVendorId();
+
+        for (const item of rawData) {
+
+            const stock: Stock[] = [
                 {
                     name: STOCK_TOLYATTI,
-                    shippingTime: '6-8',
+                    shippingTime: {
+                        from: 6,
+                        to: 8
+                    },
                     count: item.count === '*' ? 20 : parseDouble(item.count) || 0
                 }
             ];
 
-            return {
-                uid: `${this.name}_${item.code}`,
-                supplier: this.name,
+            const inStockQty = stock.reduce<number>((acc, {count}) => acc += count, 0);
+
+            const productAttrs: RimMap = {
                 model: item.model,
                 brand: item.brand,
-                image: item.image && encodeURI(item.image),
-                price: parseDouble(item.price),
                 pcd: `${item.bolts_count}X${parseDouble(item.bolts_spacing)}`,
                 width: parseDouble(item.width),
                 color: item.color || null,
@@ -94,11 +97,36 @@ export class Slik implements Supplier, SupplierRim {
                 et: parseDouble(item.et),
                 type: rimType.alloy,
                 dia: parseDouble(item.dia),
-                color_name: item.color,
-                stock: JSON.stringify(stock),
-                inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
+                countryOfOrigin: item.cnt_mnf
             };
-        });
+
+            const itemData: ParsedData<RimMap> = {
+                offerData: {
+                    price: parseDouble(item.price),
+                    imageUrls: item.image ? [encodeURI(item.image)] : [],
+                    is_available: inStockQty > 0,
+                    vendor_code: item.code,
+                    vendor_id: vendorID,
+                    in_stock_qty: inStockQty,
+                    stock: JSON.stringify(stock),
+                },
+                attrValuesMap: productAttrs,
+                productData: {
+                    name: `${item.brand} ${item.model}`,
+                    cat_ids: [],
+                    productVariant: {
+                        images: [],
+                        attrs: [], // will be mapped later
+                        is_available: true,
+                    }
+                }
+            };
+
+            parsedData.push(itemData);
+
+        }
+
+        return parsedData;
     }
 }
 

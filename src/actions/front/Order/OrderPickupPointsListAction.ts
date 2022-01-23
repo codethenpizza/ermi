@@ -1,15 +1,9 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import ShippingType from "@models/ShippingType.model";
-import PaymentStrategy from "@models/PaymentStrategy.model";
-import PickupPoint from "@models/PickupPoint.model";
-import Address from "@models/Address.model";
+import PickupPoint from "@core/models/PickupPoint.model";
+import Address from "@core/models/Address.model";
 
-export class OrderPickupPointsListAction implements Action {
-
-    get action() {
-        return [this.assert, this.handle.bind(this)];
-    }
+export class OrderPickupPointsListAction extends Action {
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

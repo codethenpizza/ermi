@@ -1,17 +1,14 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import Attribute, {IAttribute} from "@models/Attribute.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import Attribute, {IAttribute} from "@core/models/Attribute.model";
 
 type ReqParams = {
     id: string;
 };
 
 export class AttrTypeUpdateAction extends Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {

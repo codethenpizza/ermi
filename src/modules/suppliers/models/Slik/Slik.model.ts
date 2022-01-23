@@ -5,8 +5,7 @@ import {Column, DataType, Model, Table} from "sequelize-typescript";
     updatedAt: 'updated_at',
     createdAt: 'created_at'
 })
-export default class SlikModel extends Model<ISilkRaw> {
-
+export default class SlikModel extends Model<ISilkRaw> implements ISilkRaw {
     @Column({
         unique: true,
         allowNull: false
@@ -89,6 +88,12 @@ export default class SlikModel extends Model<ISilkRaw> {
 
     @Column
     count_nsb: string;
+
+    @Column
+    cnt_mnf: string;
+
+    @Column
+    onlyR: string;
 }
 
 export interface ISilkRaw {
@@ -118,6 +123,8 @@ export interface ISilkRaw {
     count_rst: string;
     count_chl: string;
     count_nsb: string;
+    cnt_mnf: string;
+    onlyR: string;
 }
 
 export interface ISilkRim {

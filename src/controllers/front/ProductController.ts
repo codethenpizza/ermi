@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {ProductElasticSearchAction} from "@actions/front/Product/ProductElasticSearchAction";
 import {ProductElasticGetAction} from "@actions/front/Product/ProductElasticGetAction";
 import {SearchByAxlesAction} from "../../modules/4wheels/actions/SearchByAxlesAction";

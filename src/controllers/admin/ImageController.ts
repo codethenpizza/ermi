@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {ImageUploadAction} from "@actions/admin/Image/ImageUploadAction";
 import {ImageDeleteAction} from "@actions/admin/Image/ImageDeleteAction";
 import {ImageListAction} from "@actions/admin/Image/ImageListAction";

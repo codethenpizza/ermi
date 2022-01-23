@@ -1,4 +1,4 @@
-import {createController} from "../../core/Controller";
+import {createController} from "../Controller";
 import {ProductCatListAction} from "@actions/admin/ProductCat/ProductCatListAction";
 import {ProductCatUpdateAction} from "@actions/admin/ProductCat/ProductCatUpdateAction";
 import {ProductCatCreateAction} from "@actions/admin/ProductCat/ProductCatCreateAction";

@@ -1,13 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import AttrType from "@models/AttrType.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import AttrType from "@core/models/AttrType.model";
 
 export class AttrTypeListAction extends Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

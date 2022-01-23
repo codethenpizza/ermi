@@ -1,16 +1,13 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import User, {IUser} from "@models/User.model";
-import {isAuth} from "../../../../middlewares/auth";
+import User, {IUser} from "@core/models/User.model";
 
 type ReqParams = {
     id: string;
 };
 
-export class B2BUserUpdateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class B2BUserUpdateAction extends Action {
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id, 10))) {

@@ -1,15 +1,9 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import Order from "@models/Order.model";
+import Order from "@core/models/Order.model";
 import {catchError} from "@actions/admin/Attribute/helper";
 
-export class OrderUpdateAction implements Action {
-    constructor() {
-    }
-
-    get action() {
-        return [this.assert, this.handle];
-    }
+export class OrderUpdateAction extends Action {
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         if (!req.params.id) {
@@ -28,7 +22,7 @@ export class OrderUpdateAction implements Action {
             const id = parseInt(req.params.id);
             const {status} = req.body
             const updateResult = await Order.update({status}, {where: {id: id}})
-            const isUpdated = !!updateResult[0];
+            const isUpdated = Boolean(updateResult[0]);
             if (isUpdated) {
                 res.status(202).send();
             } else {

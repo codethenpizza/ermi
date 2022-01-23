@@ -1,13 +1,10 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import AttrValue, {IAttrValue} from "@models/AttrValue.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import AttrValue, {IAttrValue} from "@core/models/AttrValue.model";
 
 
-export class AttrValueCreateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrValueCreateAction extends Action {
+
 
     assert(req: Request<any, any, IAttrValue, any>, res: Response, next: NextFunction) {
         const {product_variant_id, attr_id, value} = req.body;

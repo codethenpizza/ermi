@@ -1,9 +1,9 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
 import {WheelSizeApi} from "../index";
 import slugify from "slugify";
 import {SearchRespBodyItem} from "../types";
-import {RIM_DIAMETER, RIM_ET, RIM_PCD, RIM_WIDTH} from "../../suppliers/helpers/rimProductType/rimTypes";
+import {RIM_DIAMETER, RIM_ET, RIM_PCD, RIM_WIDTH} from "../../suppliers/productTypes/rim/rimTypes";
 
 interface ReqBody {
     make: string;

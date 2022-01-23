@@ -1,17 +1,14 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import Attribute from "@models/Attribute.model";
-import AttrValue from "@models/AttrValue.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import Attribute from "@core/models/Attribute.model";
+import AttrValue from "@core/models/AttrValue.model";
 
 type ReqParams = {
     slug: string;
 };
 
-export class AttrValueListByAttrSlugAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrValueListByAttrSlugAction extends Action {
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         next();

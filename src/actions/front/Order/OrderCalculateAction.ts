@@ -1,23 +1,28 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {OrderService} from "@core/services/order/OrderService";
-import {CreateOrderData} from "@core/services/order/types";
+import {ICreateOrderData} from "@core/services/order/types";
 import {setUser} from "../../../middlewares/auth";
+import {orderUseCases} from "@core/useCases";
 
-export class OrderCalculateAction implements Action {
 
-    orderService = new OrderService();
+export class OrderCalculateAction extends Action {
+
+    constructor(
+        private _orderUseCases = orderUseCases
+    ) {
+        super();
+    }
 
     get action() {
-        return [setUser, this.assert, this.handle.bind(this)];
+        return [setUser, ...super.action];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();
     }
 
-    async handle(req: Request<any, any, CreateOrderData, any>, res: Response) {
-        const result = await this.orderService.calculateOrder(req.body);
+    async handle(req: Request<any, any, ICreateOrderData, any>, res: Response) {
+        const result = await this._orderUseCases.calculate(req.body);
         res.send(result);
     }
 

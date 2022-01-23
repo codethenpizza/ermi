@@ -6,8 +6,8 @@ import {Transaction} from "sequelize";
 export class NotificationService {
 
     constructor(
-        private mailService: MailService = new MailService(),
-        private smsService: SMSService = new SMSService()
+        private mailService: MailService,
+        private smsService: SMSService
     ) {
     }
 

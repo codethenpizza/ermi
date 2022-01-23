@@ -1,11 +1,11 @@
-import User from "@models/User.model";
-import {IOrderProduct} from "@models/OrderProduct.model";
-import {CreateOrderDataMeta} from "@core/services/order/types";
-import {CalculateShippingResult} from "@core/services/order/shipping/types";
+import User from "@core/models/User.model";
+import {IOrderOfferCalculate} from "@core/models/OrderOffer.model";
+import {ICreateOrderDataMeta} from "@core/services/order/types";
+import {ICalculateShippingResult} from "@core/services/order/shipping/types";
 
 export interface CalculateDiscountData {
     user: User;
-    orderProducts: IOrderProduct[];
-    shipping: CalculateShippingResult[];
-    meta?: CreateOrderDataMeta[];
+    orderProducts: IOrderOfferCalculate[];
+    shipping: ICalculateShippingResult[];
+    meta?: ICreateOrderDataMeta[];
 }

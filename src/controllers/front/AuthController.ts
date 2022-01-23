@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {Register} from "@actions/front/Auth/Register";
 import {Login} from "@actions/front/Auth/Login";
 import {User} from "@actions/common/User";

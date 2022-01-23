@@ -1,20 +1,23 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {AuthService} from "@core/services/AuthService";
-import {IUser} from "@models/User.model";
+import {authService} from "@core/services";
+import {IUserCreate} from "@core/models/User.model";
 
-export class Register implements Action {
-    get action() {
-        return [this.assert, this.handle];
+export class Register extends Action {
+
+    constructor(
+        private _authService = authService
+    ) {
+        super();
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();
     }
 
-    async handle({body}: Request<any, any, Partial<IUser>, any>, res: Response) {
+    async handle({body}: Request<any, any, IUserCreate, any>, res: Response) {
         try {
-            const resp = await AuthService.register(body)
+            const resp = await this._authService.register(body);
             res.send(resp);
         } catch (e) {
             res.status(400).send((e as Error).message);

@@ -1,0 +1,24 @@
+{
+  "dbConfig": {
+    "name": "test",
+    "user": "test",
+    "pass": "test123",
+    "port": 3307
+  },
+  "elastic": {
+    "host": "localhost",
+    "port": "9201",
+    "protocol": "http"
+  },
+  "redis": {
+    "host": "localhost",
+    "port": "6380"
+  },
+  "auth": {
+    "secret": "qwerty",
+    "accessTokenLifetime": "6h",
+    "refreshTokenLifetime": "604800"
+  },
+  "fileStrategy": "local",
+  "cacheStrategy": "local"
+}

@@ -1,13 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import ProductCategory from "@models/ProductCategory.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import ProductCategory from "@core/models/ProductCategory.model";
 
 export class ProductCatListAction extends Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+    
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

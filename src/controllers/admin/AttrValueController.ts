@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {AttrValueDeleteAction} from "@actions/admin/AttrValue/AttrValueDeleteAction";
 import {AttrValueCreateAction} from "@actions/admin/AttrValue/AttrValueCreateAction";
 import {AttrValueUpdateAction} from "@actions/admin/AttrValue/AttrValueUpdateAction";

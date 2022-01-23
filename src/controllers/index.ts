@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {AdminController} from "@controllers/admin";
 import {FrontController} from "@controllers/front";
 import {HealthCheck} from "@actions/HealthCheck";

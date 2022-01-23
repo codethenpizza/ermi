@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {B2BDiscountGroupListAction} from "@actions/admin/B2B/Discount/B2BDiscountGroupListAction";
 import {B2BDiscountGroupCreateAction} from "@actions/admin/B2B/Discount/B2BDiscountGroupCreateAction";
 import {B2BDiscountGroupUpdateAction} from "@actions/admin/B2B/Discount/B2BDiscountGroupUpdateAction";

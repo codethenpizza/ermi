@@ -1,17 +1,13 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import Image from "@models/Image.model";
-import {isAuth} from "../../../middlewares/auth";
+import Image from "@core/models/Image.model";
 
 type QueryParams = {
     limit: string;
     offset: string;
 };
 
-export class ImageListAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ImageListAction extends Action {
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

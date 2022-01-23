@@ -1,21 +1,18 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import ProductVariant, {IProductVariant} from "@models/ProductVariant.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import ProductVariant, {IProductVariant} from "@core/models/ProductVariant.model";
 
 
-export class ProductVariantCreateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ProductVariantCreateAction extends Action {
+
 
     assert(req: Request<any, any, IProductVariant, any>, res: Response, next: NextFunction) {
-        const {product_id, price} = req.body;
-        if (!product_id && !price) {
-            res.status(400).send({error: 'product_id and price are required params'});
-        } else {
-            next()
-        }
+        // const {product_id, price} = req.body;
+        // if (!product_id && !price) {
+        //     res.status(400).send({error: 'product_id and price are required params'});
+        // } else {
+        next()
+        // }
     }
 
     async handle(req: Request<any, any, IProductVariant, any>, res: Response) {

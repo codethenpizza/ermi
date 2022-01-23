@@ -1,17 +1,14 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import ProductCategory, {IProductCategory} from "@models/ProductCategory.model";
-import {isAuth} from "../../../middlewares/auth";
+import ProductCategory, {IProductCategory} from "@core/models/ProductCategory.model";
 
-export class ProductCatCreateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ProductCatCreateAction extends Action {
+
 
     assert(req: Request<any, any, IProductCategory, any>, res: Response, next: NextFunction) {
         const {name} = req.body;
-        if(name) {
-           next();
+        if (name) {
+            next();
         } else {
             res.status(400).send({error: 'name is required param'});
         }

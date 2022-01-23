@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {Make, Model, SByModelResp, Year} from "./types";
-import {getCacheStrategy} from "@core/cache/CacheStrategy";
+import {getCacheService} from "@core/services/cache/CacheService";
 
 export class WheelSizeApiClient {
 
@@ -9,7 +9,7 @@ export class WheelSizeApiClient {
     constructor(
         private apiKey: string,
         private version = 'v1',
-        private cache = getCacheStrategy()
+        private cache = getCacheService()
     ) {
     }
 

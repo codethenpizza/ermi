@@ -1,3 +1,7 @@
+import {IOffer} from "@core/models/Offer.model";
+import {IProductVariant} from "@core/models/ProductVariant.model";
+import {Elastic} from "@core/services/elastic/types";
+
 export interface EsRespProduct {
     hits: {
         total: {
@@ -6,7 +10,7 @@ export interface EsRespProduct {
         },
         max_score: number;
         hits: {
-            _source: EsProductVariant,
+            _source: Elastic.ProductVariant,
         }[]
     },
     aggregations: {
@@ -30,26 +34,20 @@ export interface Bucket {
 
 export interface EsProductItem {
     id: number;
-    name: string;
     desc?: string;
     cats_ids: number[];
     attr_set_id: number;
-    variants: EsProductVariant[]
 }
 
-export interface EsProductVariant {
-    id?: number;
-    product_id: number;
-    vendor_code: string;
-    desc?: string;
-    price: number;
-    price_discount?: number;
-    weight?: number;
-    in_stock_qty: number;
-    is_available: boolean;
-    is_discount: boolean;
+export interface EsProductVariant extends Omit<IProductVariant, 'productVariantImgs' | 'attrs' | 'offers' | 'product'> {
     attrs: EsAttrValue;
-    images: Image[];
+    offers: IOffer[];
+    name: string;
+    product: EsProductItem;
+}
+
+export interface EsProductVariantOffer extends Omit<EsProductVariant, 'offers'> {
+    offer: IOffer;
 }
 
 export interface EsAttrValue {

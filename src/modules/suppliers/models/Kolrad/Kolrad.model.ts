@@ -1,5 +1,5 @@
 import {Column, Model, Table} from "sequelize-typescript";
-import {RimMap} from "../../helpers/rimProductType/rimTypes";
+import {RimMap} from "../../productTypes/rim/rimTypes";
 
 @Table({
     tableName: 'supplier_kolrad',
@@ -100,13 +100,11 @@ export namespace IKolrad {
         'PCD' = 'PCD'
     }
 
-    export interface ParsedStocks {
-        'stock': {
-            'name': string
-            'quantity': string
-            '$': {
-                'id': string
-            }
+    export interface ParsedStock {
+        'name': string
+        'quantity': string
+        '$': {
+            'id': string
         }
     }
 

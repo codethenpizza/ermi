@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql/mysql-server:8.0
+    environment:
+      TZ: Europe/Moscow
+      MYSQL_ROOT_PASSWORD: 903a987afbca0f6c3d07aa1666b5435e
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test123
+      MYSQL_DATABASE: test
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1 --innodb-buffer-pool-size=1G
+    volumes:
+      - mysql_data_test:/var/lib/mysql
+    tmpfs:
+      - /tmp
+    ports:
+      - 3307:3306
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - es_data_test:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6380:6379
+    volumes:
+      - redis_data_test:/var/lib/redis
+
+volumes:
+  mysql_data_test:
+    driver: local
+  es_data_test:
+    driver: local
+  redis_data_test:
+    driver: local

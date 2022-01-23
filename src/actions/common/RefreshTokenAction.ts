@@ -1,25 +1,28 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {AuthService} from "@core/services/AuthService";
+import {authService} from "@core/services";
 
 
-export class RefreshTokenAction implements Action {
-    get action() {
-        return [this.assert, this.handle];
+export class RefreshTokenAction extends Action {
+
+    constructor(
+        private _authService = authService
+    ) {
+        super();
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
-        const { refreshToken: requestToken } = req.body;
+        const {refreshToken: requestToken} = req.body;
 
         if (requestToken == null) {
-            return res.status(403).json({ message: "Refresh Token is required!" });
+            return res.status(403).json({message: "Refresh Token is required!"});
         }
         next();
     }
 
-    async handle({body: {refreshToken}}: Request<any, any, {refreshToken: string, token: string}, any>, res: Response) {
+    async handle({body: {refreshToken}}: Request<any, any, { refreshToken: string, token: string }, any>, res: Response) {
         try {
-            const tokens = await AuthService.refreshTokens(refreshToken)
+            const tokens = await this._authService.refreshTokens(refreshToken)
             res.status(200).json(tokens)
         } catch (e) {
             console.log(e);

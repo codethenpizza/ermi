@@ -1,9 +1,13 @@
 import {NextFunction, Request} from "express";
-import User, {IUser} from "@models/User.model";
-import {Action} from "@projTypes/action";
+import User, {IUser} from "@core/models/User.model";
+import {Action} from "@actions/Action";
 import {isAuth} from "../../../middlewares/auth";
 
-class UserCreateAction extends Action {
+export class UserCreateAction extends Action {
+
+    get action() {
+        return [isAuth, ...super.action];
+    }
 
     assert(req: Request<any, any, any, any>, res, next: NextFunction) {
         next();
@@ -16,9 +20,4 @@ class UserCreateAction extends Action {
         res.send(user);
     }
 
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
-
 }
-export default new UserCreateAction();

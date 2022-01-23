@@ -1,17 +1,18 @@
 import {CalculateDiscountData} from "@core/services/order/discount/types";
-import {IDiscount} from "@models/Discount.model";
+import {IDiscount} from "@core/models/Discount.model";
 import {Discount} from "@core/services/order/discount/discounts/Discount";
-import {FirstBuy} from "@core/services/order/discount/discounts/FirstBuy";
+import {Transaction} from "sequelize";
 
 export class DiscountService {
 
-    private discountStrategies: Discount[] = [
-        new FirstBuy()
-    ];
+    constructor(
+        private discountStrategies: Discount[]
+    ) {
+    }
 
-    async calculateDiscounts(data: CalculateDiscountData): Promise<IDiscount[]> {
+    async calculateDiscounts(data: CalculateDiscountData, transaction?: Transaction): Promise<IDiscount[]> {
         return (await Promise.all(
-            this.discountStrategies.map(s => s.checkForDiscount(data))
+            this.discountStrategies.map(s => s.checkForDiscount(data, transaction))
         )).filter(x => !!x);
     }
 }

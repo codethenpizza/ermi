@@ -1,4 +1,4 @@
-import {createController} from "../../core/Controller";
+import {createController} from "../Controller";
 import {AttrTypeDeleteAction} from "@actions/admin/AttrType/AttrTypeDeleteAction";
 import {AttrTypeListAction} from "@actions/admin/AttrType/AttrTypeListAction";
 import {AttrTypeCreateAction} from "@actions/admin/AttrType/AttrTypeCreateAction";

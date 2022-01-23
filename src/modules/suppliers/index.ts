@@ -1,9 +1,47 @@
-import {fetchAll, storeAll} from './runner'
-import "@db";
+import "@core/database";
+import {Supplier} from "./interfaces/Supplier";
+import {SupplierDataParser} from "./SupplierDataParser";
+import {offerUseCases, productUseCases} from "@core/useCases";
+import {IProductMapper} from "./interfaces/ProductMapper";
+import {rimOptions} from "./productTypes/rim/rimOptions";
+import {suppliersConfig} from "config";
+import {Slik} from "./models/Slik/Slik";
+import {Diskoptim} from "./models/Diskoptim/Diskoptim";
+import {Discovery} from "./models/Discovery/Discovery";
+import {Kolrad} from "./models/Kolrad/Kolrad";
 
-export const parseSuppliers = async () => {
+const suppliers: Supplier[] = [
+    new Discovery(),
+    new Slik(),
+    new Diskoptim(),
+    new Kolrad(),
+];
+
+const productTypeOptionsArr: IProductMapper.ProductTypeOptions[] = [
+    rimOptions
+    // {method: 'getTires', map: 'dsa'} as IProductMapper.MapItem<TireData>,
+];
+
+const supplierDataParser = new SupplierDataParser(suppliersConfig, productUseCases, offerUseCases);
+
+
+export const loadSuppliersData = async () => {
+    for (const supp of suppliers) {
+        try {
+            await supp.loadData();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+};
+
+export const parseSuppliersData = async () => {
+    await supplierDataParser.parseData(suppliers, productTypeOptionsArr);
+};
+
+export const updateSuppliersData = async () => {
     console.log(new Date());
-    await fetchAll();
-    await storeAll();
+    await loadSuppliersData();
+    await parseSuppliersData();
     console.log(new Date());
 };

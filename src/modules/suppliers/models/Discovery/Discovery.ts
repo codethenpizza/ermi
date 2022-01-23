@@ -1,20 +1,22 @@
 import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
-import parseDouble from "../../../../helpers/parseDouble";
+import parseDouble from "@core/helpers/parseDouble";
 
-import {STOCK_MSK} from "../../types";
-import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
 import DiscoveryModel, {IDiscoveryRaw} from "./Discovery.model";
-import Product from "@models/Product.model";
+import {RimMap, Stock, SupplierRim} from "../../productTypes/rim/rimTypes";
+import {Supplier} from "../../interfaces/Supplier";
+import {STOCK_MSK} from "../../constants";
+import {ParsedData} from "../../types";
 
-export class Discovery implements SupplierRim {
-    readonly name = 'discovery'
+export class Discovery extends Supplier implements SupplierRim {
 
-    async fetchData(): Promise<void> {
+    readonly name = 'Discovery'
+
+    async loadData(): Promise<void> {
         return new Promise((resolve, reject) => {
 
-            console.log('Start fetch Discovery');
+            console.log(`Start fetch ${this.name}`);
 
             const {host, token} = config.get('suppliers.Discovery.api');
             const url = `${host}?token=${token}`;
@@ -45,7 +47,7 @@ export class Discovery implements SupplierRim {
 
                         xml.on("end", async () => {
                             await Promise.all(functions);
-                            console.log(`End fetch Discovery. Total: [${counter}] Errors: [${errCounter}]`);
+                            console.log(`End fetch ${this.name}. Total: [${counter}] Errors: [${errCounter}]`);
                             resolve();
                         });
                     });
@@ -60,42 +62,28 @@ export class Discovery implements SupplierRim {
         return DiscoveryModel.count();
     }
 
-    async getProductData(): Promise<Product[]> {
-        return undefined;
-    }
-
-    async getRims(limit, offset): Promise<RimMap[]> {
-        console.log('Start store Discovery');
-
+    async getRims(limit, offset): Promise<ParsedData<RimMap>[]> {
         const rawData = await DiscoveryModel.findAll({limit, offset});
 
-        return rawData.map<RimMap>((item) => {
+        const parsedData: ParsedData<RimMap>[] = [];
+
+        const vendorID = await this.getVendorId();
+
+        for (const item of rawData) {
             const param = JSON.parse(item.param);
 
             if (!param) {
-                return null;
+                continue;
             }
 
             const bolts_count = parseDouble(param.find((e) => e.$.name === 'Количество отверстий')?.$text) || null;
             const bolts_spacing = parseDouble(param.find((e) => e.$.name === 'Диаметр расположения отверстий')?.$text) || null;
 
-            const supplier = 'discovery';
+            const beadlock = item.artikul?.match(/-BDL$/) ? true : undefined;
 
-            const stock: RimStock[] = [
-                {
-                    name: STOCK_MSK,
-                    shippingTime: '1-2',
-                    count: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast) || 0
-                }
-            ];
-
-            return {
-                uid: `${this.name}_${item.code}`,
-                supplier: this.name,
+            const productAttrs: RimMap = {
                 model: item.model,
                 brand: item.brand,
-                image: item.picture && encodeURI(item.picture),
-                price: parseDouble(item.price),
                 pcd: `${bolts_count}X${bolts_spacing}`,
                 width: parseDouble(param.find((e) => e.$.name === 'Ширина обода')?.$text),
                 color: param.find((e) => e.$.name === 'Цвет')?.$text || null,
@@ -105,10 +93,47 @@ export class Discovery implements SupplierRim {
                 et: parseDouble(param.find((e) => e.$.name === 'Вылет ET')?.$text),
                 type: param.find((e) => e.$.name === 'Тип диска')?.$text || null,
                 dia: parseDouble(param.find((e) => e.$.name === 'Диаметр ступицы Dia')?.$text),
-                color_name: param.find((e) => e.$.name === 'Расшифровка цвета RUS')?.$text || null,
-                stock: JSON.stringify(stock),
-                inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
+                beadlock
             };
-        }).filter(x => Boolean(x));
+
+            const stock: Stock[] = [
+                {
+                    name: STOCK_MSK,
+                    shippingTime: {
+                        from: 1,
+                        to: 2
+                    },
+                    count: item.rest_fast === '+' ? 20 : parseDouble(item.rest_fast) || 0
+                }
+            ];
+
+            const inStockQty = stock.reduce<number>((acc, {count}) => acc += count, 0);
+
+            const itemData: ParsedData<RimMap> = {
+                offerData: {
+                    price: parseDouble(item.price),
+                    imageUrls: item.picture ? [encodeURI(item.picture)] : [],
+                    is_available: inStockQty > 0,
+                    vendor_code: item.code,
+                    vendor_id: vendorID,
+                    in_stock_qty: inStockQty,
+                    stock: JSON.stringify(stock),
+                },
+                attrValuesMap: productAttrs,
+                productData: {
+                    name: item.name,
+                    cat_ids: [],
+                    productVariant: {
+                        images: [],
+                        attrs: [], // will be mapped later
+                        is_available: true,
+                    }
+                }
+            };
+
+            parsedData.push(itemData);
+        }
+
+        return parsedData;
     }
 }

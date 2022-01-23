@@ -1,17 +1,13 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
-import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
-import {isAuth} from "../../../../middlewares/auth";
+import B2BDiscountGroup from "@core/models/B2BDiscountGroup.model";
 
 type ReqParams = {
     id: string;
 };
 
-export class B2BDiscountGroupRemoveAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class B2BDiscountGroupRemoveAction extends Action {
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id, 10))) {
@@ -25,9 +21,9 @@ export class B2BDiscountGroupRemoveAction implements Action {
         const transaction = await B2BDiscountGroup.sequelize.transaction();
 
         try {
-            const id = parseInt(req.params.id, 10);
-            await B2BDiscountService.deleteDiscountGroup(id, transaction);
-            await transaction.commit();
+            // const id = parseInt(req.params.id, 10);
+            // await B2BDiscountService.deleteDiscountGroup(id, transaction);
+            // await transaction.commit();
             res.send();
         } catch (e) {
             await transaction.rollback();

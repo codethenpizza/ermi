@@ -1,21 +1,21 @@
-import {IOrderProduct} from "@models/OrderProduct.model";
-import {IShipping} from "@models/Shipping.model";
-import {CreateOrderDataAddress} from "@core/services/order/types";
-import ShippingType from "@models/ShippingType.model";
+import {IOrderOfferCalculate} from "@core/models/OrderOffer.model";
+import {IShipping} from "@core/models/Shipping.model";
+import {ICreateOrderDataAddress} from "@core/services/order/types";
+import {IShippingType} from "@core/models/ShippingType.model";
 
-export interface CalculateShippingData {
-    orderProducts: IOrderProduct[];
-    address: CreateOrderDataAddress;
+export interface ICalculateShippingData {
+    orderProducts: IOrderOfferCalculate[];
+    address: ICreateOrderDataAddress;
     shippingTypeId: number;
 }
 
-export interface ShippingStrategyData {
-    orderProducts: IOrderProduct[];
-    address: CreateOrderDataAddress;
-    shippingType: ShippingType;
+export interface IShippingStrategyData {
+    orderProducts: IOrderOfferCalculate[];
+    address: ICreateOrderDataAddress;
+    shippingType: IShippingType;
 }
 
-export interface CalculateShippingResult {
+export interface ICalculateShippingResult {
     shipping: Partial<IShipping>;
-    orderProducts: IOrderProduct[];
+    orderProducts: IOrderOfferCalculate[];
 }

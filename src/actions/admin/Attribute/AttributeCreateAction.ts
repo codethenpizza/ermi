@@ -1,13 +1,9 @@
 import {NextFunction, Request, Response} from "express";
-import Attribute, {IAttribute} from "@models/Attribute.model";
-import {Action} from "@projTypes/action";
+import Attribute, {IAttribute} from "@core/models/Attribute.model";
+import {Action} from "@actions/Action";
 import {catchError} from "@actions/admin/Attribute/helper";
-import {isAuth} from "../../../middlewares/auth";
 
-export class AttributeCreateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttributeCreateAction extends Action {
 
     assert(req: Request<any, any, IAttribute, any>, res: Response, next: NextFunction) {
         const {name, type_id} = req.body;
@@ -18,10 +14,9 @@ export class AttributeCreateAction implements Action {
         }
     }
 
-    async handle(req: Request<any, any, any, any>, res: Response) {
+    async handle(req: Request<any, any, IAttribute, any>, res: Response) {
         try {
-            const attrData: IAttribute = {...req.body};
-            const attr = new Attribute(attrData);
+            const attr = new Attribute(req.body);
             await attr.save();
             res.send(attr);
         } catch (e) {

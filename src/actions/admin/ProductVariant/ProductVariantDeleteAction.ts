@@ -1,16 +1,13 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import ProductVariant from "@models/ProductVariant.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import ProductVariant from "@core/models/ProductVariant.model";
 
 type ReqParams = {
     id: string;
 };
 
-export class ProductVariantDeleteAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ProductVariantDeleteAction extends Action {
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {

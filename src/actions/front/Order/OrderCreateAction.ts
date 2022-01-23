@@ -1,26 +1,26 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {OrderService} from "@core/services/order/OrderService";
-import {CreateOrderData} from "@core/services/order/types";
-import Order from "@models/Order.model";
+import {ICreateOrderData} from "@core/services/order/types";
+import {sequelizeTs} from "@core/database";
+import {orderUseCases} from "@core/useCases";
 
-export class OrderCreateAction implements Action {
+export class OrderCreateAction extends Action {
 
-    orderService = new OrderService();
-
-    get action() {
-        return [this.assert, this.handle.bind(this)];
+    constructor(
+        private _orderUseCases = orderUseCases
+    ) {
+        super();
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();
     }
 
-    async handle(req: Request<any, any, CreateOrderData, any>, res: Response) {
-        const transaction = await Order.sequelize.transaction();
+    async handle(req: Request<any, any, ICreateOrderData, any>, res: Response) {
+        const transaction = await sequelizeTs.transaction();
 
         try {
-            const result = await this.orderService.create(req.body, transaction);
+            const result = await this._orderUseCases.create(req.body, transaction);
             await transaction.commit();
             res.send(result);
         } catch (e) {

@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {OrderListAction} from "@actions/admin/Order/OrderListAction";
 import {OrderUpdateAction} from "@actions/admin/Order/OrderUpdateAction";
 

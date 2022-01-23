@@ -1,17 +1,13 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import Attribute, {IAttribute} from "@models/Attribute.model";
+import {Action} from "@actions/Action";
+import Attribute, {IAttribute} from "@core/models/Attribute.model";
 import {catchError} from "@actions/admin/Attribute/helper";
-import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
 };
 
-export class AttributeUpdateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttributeUpdateAction extends Action {
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
@@ -23,10 +19,9 @@ export class AttributeUpdateAction implements Action {
 
     async handle(req: Request<ReqParams, any, IAttribute, any>, res: Response) {
         try {
-            const attrData = req.body;
             const id = parseInt(req.params.id);
-            const attr = await Attribute.update(attrData, {where: {id}});
-            const isUpdated = !!attr[0];
+            const attr = await Attribute.update(req.body, {where: {id}});
+            const isUpdated = Boolean(attr[0]);
             if (isUpdated) {
                 res.status(202).send();
             } else {

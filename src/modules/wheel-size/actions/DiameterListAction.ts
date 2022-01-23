@@ -1,4 +1,4 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
 import {WheelSizeApi} from "../index";
 

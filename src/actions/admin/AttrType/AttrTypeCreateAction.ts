@@ -1,21 +1,18 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import AttrType from "@models/AttrType.model";
-import {isAuth} from "../../../middlewares/auth";
+import AttrType from "@core/models/AttrType.model";
 
 type ReqBody = {
     type: string;
 };
 
-export class AttrTypeCreateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrTypeCreateAction extends Action {
+
 
     assert(req: Request<any, any, ReqBody, any>, res: Response, next: NextFunction) {
         const {type} = req.body;
-        if(type) {
-           next();
+        if (type) {
+            next();
         } else {
             res.status(400).send({error: 'type is required param'});
         }
