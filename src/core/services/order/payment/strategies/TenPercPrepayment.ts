@@ -1,8 +1,9 @@
-import {PaymentS} from "@core/services/order/payment/strategies/PaymentS";
-import {IInvoice} from "@models/Invoice.model";
+import {PaymentStrat} from "@core/services/order/payment/strategies/PaymentStrat";
+import {Transaction} from "sequelize";
+import {IInvoiceCalc} from "@core/services/order/payment/types";
 
-export class TenPercPrepayment implements PaymentS {
-    async calculateInvoices(total: number): Promise<IInvoice[]> {
+export class TenPercPrepayment implements PaymentStrat {
+    async calculateInvoices(total: number, transaction?: Transaction): Promise<IInvoiceCalc[]> {
 
         const firstVal = Math.floor((total / 100) * 10);
         const firstDesc = 'Предоплата 10% за заказ';

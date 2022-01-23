@@ -6,5 +6,5 @@
   "ignore": [
     "src/**/*.spec.ts"
   ],
-  "exec": "tsc && NODE_ENV=development node dist/server/index.js"
+  "exec": "tsc && NODE_ENV=development node dist/index.js"
 }

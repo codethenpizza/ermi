@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {FrontProductController} from "@controllers/front/ProductController";
 import {WheelSizeController} from "../../modules/wheel-size/Controller";
 import {AuthController} from "@controllers/front/AuthController";

@@ -1,16 +1,11 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import AttrSet from "@models/AttrSet.model";
-import {isAuth} from "../../../middlewares/auth";
 
 type ReqParams = {
     id: string;
 };
 
-export class AttrSetDeleteAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrSetDeleteAction extends Action {
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {
@@ -22,13 +17,13 @@ export class AttrSetDeleteAction implements Action {
 
     async handle(req: Request<ReqParams, any, any, any>, res: Response) {
         try {
-            const id = parseInt(req.params.id);
-            const attr = await AttrSet.destroyWR({where: {id}});
-            if (attr) {
-                res.status(204).send();
-            } else {
-                res.status(400).send({error: `attribute set with id=${id} not found`});
-            }
+            // const id = parseInt(req.params.id);
+            // const attr = await AttrSet.destroyWR({where: {id}});
+            // if (attr) {
+            //     res.status(204).send();
+            // } else {
+            //     res.status(400).send({error: `attribute set with id=${id} not found`});
+            // }
         } catch (error) {
             res.status(400).send({error});
         }

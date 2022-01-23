@@ -1,18 +1,15 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import Attribute from "@models/Attribute.model";
-import {IProductCategory} from "@models/ProductCategory.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import Attribute from "@core/models/Attribute.model";
+import {IProductCategory} from "@core/models/ProductCategory.model";
 
 type ReqParams = {
     id: string;
 };
 
 export class ProductCatUpdateAction extends Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+    
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {

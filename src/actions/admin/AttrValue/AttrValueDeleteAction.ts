@@ -1,16 +1,13 @@
 import {NextFunction, Request, Response} from "express";
-import {Action} from "@projTypes/action";
-import AttrValue from "@models/AttrValue.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import AttrValue from "@core/models/AttrValue.model";
 
 type ReqParams = {
     id: string;
 };
 
-export class AttrValueDeleteAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrValueDeleteAction extends Action {
+
 
     assert(req: Request<ReqParams, any, any, any>, res: Response, next: NextFunction) {
         if (isNaN(parseInt(req.params.id))) {

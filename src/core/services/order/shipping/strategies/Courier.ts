@@ -1,14 +1,19 @@
 import {ShippingStrategy} from "@core/services/order/shipping/strategies/ShippingStrategy";
-import {CalculateShippingResult, ShippingStrategyData} from "@core/services/order/shipping/types";
+import {ICalculateShippingResult, IShippingStrategyData} from "@core/services/order/shipping/types";
+import {Transaction} from "sequelize";
 
 export class Courier implements ShippingStrategy {
 
-    async calculate({address, shippingType, orderProducts}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
+    static defaultCost = 500;
+
+    async calculate(data: IShippingStrategyData, transaction?: Transaction): Promise<ICalculateShippingResult[]> {
+
+        const {shippingType, orderProducts} = data;
 
         // Check the availability of goods
 
         // Calculate shipping cost
-        const cost = 500;
+        const cost = Courier.defaultCost;
 
         // Calculate shipping date
         const dateFrom = new Date(Date.now() + 60 ** 3 * 24 * 2);

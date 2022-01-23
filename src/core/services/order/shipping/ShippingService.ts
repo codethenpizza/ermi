@@ -1,24 +1,19 @@
-import {
-    CalculateShippingData,
-    CalculateShippingResult,
-    ShippingStrategyData
-} from "@core/services/order/shipping/types";
-import ShippingType from "@models/ShippingType.model";
+import {ICalculateShippingData, ICalculateShippingResult} from "@core/services/order/shipping/types";
+import ShippingType from "@core/models/ShippingType.model";
 import {ShippingStrategy} from "@core/services/order/shipping/strategies/ShippingStrategy";
-import {LocalPickup} from "@core/services/order/shipping/strategies/LocalPickup";
-import slugify from "slugify";
-import {Courier} from "./strategies/Courier";
-
-const s = (className: string) => slugify(className, {lower: true});
+import {customStringify} from "@core/helpers/utils";
+import {Transaction} from "sequelize";
 
 export class ShippingService {
 
-    private readonly strategies: {[x: string]: ShippingStrategy} = {
-        [s(LocalPickup.name)]: new LocalPickup(),
-        [s(Courier.name)]: new Courier()
-    };
+    constructor(
+        private readonly strategies: { [x: string]: ShippingStrategy }
+    ) {
+    }
 
-    async calculateShipping({shippingTypeId, address, orderProducts}: CalculateShippingData): Promise<CalculateShippingResult[]> {
+    async calculateShipping(data: ICalculateShippingData, transaction?: Transaction): Promise<ICalculateShippingResult[]> {
+        const {shippingTypeId, address, orderProducts} = data;
+
         if (
             !shippingTypeId ||
             (!address.address && !address.address_id && !address.pickup_point_id)
@@ -26,13 +21,13 @@ export class ShippingService {
             return [];
         }
 
-        const shippingType = await ShippingType.findByPk(shippingTypeId);
+        const shippingType = await ShippingType.findByPk(shippingTypeId, {transaction});
 
-        return this.strategies[s(shippingType.strategy)].calculate({
+        return this.strategies[customStringify(shippingType.strategy)].calculate({
             orderProducts,
             address,
-            shippingType
-        });
+            shippingType,
+        }, transaction);
     }
 
 }

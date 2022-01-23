@@ -1,10 +1,14 @@
 import {ShippingStrategy} from "@core/services/order/shipping/strategies/ShippingStrategy";
-import {CalculateShippingResult, ShippingStrategyData} from "@core/services/order/shipping/types";
-import PickupPoint from "@models/PickupPoint.model";
+import {ICalculateShippingResult, IShippingStrategyData} from "@core/services/order/shipping/types";
+import PickupPoint from "@core/models/PickupPoint.model";
+import {Transaction} from "sequelize";
 
 export class LocalPickup implements ShippingStrategy {
 
-    async calculate({orderProducts, address: {pickup_point_id}, shippingType}: ShippingStrategyData): Promise<CalculateShippingResult[]> {
+    async calculate(
+        {orderProducts, address: {pickup_point_id}, shippingType}: IShippingStrategyData,
+        transaction?: Transaction
+    ): Promise<ICalculateShippingResult[]> {
 
         if (!pickup_point_id) {
             return [];
@@ -12,8 +16,7 @@ export class LocalPickup implements ShippingStrategy {
 
         // Check the availability of goods
 
-        const pickupPoint = await PickupPoint.findByPk(pickup_point_id);
-
+        const pickupPoint = await PickupPoint.findByPk(pickup_point_id, {transaction});
 
 
         return [
@@ -24,7 +27,7 @@ export class LocalPickup implements ShippingStrategy {
                     shipping_type_id: shippingType.id,
                     shippingType,
                     cost: 0,
-                    status: 'done' // Set done after manager check
+                    status: 'done' // TODO Set done after manager check
                 },
                 orderProducts
             }

@@ -1,14 +1,11 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import User from "@models/User.model";
+import User from "@core/models/User.model";
 import {Op} from "sequelize";
-import B2BDiscountGroup from "@models/B2BDiscountGroup.model";
-import {isAuth} from "../../../../middlewares/auth";
+import B2BDiscountGroup from "@core/models/B2BDiscountGroup.model";
 
-export class B2BUserListAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class B2BUserListAction extends Action {
+
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

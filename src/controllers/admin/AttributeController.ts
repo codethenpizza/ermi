@@ -1,4 +1,4 @@
-import {createController} from "../../core/Controller";
+import {createController} from "../Controller";
 import {AttributeListAction} from "@actions/admin/Attribute/AttributeListAction";
 import {AttributeGetAction} from "@actions/admin/Attribute/AttributeGetAction";
 import {AttributeCreateAction} from "@actions/admin/Attribute/AttributeCreateAction";

@@ -1,4 +1,4 @@
-import {createController} from "@core/Controller";
+import {createController} from "@controllers/Controller";
 import {Login} from "@actions/admin/Auth/Login";
 import {RefreshTokenAction} from "@actions/common/RefreshTokenAction"
 import {User} from "@actions/common/User";

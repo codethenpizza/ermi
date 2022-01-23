@@ -1,11 +1,12 @@
-import {PaymentS} from "@core/services/order/payment/strategies/PaymentS";
-import {IInvoice} from "@models/Invoice.model";
+import {PaymentStrat} from "@core/services/order/payment/strategies/PaymentStrat";
+import {Transaction} from "sequelize";
+import {IInvoiceCalc} from "@core/services/order/payment/types";
 
-export class FullPrepayment implements PaymentS {
+export class FullPrepayment implements PaymentStrat {
 
     private readonly desc = 'Предоплата за заказ';
 
-    async calculateInvoices(total: number): Promise<IInvoice[]> {
+    async calculateInvoices(total: number, transaction?: Transaction): Promise<IInvoiceCalc[]> {
         return [{value: total, desc: this.desc}];
     }
 }

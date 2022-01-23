@@ -26,7 +26,7 @@
     "refreshTokenLifetime": "604800"
   },
   "suppliersConfig": {
-    "ProductMapperStoreLimit": 1000
+    "dataParserLimit": 1000
   },
   "suppliers": {
     "Slik": {
@@ -64,7 +64,7 @@
   "wheelSize": {
     "apiKey": ""
   },
-  "fileStrategy": "s3",
+  "fileStrategy": "local",
   "cacheStrategy": "local",
   "images": {
     "sizes": {

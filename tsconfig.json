@@ -3,12 +3,12 @@
     "module": "commonjs",
     "target": "es6",
     "lib": [
-      "es2019",
+      "es2020",
       "dom"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": "src",
@@ -27,9 +27,6 @@
       "@projTypes/*": [
         "types/*"
       ],
-      "@db": [
-        "database.ts"
-      ],
       "@server/*": [
         "server/*"
       ],
@@ -45,7 +42,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "migrations/**/*"
+    "node_modules"
   ]
 }

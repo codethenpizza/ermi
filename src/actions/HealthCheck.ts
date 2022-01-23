@@ -1,10 +1,7 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
 
-export class HealthCheck implements Action {
-    get action() {
-        return [this.assert, this.handle];
-    }
+export class HealthCheck extends Action {
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

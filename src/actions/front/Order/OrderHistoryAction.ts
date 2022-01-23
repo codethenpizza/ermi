@@ -1,25 +1,30 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {IUser, IUserJWTPayload} from "@models/User.model";
+import {IUser} from "@core/models/User.model";
 import {isAuth} from "../../../middlewares/auth";
-import {JWTPayload} from "@core/services/AuthService";
-import {OrderService} from "@core/services/order/OrderService";
-import {OrderResp} from "@core/services/order/types";
+import {IOrderResp} from "@core/services/order/types";
+import {orderUseCases} from "@core/useCases";
 
-export class OrderHistoryAction implements Action {
+export class OrderHistoryAction extends Action {
+
+    constructor(
+        private _orderUseCases = orderUseCases
+    ) {
+        super();
+    }
+
     get action() {
-        return [isAuth, this.assert, this.handle];
+        return [isAuth, ...super.action];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();
     }
 
-    async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response<OrderResp[]>) {
+    async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response<IOrderResp[]>) {
         try {
-            const orderService = new OrderService();
-            const JWTPayload = user as JWTPayload<IUserJWTPayload>;
-            const orders = await orderService.getUserOrders(JWTPayload.user);
+            // @ts-ignore
+            const orders = await this._orderUseCases.getUserOrders(JWTPayload.user as IUser);
             res.send(orders);
         } catch (e) {
             console.error(e.message);

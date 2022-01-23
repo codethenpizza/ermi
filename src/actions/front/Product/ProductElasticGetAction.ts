@@ -1,15 +1,18 @@
-import {Action} from "@projTypes/action";
+import {Action} from "@actions/Action";
 import {NextFunction, Request, Response} from "express";
-import {EsProduct} from "@server/elastic/EsProducts";
 import {setUser} from "../../../middlewares/auth";
-import {B2BDiscountService} from "@core/services/b2b/B2BDiscountService";
-import {EsProductVariant} from "@actions/front/types";
-import {JWTPayload} from "@core/services/AuthService";
-import {IUserJWTPayload} from "@models/User.model";
+import {catalogUseCases} from "@core/useCases";
 
-export class ProductElasticGetAction implements Action {
+export class ProductElasticGetAction extends Action {
+
+    constructor(
+        private _catalogUseCases = catalogUseCases
+    ) {
+        super();
+    }
+
     get action() {
-        return [setUser, this.assert.bind(this), this.handle.bind(this)];
+        return [setUser, ...super.action];
     }
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
@@ -17,15 +20,9 @@ export class ProductElasticGetAction implements Action {
     }
 
     async handle(req: Request<{ id: string }, any, any, any>, res: Response) {
-        const esProduct = new EsProduct();
         try {
-            const resp = await esProduct.es.get(req.params.id);
-            if (resp) {
-                let product = resp.body._source;
-                const JWTPayload = req.user as JWTPayload<IUserJWTPayload>;
-                if (JWTPayload?.user) {
-                    product = await B2BDiscountService.enrichESProductByB2BUserDiscount(JWTPayload.user, product) as EsProductVariant;
-                }
+            const product = await this._catalogUseCases.get(req.params.id, req.user);
+            if (product) {
                 res.send(product);
             } else {
                 res.status(404).send();

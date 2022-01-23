@@ -1,13 +1,8 @@
 import {NextFunction, Request} from "express";
-import User from "@models/User.model";
-import {Action} from "@projTypes/action";
-import {isAuth} from "../../../middlewares/auth";
+import User from "@core/models/User.model";
+import {Action} from "@actions/Action";
 
 export class UserGetAction extends Action {
-
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
 
     assert(req: Request<any, any, any, any>, res, next: NextFunction) {
         next();

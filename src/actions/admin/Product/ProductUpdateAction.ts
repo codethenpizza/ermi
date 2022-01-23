@@ -1,16 +1,13 @@
 import {NextFunction, Request, Response} from "express";
-import Product, {IProduct} from "@models/Product.model";
-import {Action} from "@projTypes/action";
-import {isAuth} from "../../../middlewares/auth";
+import {IProduct} from "@core/models/Product.model";
+import {Action} from "@actions/Action";
 
 type ReqParams = {
     id: string;
 };
 
-export class ProductUpdateAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class ProductUpdateAction extends Action {
+
 
     assert(req: Request<ReqParams, any, IProduct, any>, res: Response, next: NextFunction) {
         if (!req.params.id) {
@@ -21,10 +18,10 @@ export class ProductUpdateAction implements Action {
     }
 
     async handle(req: Request<ReqParams, any, IProduct, any>, res: Response) {
-        const id = parseInt(req.params.id);
-        const product = req.body;
+        // const id = parseInt(req.params.id);
+        // const product = req.body;
         try {
-            await Product.updateWR(id, product);
+            // await Product.updateWR(id, product);
             res.status(202).send();
         } catch (error) {
             res.status(500).send({error});

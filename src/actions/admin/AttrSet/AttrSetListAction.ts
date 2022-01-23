@@ -1,14 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 
-import {Action} from "@projTypes/action";
-import Attribute from "@models/Attribute.model";
-import AttrSet from "@models/AttrSet.model";
-import {isAuth} from "../../../middlewares/auth";
+import {Action} from "@actions/Action";
+import Attribute from "@core/models/Attribute.model";
+import AttrSet from "@core/models/AttrSet.model";
 
-export class AttrSetListAction implements Action {
-    get action() {
-        return [isAuth, this.assert, this.handle];
-    }
+export class AttrSetListAction extends Action {
 
     assert(req: Request<any, any, any, any>, res: Response, next: NextFunction) {
         next();

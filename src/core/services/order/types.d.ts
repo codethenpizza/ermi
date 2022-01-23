@@ -1,48 +1,48 @@
-import {IDiscount} from "@models/Discount.model";
-import Address from "@models/Address.model";
-import {CalculateShippingResult} from "@core/services/order/shipping/types";
-import {IUser} from "@models/User.model";
-import Order from "@models/Order.model";
-import {EsProductVariant} from "@actions/front/types";
+import {IDiscount} from "@core/models/Discount.model";
+import Address from "@core/models/Address.model";
+import {ICalculateShippingResult} from "@core/services/order/shipping/types";
+import {IUser} from "@core/models/User.model";
+import {IOrder} from "@core/models/Order.model";
+import {Elastic} from "@core/services/elastic/types";
 
 
-export interface CreateOrderData {
-    productItems: CreateOrderDataProduct[];
+export interface ICreateOrderData {
+    productItems: ICreateOrderDataProduct[];
+    shipping_type_id: number;
+    payment_strategy_id: number;
+    address: ICreateOrderDataAddress;
     user_id?: number;
     userData?: Partial<IUser>;
-    shipping_type_id?: number;
-    address: CreateOrderDataAddress;
-    payment_strategy_id?: number;
-    meta?: CreateOrderDataMeta[];
+    meta?: ICreateOrderDataMeta[];
 }
 
-export interface CreateOrderDataAddress {
+export interface ICreateOrderDataAddress {
     address_id?: number;
     pickup_point_id?: number;
     address?: Partial<Address>;
 }
 
-export interface CreateOrderDataProduct {
-    product_variant_id: number;
+export interface ICreateOrderDataProduct {
+    offer_id: number;
     qty: number;
 }
 
-export interface CreateOrderDataMeta {
+export interface ICreateOrderDataMeta {
     key: string;
     value: any;
 }
 
-export interface CalculateOrderTotal {
+export interface ICalculateOrderTotal {
     discounts: IDiscount[];
-    shipping: CalculateShippingResult[];
+    shipping: ICalculateShippingResult[];
 }
 
-export interface CalculateOrderResult extends CalculateOrderTotal {
+export interface ICalculateOrderResult extends ICalculateOrderTotal {
     total: number;
     b2b_discount_id?: number;
 }
 
-export interface OrderResp {
-    order: Order;
-    esOrderProducts: EsProductVariant[];
+export interface IOrderResp {
+    order: IOrder;
+    esOrderProducts: Elastic.ProductVariantFormatted[];
 }

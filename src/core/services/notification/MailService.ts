@@ -5,8 +5,8 @@ import {GetObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {Transaction} from "sequelize";
 
 import {MailData} from "@core/services/notification/types";
-import User from "@models/User.model";
-import {getCacheStrategy} from "@core/cache/CacheStrategy";
+import User from "@core/models/User.model";
+import {cacheService} from "@core/services";
 import ReadableStream = NodeJS.ReadableStream;
 
 
@@ -15,7 +15,7 @@ export class MailService {
     private transporter?: Transporter<SMTPTransport.SentMessageInfo>;
 
     constructor(
-        private cacheService = getCacheStrategy()
+        private _cacheService = cacheService
     ) {
     }
 
@@ -47,7 +47,7 @@ export class MailService {
     async getDKIMPrivateKey(): Promise<string> {
         const DKIMCacheKey = '4wheels-DKIM';
 
-        const cachedData = await this.cacheService.get(DKIMCacheKey);
+        const cachedData = await this._cacheService.get(DKIMCacheKey);
 
         if (cachedData) {
             return cachedData;
@@ -61,7 +61,7 @@ export class MailService {
         });
 
         const obj = await s3Client.send(new GetObjectCommand({Bucket, Key, ResponseContentType: 'string'}));
-        const data = await new Promise<string>(((resolve, reject) => {
+        const data = await new Promise<string>(((resolve) => {
             let str = '';
             (obj.Body as ReadableStream).on('readable', () => {
                 let tmp;
@@ -74,7 +74,7 @@ export class MailService {
             });
         }));
 
-        await this.cacheService.set(DKIMCacheKey, data);
+        await this._cacheService.set(DKIMCacheKey, data);
 
         return data;
     }

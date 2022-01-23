@@ -2,48 +2,79 @@ import config from 'config';
 import request from 'request';
 import XmlStream from 'xml-stream';
 
-import {STOCK_MSK, Supplier} from "../../types";
-import {RimMap, RimStock, SupplierRim} from "../../helpers/rimProductType/rimTypes";
-import Product from "@models/Product.model";
+import {STOCK_MSK} from "../../constants";
+import {RimMap, Stock, SupplierRim} from "../../productTypes/rim/rimTypes";
 import KolradModel, {IKolrad} from "./Kolrad.model";
-import progressBar from "../../../../helpers/progressBar";
-import parseDouble from "../../../../helpers/parseDouble";
-import {rimType} from "../../helpers/constants";
-import ParsedStocks = IKolrad.ParsedStocks;
+import progressBar from "../../../../core/helpers/progressBar";
+import parseDouble from "../../../../core/helpers/parseDouble";
+import {ParsedData} from "../../types";
+import {Supplier} from "../../interfaces/Supplier";
+import {rimType} from "../../productTypes/rim/constants";
 
-export class Kolrad implements Supplier, SupplierRim {
-    readonly name = 'kolrad';
+export class Kolrad extends Supplier implements SupplierRim {
 
-    async fetchData(): Promise<void> {
+    readonly name = 'Kolrad';
+
+    readonly targetStockID = '3'; // "Скл Видное"
+
+    async loadData(): Promise<void> {
+        const {host, token, contractNum} = config.get('suppliers.Kolrad.api');
+        const baseUrl = `${host}`;
+        const params = `${contractNum}/?token=${token}`
+        const url = `${baseUrl}/page0/${params}`
+
         return new Promise(async (resolve, reject) => {
-            console.log('Start fetch Kolrad');
 
-            const {host, token, contractNum} = config.get('suppliers.Kolrad.api');
-            const baseUrl = `${host}`;
-            const params = `${contractNum}/?token=${token}`
+            console.log(`Start fetch ${this.name}`);
 
             let counter = 0;
+            let errCounter = 0;
             let totalPages = 0;
 
             try {
-                const url = `${baseUrl}/page0/${params}`
-                totalPages = await this.getTotalPages(url)
+                totalPages = await this.getTotalPages(url);
 
                 if (!totalPages) {
                     throw new Error('total pages is empty ' + totalPages);
                 }
 
-                for (let i = 10; i <= totalPages; i++) {
-                    const pageUrl = `${baseUrl}/page${i}/${params}`;
-                    const pageCount = await this.parsePage(pageUrl);
-                    counter += pageCount;
-                    progressBar(i, totalPages, `fetch ${this.name}`);
+                const offset = 10;
+
+                const chunkLength = 10;
+
+                const total = totalPages - offset;
+
+                const parseChunk = async (i: number) => {
+                    const chuckFns = new Array(chunkLength).fill(null).map(async (_, index) => {
+                        try {
+                            const pageUrl = `${baseUrl}/page${i + index}/${params}`;
+                            const pageCounters = await this.parsePage(pageUrl);
+                            counter += pageCounters.counter;
+                            errCounter += pageCounters.errCounter;
+                        } catch (e) {
+                            console.log('Chunk error', e);
+                        }
+                    });
+                    await Promise.allSettled(chuckFns);
+
+
+                    let current = i - offset + chunkLength;
+                    if (current > total) {
+                        current = total;
+                    }
+                    progressBar(current, total, `Page ${current}/${total}`);
                 }
 
-                console.log('counter:', counter)
-                resolve()
+
+                progressBar(0, total, `Page ${0}/${total}`);
+                for (let i = offset; i <= totalPages; i += chunkLength) {
+                    await parseChunk(i);
+                }
+
+                console.log(`End fetch ${this.name}. Total: [${counter}] Errors: [${errCounter}]`);
+                resolve();
             } catch (e) {
-                // console.log(e)
+                console.log(e)
                 reject(e);
             }
         });
@@ -53,43 +84,65 @@ export class Kolrad implements Supplier, SupplierRim {
         return KolradModel.count();
     }
 
-    async getProductData(): Promise<Product[]> {
-        return undefined;
-    }
-
-    async getRims(limit, offset): Promise<RimMap[]> {
-        console.log('Start store Kolrad');
-
+    async getRims(limit, offset): Promise<ParsedData<RimMap>[]> {
         const rawData: IKolrad.Raw[] = await KolradModel.findAll({limit, offset});
-        const toCreate: RimMap[] = [];
+        const parsedData: ParsedData<RimMap>[] = [];
+
+        const vendorID = await this.getVendorId();
+
         for (const item of rawData) {
             try {
-                const {
-                    vendor: brand,
-                    picture: image,
-                    vendorCode,
-                } = item;
-
-                const stock = this.getRimStocks(item);
                 const price = this.getRimPrice(item);
-                const params: IKolrad.ParsedParams = this.getRimParsedParams(item)
+                const stock = this.getRimStocks(item);
+                const inStockQty = stock.reduce<number>((acc, {count}) => acc += count, 0);
 
-                toCreate.push({
-                    uid: `${this.name}_${vendorCode}`,
-                    supplier: this.name,
-                    price,
-                    brand,
-                    image,
+                const params: IKolrad.ParsedParams = this.getRimParsedParams(item);
+
+
+                const productAttrs: RimMap = {
+                    brand: item.vendor,
                     type: rimType.alloy,
-                    stock: JSON.stringify(stock),
-                    inStock: stock.reduce<number>((acc, {count}) => acc += count, 0),
-                    ...params
-                })
+                    dia: params.dia,
+                    et: params.et,
+                    pcd: params.pcd,
+                    bolts_spacing: params.bolts_spacing,
+                    color: params.color,
+                    bolts_count: params.bolts_count,
+                    width: params.width,
+                    model: params.model,
+                    diameter: params.diameter
+                }
+
+                const itemData: ParsedData<RimMap> = {
+                    offerData: {
+                        price,
+                        imageUrls: item.picture ? [item.picture] : [],
+                        is_available: inStockQty > 0,
+                        vendor_code: item.vendorCode,
+                        vendor_id: vendorID,
+                        in_stock_qty: inStockQty,
+                        stock: JSON.stringify(stock),
+                    },
+                    attrValuesMap: productAttrs,
+                    productData: {
+                        name: item.name,
+                        cat_ids: [],
+                        productVariant: {
+                            images: [],
+                            attrs: [], // will be mapped later
+                            is_available: true,
+                        }
+                    }
+                };
+
+                parsedData.push(itemData);
+
             } catch (e) {
-                console.log(e)
+                console.error(e);
             }
         }
-        return toCreate
+
+        return parsedData;
     }
 
     private async getTotalPages(url: string): Promise<number> {
@@ -110,8 +163,9 @@ export class Kolrad implements Supplier, SupplierRim {
         })
     }
 
-    private async parsePage(url: string): Promise<number> {
-        let pageCounter = 0;
+    private async parsePage(url: string): Promise<{ counter: number, errCounter: number }> {
+        let counter = 0;
+        let errCounter = 0;
         return new Promise((resolve) => {
             const functions = [];
             request.get(url)
@@ -119,52 +173,70 @@ export class Kolrad implements Supplier, SupplierRim {
                     const xml = new XmlStream(resp);
 
                     xml.collect('param');
+                    xml.collect('stock');
+
                     xml.on('endElement: offer', (item: any) => {
                         functions.push((async () => {
                             if (item.categoryId !== '5') {
                                 return;
                             }
 
-                            const stock = item.stocks?.stock
-                            if (!stock || (stock['$']?.id !== '3' || stock.quantity === '0')) {
+                            const stocks: IKolrad.ParsedStock[] = item.stocks?.stock;
+
+                            const targetStock = stocks ? stocks.find(x => {
+                                return x.$.id === this.targetStockID && x.quantity !== '0';
+                            }) : null;
+
+                            if (!targetStock) {
                                 return;
                             }
 
                             try {
                                 item.param = JSON.stringify(item.param);
                                 item.prices = JSON.stringify(item.prices);
-                                item.stocks = JSON.stringify(item.stocks);
+                                item.stocks = JSON.stringify(stocks);
                                 await KolradModel.upsert(item)
-                                pageCounter++;
+                                counter++;
                             } catch (e) {
+                                errCounter++;
                                 console.error(e, item);
                             }
                         })())
 
                     });
 
-                    xml.on("error", (err) => {
-                        console.log('Error', err);
+                    xml.on("error", (err: Error) => {
+                        if (err.message.includes('not well-formed')) {
+                            return;
+                        }
+                        errCounter++;
+                        console.error(err);
                     });
 
                     xml.on("end", async () => {
                         await Promise.all(functions);
-                        resolve(pageCounter);
+                        resolve({counter, errCounter});
                     });
                 });
         })
     }
 
-    private getRimStocks({stocks}: IKolrad.Raw): RimStock[] {
-        const parsedStocks: ParsedStocks = JSON.parse(stocks);
-        let count = 0
-        if (parsedStocks?.stock?.quantity) {
-            count = parsedStocks.stock.quantity === '>12' ? 13 : Number(parsedStocks.stock.quantity);
+    private getRimStocks({stocks}: IKolrad.Raw): Stock[] {
+        const parsedStocks: IKolrad.ParsedStock[] = JSON.parse(stocks);
+        let count = 0;
+
+        const targetStock = parsedStocks.find(x => x.$.id === this.targetStockID);
+
+        if (targetStock?.quantity) {
+            count = targetStock.quantity === '>12' ? 13 : Number(targetStock.quantity);
         }
 
         return [{
             name: STOCK_MSK,
-            shippingTime: '1-2',
+            shippingTime: {
+                from: 1,
+                to: 2
+            },
             count: count
         }]
     }

@@ -1,4 +1,4 @@
-import {createController} from "../../core/Controller";
+import {createController} from "../Controller";
 import {AttrSetGetAction} from "@actions/admin/AttrSet/AttrSetGetAction";
 import {AttrSetListAction} from "@actions/admin/AttrSet/AttrSetListAction";
 import {AttrSetCreateAction} from "@actions/admin/AttrSet/AttrSetCreateAction";
