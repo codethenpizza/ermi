@@ -218,35 +218,6 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "stock": {
-        "properties": {
-            "value": {
-                "type": "nested",
-                "properties": {
-                    "name": {
-                        "type": "text",
-                        "index": false
-                    },
-                    "shippingTime": {
-                        "type": "keyword",
-                    },
-                    "count": {
-                        "type": "integer",
-                        "index": false
-                    }
-                }
-            },
-            "name": {
-                "type": "text"
-            },
-            "slug": {
-                "type": "keyword"
-            },
-            "type": {
-                "type": "text"
-            }
-        }
-    },
     "beadlock": {
         "properties": {
             "name": {
