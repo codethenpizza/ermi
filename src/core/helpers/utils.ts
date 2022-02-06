@@ -56,3 +56,5 @@ export const generateVariantCode = (length = 15) => {
     }
     return result;
 };
+
+export const commonSlugify = (str: string): string => slugify(str, {lower: true})

@@ -2,7 +2,7 @@ import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table, Un
 import AttrType, {IAttrType} from "@core/models/AttrType.model";
 import AttrSet, {IAttrSet} from "@core/models/AttrSet.model";
 import AttrSetAttr from "@core/models/AttrSetAttr.model";
-import slugify from "slugify";
+import {commonSlugify} from "@core/helpers/utils";
 
 @Table({
     tableName: 'attribute',
@@ -43,7 +43,7 @@ export default class Attribute extends Model<Attribute> implements IAttribute {
         field: 'name'
     })
     set name(val: string) {
-        this.setDataValue('slug', slugify(val, {lower: true}));
+        this.setDataValue('slug', commonSlugify(val));
         this.setDataValue('name', val);
     }
 

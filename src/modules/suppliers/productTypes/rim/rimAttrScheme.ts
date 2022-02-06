@@ -1,8 +1,23 @@
 import {LOWERCASE_NORMALIZER} from "@core/services/elastic/schemas/normalizers/LowerCase";
 import {EsScheme} from "@core/services/elastic/schemas/types";
+import {commonSlugify} from "@core/helpers/utils";
+import {
+    RIM_BOLTS_COUNT,
+    RIM_BOLTS_SPACING,
+    RIM_COLOR,
+    RIM_DIA,
+    RIM_DIAMETER,
+    RIM_MODEL,
+    RIM_PCD,
+    RIM_TYPE,
+    RIM_COUNTRY_OF_ORIGIN,
+    RIM_ET,
+    RIM_WIDTH, RIM_BEADLOCK
+} from "./rimTypes";
+import {ATTR_BRAND} from "@core/helpers/productConstants";
 
 export const RimAttrScheme: EsScheme.Scheme = {
-    "bolts-count": {
+    [commonSlugify(RIM_BOLTS_COUNT)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -18,7 +33,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "bolts-spacing": {
+    [commonSlugify(RIM_BOLTS_SPACING)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -34,7 +49,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "brand": {
+    [commonSlugify(ATTR_BRAND)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -51,7 +66,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "color": {
+    [commonSlugify(RIM_COLOR)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -68,7 +83,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "dia": {
+    [commonSlugify(RIM_DIA)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -84,7 +99,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "diameter": {
+    [commonSlugify(RIM_DIAMETER)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -100,7 +115,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "et": {
+    [commonSlugify(RIM_ET)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -116,7 +131,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "model": {
+    [commonSlugify(RIM_MODEL)]: {
         "properties": {
             "name": {
                 "type": "text",
@@ -133,7 +148,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "pcd": {
+    [commonSlugify(RIM_PCD)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -150,24 +165,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "recommended-price": {
-        "properties": {
-            "name": {
-                "type": "text"
-            },
-            "value": {
-                "type": "scaled_float",
-                "scaling_factor": 100
-            },
-            "slug": {
-                "type": "keyword"
-            },
-            "type": {
-                "type": "text"
-            }
-        }
-    },
-    "type": {
+    [commonSlugify(RIM_TYPE)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -184,24 +182,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "supplier": {
-        "properties": {
-            "name": {
-                "type": "text"
-            },
-            "value": {
-                "type": "keyword",
-                "normalizer": LOWERCASE_NORMALIZER
-            },
-            "slug": {
-                "type": "keyword"
-            },
-            "type": {
-                "type": "text"
-            }
-        }
-    },
-    "width": {
+    [commonSlugify(RIM_WIDTH)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -218,36 +199,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "stock": {
-        "properties": {
-            "value": {
-                "type": "nested",
-                "properties": {
-                    "name": {
-                        "type": "text",
-                        "index": false
-                    },
-                    "shippingTime": {
-                        "type": "keyword",
-                    },
-                    "count": {
-                        "type": "integer",
-                        "index": false
-                    }
-                }
-            },
-            "name": {
-                "type": "text"
-            },
-            "slug": {
-                "type": "keyword"
-            },
-            "type": {
-                "type": "text"
-            }
-        }
-    },
-    "beadlock": {
+    [commonSlugify(RIM_BEADLOCK)]: {
         "properties": {
             "name": {
                 "type": "text"
@@ -263,7 +215,7 @@ export const RimAttrScheme: EsScheme.Scheme = {
             }
         }
     },
-    "country-of-origin": {
+    [commonSlugify((RIM_COUNTRY_OF_ORIGIN))]: {
         "properties": {
             "name": {
                 "type": "text"

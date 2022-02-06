@@ -9,16 +9,20 @@ import {Slik} from "./models/Slik/Slik";
 import {Diskoptim} from "./models/Diskoptim/Diskoptim";
 import {Discovery} from "./models/Discovery/Discovery";
 import {Kolrad} from "./models/Kolrad/Kolrad";
+import {Shinservice} from "./models/Shinservice/Shinservice";
+import {tireOptions} from "./productTypes/tire/tireOptions";
 
 const suppliers: Supplier[] = [
     new Discovery(),
     new Slik(),
     new Diskoptim(),
     new Kolrad(),
+    new Shinservice()
 ];
 
 const productTypeOptionsArr: IProductMapper.ProductTypeOptions[] = [
-    rimOptions
+    rimOptions,
+    tireOptions
     // {method: 'getTires', map: 'dsa'} as IProductMapper.MapItem<TireData>,
 ];
 

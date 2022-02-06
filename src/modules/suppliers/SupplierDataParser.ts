@@ -35,6 +35,10 @@ export class SupplierDataParser {
         for (const supp of suppliers) {
             for (const productTypeOptions of productTypeOptionsArr) {
                 const {method, mappingKey, getProductFindOptionsFns} = productTypeOptions;
+                if (!supp[method]) {
+                    // in case supplier  haven't method
+                    continue
+                }
 
                 const getData: Function = supp[method].bind(supp);
 
@@ -114,9 +118,9 @@ export class SupplierDataParser {
                     }
 
                 }
-                progressBar(countParams.offset + index + 1, countParams.total, `Rim ${countParams.offset + index + 1}/${countParams.total}`);
+                progressBar(countParams.offset + index + 1, countParams.total, `Item ${countParams.offset + index + 1}/${countParams.total}`);
             } catch (e) {
-                console.error(e);
+                console.error(JSON.stringify(e, null, 2));
             }
         }
     }
