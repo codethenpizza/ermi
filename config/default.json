@@ -59,6 +59,11 @@
         "contractNum": "",
         "token": ""
       }
+    },
+    "Shinservice": {
+      "api": {
+        "host": "https://duplo.shinservice.ru/xml/shinservice-b2b.xml?id=90527589"
+      }
     }
   },
   "wheelSize": {

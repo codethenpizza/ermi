@@ -4,6 +4,7 @@ import {RimAttrScheme} from "../../../modules/suppliers/productTypes/rim/rimAttr
 import {ElasticProductService} from "@core/services/elastic/ElasticProductService/ElasticProductService";
 import {Normalizers} from "@core/services/elastic/schemas/normalizers";
 import {EsScheme} from "@core/services/elastic/schemas/types";
+import {TireAttrScheme} from "../../../modules/suppliers/productTypes/tire/tireAttrScheme";
 
 export const getElasticProductService = (): ElasticProductService => {
     const node = `${elastic.protocol}://${elastic.host}${elastic.port ? ':' + elastic.port : ''}`
@@ -11,7 +12,8 @@ export const getElasticProductService = (): ElasticProductService => {
     const ELASTIC_PRODUCT_INDEX = 'product';
     const ELASTIC_PRODUCT_SCHEMAS: EsScheme.Scheme[] = [
         // add product types attrs schemas here
-        RimAttrScheme
+        RimAttrScheme,
+        TireAttrScheme
     ];
     return new ElasticProductService(
         elasticClient,

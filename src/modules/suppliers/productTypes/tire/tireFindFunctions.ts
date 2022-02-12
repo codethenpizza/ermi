@@ -1,11 +1,11 @@
 import AttrValue from "@core/models/AttrValue.model";
 import ProductVariant from "@core/models/ProductVariant.model";
 import {sequelizeTs} from "@core/database";
-import {RimMapOptions} from "./rimTypes";
+import {TireMapOptions} from "./tireTypes";
 import {FindProductIdFn, IOfferCreateOptions} from "@core/services/offer/types";
 import ProductCatsProduct from "@core/models/ProductCatsProduct.model";
 
-export const getRimFindOptionsFns = async (mapping: RimMapOptions): Promise<IOfferCreateOptions> => {
+export const getTireFindOptionsFns = async (mapping: TireMapOptions): Promise<IOfferCreateOptions> => {
 
     const findProductIdFn: FindProductIdFn = async (data) => {
         const brand = data.productVariant.attrs.find(x => x.attr_id === mapping.brand)?.value;
@@ -25,8 +25,8 @@ export const getRimFindOptionsFns = async (mapping: RimMapOptions): Promise<IOff
                      LEFT JOIN ${ProductCatsProduct.tableName} D
                                ON C.product_id = D.product_id
             WHERE A.value = :brand
-            AND B.value = :model
-            AND D.product_cat_id = :catId
+              AND B.value = :model
+              AND D.product_cat_id = :catId
             LIMIT 1
         `, {
             replacements: {

@@ -45,15 +45,16 @@ export interface RimMapOptions extends OptionsIDMapping {
     countryOfOrigin: number;
 }
 
-export const RIM_MODEL = 'Model';
-export const RIM_COLOR = 'Color';
-export const RIM_WIDTH = 'Width';
-export const RIM_ET = 'ET';
-export const RIM_DIAMETER = 'Diameter';
-export const RIM_BOLTS_COUNT = 'Bolts count';
-export const RIM_BOLTS_SPACING = 'Bolts spacing';
-export const RIM_PCD = 'PCD';
-export const RIM_DIA = 'DIA';
-export const RIM_TYPE = 'Type';
-export const RIM_BEADLOCK = 'Beadlock';
-export const RIM_COUNTRY_OF_ORIGIN = 'Country of Origin';
+export const RIM_PREFIX = 'RIM_'
+export const RIM_MODEL = RIM_PREFIX + 'Model';
+export const RIM_COLOR = RIM_PREFIX + 'Color';
+export const RIM_WIDTH = RIM_PREFIX + 'Width';
+export const RIM_ET = RIM_PREFIX + 'ET';
+export const RIM_DIAMETER = RIM_PREFIX + 'Diameter';
+export const RIM_BOLTS_COUNT = RIM_PREFIX + 'Bolts count';
+export const RIM_BOLTS_SPACING = RIM_PREFIX + 'Bolts spacing';
+export const RIM_PCD = RIM_PREFIX + 'PCD';
+export const RIM_DIA = RIM_PREFIX + 'DIA';
+export const RIM_TYPE = RIM_PREFIX + 'Type';
+export const RIM_BEADLOCK = RIM_PREFIX + 'Beadlock';
+export const RIM_COUNTRY_OF_ORIGIN = RIM_PREFIX + 'Country of Origin';
