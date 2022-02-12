@@ -24,7 +24,7 @@ export class OrderHistoryAction extends Action {
     async handle({user}: Request<any, any, Partial<IUser>, any>, res: Response<IOrderResp[]>) {
         try {
             // @ts-ignore
-            const orders = await this._orderUseCases.getUserOrders(JWTPayload.user as IUser);
+            const orders = await this._orderUseCases.getUserOrders(user.user as IUser);
             res.send(orders);
         } catch (e) {
             console.error(e.message);

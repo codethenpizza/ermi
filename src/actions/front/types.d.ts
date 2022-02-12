@@ -14,10 +14,7 @@ export interface EsRespProduct {
         }[]
     },
     aggregations: {
-        attrs: {
-            doc_count: number;
-            [x: string]: EsProdAggAttr | number;
-        }
+        [attr: string]: Elastic.EsProdAggAttr;
     }
 }
 
