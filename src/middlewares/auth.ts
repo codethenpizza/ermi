@@ -11,7 +11,7 @@ export const isAuth: RequestHandler = (req: Request<any, any, any, any>, res: Re
         const token = AuthService.parseAuthHeader(req.headers)
         if (token == null) return res.sendStatus(401);
 
-        jwt.verify(token, config.auth.secretAccessToken, (err, user) => {
+        jwt.verify(token, config.auth.secret, (err, user) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {
                     return res.status(401).send({message: "Unauthorized! Access Token was expired!"});
