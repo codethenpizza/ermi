@@ -6,10 +6,7 @@ export namespace Elastic {
         products: T[],
         total: number,
         aggregations?: {
-            attrs: {
-                doc_count: number;
-                [x: string]: EsProdAggAttr | number;
-            }
+            [attr: string]: EsProdAggAttr;
         }
     }
 

@@ -5,6 +5,8 @@ import Attribute from "@core/models/Attribute.model";
 import {OfferPriorityService} from "@core/services/catalog/OfferPriorityService";
 import {Elastic} from "@core/services/elastic/types";
 import {CatalogEsQueryBuilderService} from "@core/services/elastic/CatalogEsQueryBuilderService/CatalogEsQueryBuilderService";
+import {CatalogSearchResponse} from "@core/useCases/CatalogUseCases/types";
+import {getAttrFilterOptionsMap} from "@core/useCases/CatalogUseCases/helpers";
 
 export class CatalogUseCases {
 
@@ -31,7 +33,7 @@ export class CatalogUseCases {
         }
     }
 
-    async search(params: Elastic.SearchParams, user?: Partial<IUser>) {
+    async search(params: Elastic.SearchParams, user?: Partial<IUser>): Promise<CatalogSearchResponse> {
         const aggAttrs = await Attribute.findAggregatable();
 
         const availableFilters: Elastic.SearchFilter[] = [
@@ -63,10 +65,13 @@ export class CatalogUseCases {
             productOffers = await this.b2bDiscountService.enrichESProductByB2BUserDiscount(user, productOffers) as Elastic.ProductVariantFormatted[];
         }
 
+        const attrFilterOptions = getAttrFilterOptionsMap(aggregations, aggAttrs);
+
         return {
             products: productOffers,
             total,
-            aggregations
+            attrFilterOptionsMap: attrFilterOptions
         };
     }
+
 }
